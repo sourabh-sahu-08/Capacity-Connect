@@ -31,8 +31,10 @@ export const Onboarding = () => {
 
   const handleFinish = () => {
     const userRole = useAuthStore.getState().user?.role;
-    if (userRole === 'MANAGER' || userRole === 'TRAINER' || userRole === 'ADMIN') {
+    if (userRole === 'MANAGER' || userRole === 'ADMIN') {
       navigate('/manager-dashboard');
+    } else if (userRole === 'TRAINER') {
+      navigate('/trainer-dashboard');
     } else {
       navigate('/dashboard');
     }
@@ -190,3 +192,4 @@ export const Onboarding = () => {
     </div>
   );
 };
+

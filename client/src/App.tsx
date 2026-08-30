@@ -13,6 +13,7 @@ import { LearningHub } from './features/learning/LearningHub';
 import { CoursePlayer } from './features/learning/CoursePlayer';
 import { LearnerDashboard } from './features/dashboard/LearnerDashboard';
 import { ManagerDashboard } from './features/dashboard/ManagerDashboard';
+import { TrainerDashboard } from './features/dashboard/TrainerDashboard';
 import { Settings } from './features/settings/Settings';
 import { AppShell } from './components/layout/AppShell';
 import { useAuthStore } from './store/authStore';
@@ -20,8 +21,11 @@ import { useAuthStore } from './store/authStore';
 const IndexRedirect = () => {
   const user = useAuthStore((state) => state.user);
   if (!user) return <Navigate to="/login" />;
-  if (user.role === "MANAGER" || user.role === "TRAINER" || user.role === "ADMIN") {
+  if (user.role === "MANAGER" || user.role === "ADMIN") {
     return <Navigate to="/manager-dashboard" />;
+  }
+  if (user.role === "TRAINER") {
+    return <Navigate to="/trainer-dashboard" />;
   }
   return <Navigate to="/dashboard" />;
 };
@@ -49,6 +53,22 @@ function App() {
             element={
               <PrivateRoute>
                 <LearnerDashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/trainer-dashboard" 
+            element={
+              <PrivateRoute>
+                <TrainerDashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/manager-dashboard" 
+            element={
+              <PrivateRoute>
+                <ManagerDashboard />
               </PrivateRoute>
             } 
           />
@@ -117,14 +137,6 @@ function App() {
             } 
           />
           <Route 
-            path="/manager-dashboard" 
-            element={
-              <PrivateRoute>
-                <ManagerDashboard />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
             path="/settings" 
             element={
               <PrivateRoute>
@@ -140,4 +152,3 @@ function App() {
 }
 
 export default App;
-

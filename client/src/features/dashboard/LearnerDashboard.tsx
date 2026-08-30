@@ -112,7 +112,7 @@ export const LearnerDashboard = () => {
           </div>
           <div className="shrink-0 flex flex-col items-end gap-6">
             <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
-              Est. Effort — 4.5 Hours
+              Est. Effort - 4.5 Hours
             </div>
             <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
               <span className="text-sm font-bold tracking-widest uppercase">Start Path</span>

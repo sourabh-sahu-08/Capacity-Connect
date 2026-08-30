@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Layers, Zap, Hexagon, Trophy, Settings, LogOut, LayoutDashboard, Users, BookOpen, BarChart3 } from 'lucide-react';
+import { Compass, Layers, Zap, Hexagon, Trophy, Settings, LogOut, LayoutDashboard, Users, BookOpen, BarChart3, Presentation } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const TRAINEE_NAV = [
@@ -14,8 +14,16 @@ const TRAINEE_NAV = [
 ];
 
 const TRAINER_NAV = [
+  { name: 'Command Center', icon: Presentation, path: '/trainer-dashboard' },
+  { name: 'My Learners', icon: Users, path: '/trainer-dashboard' },
+  { name: 'Assessments', icon: BookOpen, path: '/trainer-dashboard' },
+  { name: 'Analytics', icon: BarChart3, path: '/trainer-dashboard' },
+  { name: 'System', icon: Settings, path: '/settings' },
+];
+
+const MANAGER_NAV = [
   { name: 'Pulse', icon: LayoutDashboard, path: '/manager-dashboard' },
-  { name: 'Learners', icon: Users, path: '/manager-dashboard' }, // simplified for now
+  { name: 'Workforce', icon: Users, path: '/manager-dashboard' },
   { name: 'Content Studio', icon: BookOpen, path: '/manager-dashboard' },
   { name: 'Analytics', icon: BarChart3, path: '/manager-dashboard' },
   { name: 'System', icon: Settings, path: '/settings' },
@@ -32,8 +40,12 @@ export const Sidebar = () => {
     navigate('/login');
   };
 
-  const isTrainer = user?.role === 'MANAGER' || user?.role === 'TRAINER' || user?.role === 'ADMIN';
-  const NAV_ITEMS = isTrainer ? TRAINER_NAV : TRAINEE_NAV;
+  let NAV_ITEMS = TRAINEE_NAV;
+  if (user?.role === 'TRAINER') {
+    NAV_ITEMS = TRAINER_NAV;
+  } else if (user?.role === 'MANAGER' || user?.role === 'ADMIN') {
+    NAV_ITEMS = MANAGER_NAV;
+  }
   
   return (
     <div className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 bg-white border-r border-slate-200 z-50 shadow-sm">

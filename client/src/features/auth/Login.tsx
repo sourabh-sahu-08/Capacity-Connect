@@ -15,8 +15,10 @@ export const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.data, response.data.token);
-      if (response.data.role === 'MANAGER' || response.data.role === 'TRAINER' || response.data.role === 'ADMIN') {
+      if (response.data.role === 'MANAGER' || response.data.role === 'ADMIN') {
         navigate('/manager-dashboard');
+      } else if (response.data.role === 'TRAINER') {
+        navigate('/trainer-dashboard');
       } else {
         navigate('/dashboard');
       }
