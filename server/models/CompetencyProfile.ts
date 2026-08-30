@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import './Skill';
 
 const competencyProfileSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },

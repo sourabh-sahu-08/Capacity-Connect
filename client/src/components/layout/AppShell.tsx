@@ -3,9 +3,7 @@ import { Sidebar } from './Sidebar';
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white selection:bg-indigo-500/30 font-sans">
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#1a1b26_0%,transparent_40%)] pointer-events-none opacity-50"></div>
-      
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/30 font-sans">
       <Sidebar />
       
       <main className="flex-1 w-full pl-28 pr-8 py-10 min-w-0 overflow-auto relative z-10">
@@ -16,8 +14,8 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 
       {/* Floating AI Command placeholder */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-        <button className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 hover:border-indigo-500/50 hover:bg-zinc-800 transition-all px-6 py-3 rounded-full flex items-center gap-3 text-sm font-medium text-zinc-300 shadow-2xl">
-          <span className="text-indigo-400">✦</span> Ask Capacity AI anything...
+        <button className="bg-white/80  border border-slate-200 hover:border-indigo-500/50 hover:bg-slate-100 transition-all px-6 py-3 rounded-full flex items-center gap-3 text-sm font-medium text-slate-700 shadow-md hover:shadow-lg transition-shadow">
+          <span className="text-indigo-600">✦</span> Ask Capacity AI anything...
         </button>
       </div>
     </div>

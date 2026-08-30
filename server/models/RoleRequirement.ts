@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import './Skill';
 
 const roleRequirementSchema = new Schema({
   roleName: { type: String, required: true, unique: true },

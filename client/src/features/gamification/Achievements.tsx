@@ -12,24 +12,24 @@ const ACHIEVEMENTS = [
 
 export const Achievements = () => {
   return (
-    <div className="p-8 space-y-8 text-white max-w-5xl mx-auto">
+    <div className="p-8 space-y-8 text-slate-900 max-w-5xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold">Achievements</h1>
-        <p className="text-zinc-400 mt-2">Track your progress and unlock rewards.</p>
+        <p className="text-slate-600 mt-2">Track your progress and unlock rewards.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl text-center">
-          <div className="text-sm font-medium text-zinc-400 uppercase tracking-widest mb-2">Total XP</div>
-          <div className="text-5xl font-extrabold text-indigo-400">2,450</div>
+        <div className="bg-white border border-slate-200 p-6 rounded-xl text-center">
+          <div className="text-sm font-medium text-slate-600 uppercase tracking-widest mb-2">Total XP</div>
+          <div className="text-5xl font-extrabold text-indigo-600">2,450</div>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl text-center">
-          <div className="text-sm font-medium text-zinc-400 uppercase tracking-widest mb-2">Current Level</div>
-          <div className="text-5xl font-extrabold text-emerald-400">12</div>
+        <div className="bg-white border border-slate-200 p-6 rounded-xl text-center">
+          <div className="text-sm font-medium text-slate-600 uppercase tracking-widest mb-2">Current Level</div>
+          <div className="text-5xl font-extrabold text-emerald-600">12</div>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl text-center">
-          <div className="text-sm font-medium text-zinc-400 uppercase tracking-widest mb-2">Learning Streak</div>
-          <div className="text-5xl font-extrabold text-amber-500 flex justify-center items-center gap-2"><Flame size={40} /> 12</div>
+        <div className="bg-white border border-slate-200 p-6 rounded-xl text-center">
+          <div className="text-sm font-medium text-slate-600 uppercase tracking-widest mb-2">Learning Streak</div>
+          <div className="text-5xl font-extrabold text-amber-600 flex justify-center items-center gap-2"><Flame size={40} /> 12</div>
         </div>
       </div>
 
@@ -42,26 +42,26 @@ export const Achievements = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.1 }}
-              className={`p-6 rounded-xl border ${ach.unlocked ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-950 border-zinc-800/50 opacity-60'}`}
+              className={`p-6 rounded-xl border ${ach.unlocked ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200/50 opacity-60'}`}
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${ach.unlocked ? 'bg-indigo-500/20 text-indigo-400' : 'bg-zinc-800 text-zinc-500'}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${ach.unlocked ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
                   <ach.icon size={24} />
                 </div>
                 <div>
                   <h3 className="font-bold">{ach.title}</h3>
-                  {ach.unlocked && <div className="text-xs text-zinc-500">{ach.date}</div>}
+                  {ach.unlocked && <div className="text-xs text-slate-500">{ach.date}</div>}
                 </div>
               </div>
-              <p className="text-sm text-zinc-400 mb-4">{ach.desc}</p>
+              <p className="text-sm text-slate-600 mb-4">{ach.desc}</p>
               
               {!ach.unlocked && (
                 <div>
-                  <div className="flex justify-between text-xs text-zinc-500 mb-1">
+                  <div className="flex justify-between text-xs text-slate-500 mb-1">
                     <span>Progress</span>
                     <span>{ach.progress}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-zinc-600 rounded-full" style={{ width: `${ach.progress}%` }}></div>
                   </div>
                 </div>

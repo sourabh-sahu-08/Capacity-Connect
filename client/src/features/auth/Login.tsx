@@ -26,15 +26,15 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-zinc-950 text-white">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-zinc-900 p-10 shadow-2xl border border-zinc-800">
+    <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-900">
+      <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-10 shadow-md hover:shadow-lg transition-shadow border border-slate-200">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
             Sign in to your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+          {error && <div className="text-red-600 text-sm text-center">{error}</div>}
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
               <label htmlFor="email-address" className="sr-only">Email address</label>
@@ -43,7 +43,7 @@ export const Login = () => {
                 name="email"
                 type="email"
                 required
-                className="relative block w-full appearance-none rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -56,7 +56,7 @@ export const Login = () => {
                 name="password"
                 type="password"
                 required
-                className="relative block w-full appearance-none rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -72,8 +72,8 @@ export const Login = () => {
               Sign in
             </button>
           </div>
-          <div className="text-center text-sm text-zinc-400 mt-4">
-            Don't have an account? <a href="/register" className="text-indigo-400 hover:text-indigo-300">Sign up</a>
+          <div className="text-center text-sm text-slate-600 mt-4">
+            Don't have an account? <a href="/register" className="text-indigo-600 hover:text-indigo-700">Sign up</a>
           </div>
         </form>
       </div>
