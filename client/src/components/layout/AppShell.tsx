@@ -14,7 +14,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 
       {/* Floating AI Command placeholder */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-        <button className="bg-white/80  border border-slate-200 hover:border-indigo-500/50 hover:bg-slate-100 transition-all px-6 py-3 rounded-full flex items-center gap-3 text-sm font-medium text-slate-700 shadow-md hover:shadow-lg transition-shadow">
+        <button className="bg-white/80 border border-slate-200 hover:border-indigo-500/50 hover:bg-slate-100 transition-all px-6 py-3 rounded-full flex items-center gap-3 text-sm font-medium text-slate-700 shadow-md hover:shadow-lg transition-shadow">
           <span className="text-indigo-600">✦</span> Ask Capacity AI anything...
         </button>
       </div>

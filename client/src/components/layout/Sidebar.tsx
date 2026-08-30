@@ -41,14 +41,14 @@ export const Sidebar = () => {
         C<span className="text-indigo-200">C</span>
       </div>
 
-      <div className="flex flex-col gap-4 w-full px-3">
+      <div className="flex flex-col items-center gap-4 w-full px-3">
         {NAV_ITEMS.map((item, index) => (
           <NavLink 
             key={item.name + index} 
             to={item.path}
             onMouseEnter={() => setHoveredItem(item.name)}
             onMouseLeave={() => setHoveredItem(null)}
-            className={({ isActive }) => `relative flex items-center justify-center w-full h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
           >
             {({ isActive }) => (
               <>
@@ -77,7 +77,7 @@ export const Sidebar = () => {
           onClick={handleLogout}
           onMouseEnter={() => setHoveredItem('Logout')}
           onMouseLeave={() => setHoveredItem(null)}
-          className="relative flex items-center justify-center w-full h-12 rounded-xl transition-all duration-300 text-slate-500 hover:text-rose-600 hover:bg-rose-50"
+          className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-300 text-slate-500 hover:text-rose-600 hover:bg-rose-50"
         >
           <LogOut className="w-5 h-5 shrink-0 z-10" />
           <AnimatePresence>
