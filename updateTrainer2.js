@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+﻿const fs = require('fs');
+const content = `import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, BookOpen, CheckCircle, AlertTriangle, Clock, 
@@ -82,7 +83,7 @@ export const TrainerDashboard = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Trainer Operations Center</h1>
-          <p className="text-sm text-slate-500">Welcome back. Here\'s what requires your attention today.</p>
+          <p className="text-sm text-slate-500">Welcome back. Here\\'s what requires your attention today.</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
@@ -103,14 +104,14 @@ export const TrainerDashboard = () => {
         {[
           { label: 'Active Learners', value: mockData.kpis.activeLearners },
           { label: 'Active Courses', value: mockData.kpis.activeCourses },
-          { label: 'Completion Rate', value: `${mockData.kpis.completionRate}%` },
-          { label: 'Avg Assessment', value: `${mockData.kpis.avgAssessment}%` },
+          { label: 'Completion Rate', value: \`\${mockData.kpis.completionRate}%\` },
+          { label: 'Avg Assessment', value: \`\${mockData.kpis.avgAssessment}%\` },
           { label: 'Need Attention', value: mockData.kpis.needAttention, highlight: true },
           { label: 'Pending Reviews', value: mockData.kpis.pendingReviews, highlight: true }
         ].map((kpi, idx) => (
-          <div key={idx} className={`bg-white border ${kpi.highlight ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm`}>
+          <div key={idx} className={\`bg-white border \${kpi.highlight ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm\`}>
             <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1">{kpi.label}</span>
-            <span className={`text-xl font-medium ${kpi.highlight ? 'text-amber-600' : 'text-slate-900'}`}>{kpi.value}</span>
+            <span className={\`text-xl font-medium \${kpi.highlight ? 'text-amber-600' : 'text-slate-900'}\`}>{kpi.value}</span>
           </div>
         ))}
       </section>
@@ -119,7 +120,7 @@ export const TrainerDashboard = () => {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase flex items-center gap-2">
-            <AlertTriangle size={16} className="text-red-500" /> Today\'s Priorities
+            <AlertTriangle size={16} className="text-red-500" /> Today\\'s Priorities
           </h2>
           <button className="text-xs font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All</button>
         </div>
@@ -214,7 +215,7 @@ export const TrainerDashboard = () => {
               <button 
                 key={tab} 
                 onClick={() => setActiveSnapshotTab(tab)}
-                className={`px-4 py-1.5 rounded-md text-[10px] font-bold tracking-widest uppercase transition-colors ${activeSnapshotTab === tab ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                className={\`px-4 py-1.5 rounded-md text-[10px] font-bold tracking-widest uppercase transition-colors \${activeSnapshotTab === tab ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}\`}
               >
                 {tab}
               </button>
@@ -279,7 +280,7 @@ export const TrainerDashboard = () => {
             <button 
               key={tab} 
               onClick={() => setActiveSecondaryTab(tab)}
-              className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${activeSecondaryTab === tab ? 'bg-indigo-50 border border-indigo-200 text-indigo-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+              className={\`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all \${activeSecondaryTab === tab ? 'bg-indigo-50 border border-indigo-200 text-indigo-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}\`}
             >
               {tab}
             </button>
@@ -322,7 +323,7 @@ export const TrainerDashboard = () => {
                 <div className="space-y-3">
                   {mockData.notifications.map(n => (
                     <div key={n.id} className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`}></div>
+                      <div className={\`w-2 h-2 rounded-full \${n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}\`}></div>
                       <p className="text-sm text-slate-600">{n.text}</p>
                     </div>
                   ))}
@@ -347,3 +348,5 @@ export const TrainerDashboard = () => {
     </div>
   );
 };
+`;
+fs.writeFileSync('client/src/features/dashboard/TrainerDashboard.tsx', content, 'utf8');
