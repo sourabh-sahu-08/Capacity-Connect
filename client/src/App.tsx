@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './features/auth/Login';
 import { Register } from './features/auth/Register';
@@ -12,10 +13,20 @@ import { LearningHub } from './features/learning/LearningHub';
 import { CoursePlayer } from './features/learning/CoursePlayer';
 import { LearnerDashboard } from './features/dashboard/LearnerDashboard';
 import { ManagerDashboard } from './features/dashboard/ManagerDashboard';
+import { Settings } from './features/settings/Settings';
 import { AppShell } from './components/layout/AppShell';
 import { useAuthStore } from './store/authStore';
 
-const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+const IndexRedirect = () => {
+  const user = useAuthStore((state) => state.user);
+  if (!user) return <Navigate to="/login" />;
+  if (user.role === "MANAGER" || user.role === "TRAINER" || user.role === "ADMIN") {
+    return <Navigate to="/manager-dashboard" />;
+  }
+  return <Navigate to="/dashboard" />;
+};
+
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   return isAuthenticated ? <AppShell>{children}</AppShell> : <Navigate to="/login" />;
 };
@@ -113,7 +124,15 @@ function App() {
               </PrivateRoute>
             } 
           />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route 
+            path="/settings" 
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
+            } 
+          />
+          <Route path="/" element={<IndexRedirect />} />
         </Routes>
       </div>
     </Router>
@@ -121,3 +140,4 @@ function App() {
 }
 
 export default App;
+

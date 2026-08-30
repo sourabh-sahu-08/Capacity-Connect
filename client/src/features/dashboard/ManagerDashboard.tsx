@@ -1,134 +1,202 @@
-import React from 'react';
-import { Users, BookOpen, TrendingUp, AlertTriangle } from 'lucide-react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-
-const KPICard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden group">
-    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-    <div className="flex justify-between items-start mb-4">
-      <div className="p-3 bg-zinc-950 rounded-lg text-indigo-400 border border-zinc-800">
-        <Icon size={24} />
-      </div>
-      {trend && <div className="text-emerald-400 text-sm font-medium bg-emerald-400/10 px-2 py-1 rounded">{trend}</div>}
-    </div>
-    <h3 className="text-zinc-400 text-sm font-medium">{title}</h3>
-    <div className="text-3xl font-bold text-white mt-1">{value}</div>
-    {subtitle && <div className="text-zinc-500 text-xs mt-2">{subtitle}</div>}
-  </div>
-);
-
-const HEATMAP_DATA = [
-  { dept: 'Engineering', React: 85, Node: 70, Cloud: 45, Cyber: 60 },
-  { dept: 'Marketing', React: 20, Node: 10, Cloud: 30, Cyber: 40 },
-  { dept: 'HR', React: 10, Node: 10, Cloud: 20, Cyber: 75 },
-  { dept: 'Operations', React: 40, Node: 50, Cloud: 65, Cyber: 80 },
-];
-
-const getColor = (val: number) => {
-  if (val >= 80) return '#4f46e5'; // indigo-600
-  if (val >= 60) return '#6366f1'; // indigo-500
-  if (val >= 40) return '#818cf8'; // indigo-400
-  if (val >= 20) return '#a5b4fc'; // indigo-300
-  return '#e0e7ff'; // indigo-100
-};
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
+import { AlertCircle, ArrowRight, Brain, PlayCircle, Plus, Users, BookOpen, Activity, AlertTriangle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { getManagerOverview, getAttentionQueue } from '../../api/intelligenceApi';
 
 export const ManagerDashboard = () => {
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
+  const navigate = useNavigate();
+
+  const [overview, setOverview] = useState<any>(null);
+  const [queue, setQueue] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (token) {
+      getManagerOverview(token).then(setOverview).catch(console.error);
+      getAttentionQueue(token).then(setQueue).catch(console.error);
+    }
+  }, [token]);
+
+  const totalActive = overview ? overview.totalActiveLearners : 124;
+  const velocity = overview ? overview.learningVelocity : '+18%';
+  const avgCompletion = overview ? `${Math.round(overview.averageCompetency)}%` : '82%';
+
   return (
-    <div className="space-y-8 max-w-7xl mx-auto text-white">
-      <div>
-        <h1 className="text-3xl font-bold">Manager Dashboard</h1>
-        <p className="text-zinc-400 mt-2">Organizational capability and workforce readiness intelligence.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard title="Total Members" value="1,240" icon={Users} trend="+12" />
-        <KPICard title="Active Learners" value="945" icon={BookOpen} subtitle="In last 30 days" />
-        <KPICard title="Training Completion" value="78%" icon={TrendingUp} trend="+4%" />
-        <KPICard title="Average Competency" value="72 / 100" icon={TrendingUp} trend="+2.5" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-          <h2 className="text-xl font-bold mb-6">Organizational Skill Heatmap</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr>
-                  <th className="p-3 text-zinc-400 font-medium">Department</th>
-                  <th className="p-3 text-zinc-400 font-medium text-center">React.js</th>
-                  <th className="p-3 text-zinc-400 font-medium text-center">Node.js</th>
-                  <th className="p-3 text-zinc-400 font-medium text-center">Cloud Infra</th>
-                  <th className="p-3 text-zinc-400 font-medium text-center">Cybersecurity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {HEATMAP_DATA.map(row => (
-                  <tr key={row.dept} className="border-t border-zinc-800/50">
-                    <td className="p-3 font-medium">{row.dept}</td>
-                    {['React', 'Node', 'Cloud', 'Cyber'].map(skill => (
-                      <td key={skill} className="p-3 text-center">
-                        <div 
-                          className="w-full h-8 rounded flex items-center justify-center text-xs font-bold text-white shadow-sm"
-                          style={{ backgroundColor: getColor(row[skill as keyof typeof row] as number) }}
-                        >
-                          {(row[skill as keyof typeof row] as number) >= 40 ? row[skill as keyof typeof row] : ''}
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="flex justify-end items-center gap-2 mt-4 text-xs text-zinc-500">
-              <span>Low</span>
-              <div className="flex">
-                {[20, 40, 60, 80].map(v => (
-                  <div key={v} className="w-6 h-4" style={{ backgroundColor: getColor(v) }}></div>
-                ))}
+    <div className="space-y-12 pb-32 pt-10 font-sans selection:bg-indigo-500/30">
+      
+      {/* LEARNING PULSE (HERO) */}
+      <section className="flex flex-col md:flex-row items-end justify-between gap-10 border-b border-white/5 pb-10">
+        <div className="space-y-6">
+          <h2 className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase">
+            Learning Command Center
+          </h2>
+          <div className="flex items-baseline gap-6">
+            <h1 className="text-6xl md:text-8xl font-light tracking-tighter text-white">
+              {totalActive}
+            </h1>
+            <div>
+              <div className="text-sm font-bold tracking-[0.2em] text-indigo-400 uppercase">
+                Active Learners
               </div>
-              <span>High</span>
+              <div className="text-xs tracking-widest text-emerald-400/80 mt-1 font-medium">
+                {velocity} THIS MONTH
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="text-amber-500" />
-              <h2 className="text-lg font-bold text-amber-500">Skill Gap Insights</h2>
-            </div>
-            <p className="text-zinc-300 text-sm leading-relaxed mb-4">
-              <strong className="text-white">Engineering Department</strong> shows a significant cloud infrastructure skill gap compared to target role requirements.
-            </p>
-            <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 text-sm">
-              <div className="font-medium text-zinc-400 mb-2">Recommended Action</div>
-              <div className="text-white">Assign <span className="text-indigo-400 font-medium cursor-pointer">Cloud Fundamentals Learning Path</span> to 45 at-risk learners.</div>
-              <button className="mt-3 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded transition-colors font-medium text-white">Assign Training</button>
-            </div>
+        <div className="flex gap-4">
+          <button onClick={() => navigate('/learning-hub')} className="flex items-center justify-center w-12 h-12 rounded-full bg-white text-black hover:bg-zinc-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+            <Plus size={24} />
+          </button>
+          <div className="text-right">
+            <div className="text-3xl font-light text-white">{avgCompletion}</div>
+            <div className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase mt-1">Avg Competency</div>
           </div>
+        </div>
+      </section>
+
+      {/* DASHBOARD GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* LEFT COLUMN (ATTENTION & QUICK ACTIONS) */}
+        <div className="lg:col-span-5 space-y-8">
           
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-            <h2 className="font-bold mb-4">Team Performance</h2>
+          {/* LEARNER ATTENTION QUEUE */}
+          <section className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xs font-bold tracking-[0.2em] text-zinc-400 uppercase flex items-center gap-2">
+                <AlertCircle size={14} className="text-rose-400" /> Needs Attention
+              </h3>
+              <span className="text-xs font-bold text-zinc-500">{queue.length > 0 ? queue.length : 2} Actions</span>
+            </div>
+
             <div className="space-y-4">
-              {[
-                { name: 'Frontend Team', comp: 82, tr: 95 },
-                { name: 'Backend Team', comp: 76, tr: 88 },
-                { name: 'DevOps Team', comp: 65, tr: 70 },
-              ].map(team => (
-                <div key={team.name}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>{team.name}</span>
-                    <span className="text-zinc-400">Avg {team.comp}%</span>
+              {queue.length > 0 ? (
+                queue.map((item, idx) => (
+                  <div key={idx} onClick={() => navigate('/skill-gap')} className="group bg-black/40 border border-rose-500/20 rounded-xl p-4 hover:border-rose-500/50 transition-colors cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="font-medium text-white group-hover:text-rose-300 transition-colors">{item.learner}</div>
+                      <span className="text-[10px] uppercase tracking-wider text-rose-400 font-bold bg-rose-500/10 px-2 py-1 rounded">
+                        Risk: {item.riskScore}
+                      </span>
+                    </div>
+                    <div className="text-xs text-zinc-500 mt-3 flex items-center justify-between">
+                      <span>{item.reason}</span>
+                      <ArrowRight size={14} className="text-zinc-600 group-hover:text-rose-400 transition-colors" />
+                    </div>
                   </div>
-                  <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-500" style={{ width: `${team.comp}%` }}></div>
+                ))
+              ) : (
+                <div onClick={() => navigate('/skill-gap')} className="group bg-black/40 border border-rose-500/20 rounded-xl p-4 hover:border-rose-500/50 transition-colors cursor-pointer">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-medium text-white group-hover:text-rose-300 transition-colors">Rahul Sharma</div>
+                    <span className="text-[10px] uppercase tracking-wider text-rose-400 font-bold bg-rose-500/10 px-2 py-1 rounded">Stalled</span>
+                  </div>
+                  <div className="text-sm text-zinc-400">Backend Architecture</div>
+                  <div className="text-xs text-zinc-500 mt-3 flex items-center justify-between">
+                    <span>Progress stalled for 7 days</span>
+                    <ArrowRight size={14} className="text-zinc-600 group-hover:text-rose-400 transition-colors" />
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-          </div>
+          </section>
+
+          {/* QUICK ACTIONS */}
+          <section className="grid grid-cols-2 gap-4">
+            <button onClick={() => navigate('/learning-hub')} className="bg-indigo-600/10 border border-indigo-500/30 hover:bg-indigo-600/20 hover:border-indigo-500/60 rounded-xl p-4 flex flex-col items-center justify-center gap-3 transition-all text-indigo-400">
+              <BookOpen size={24} />
+              <span className="text-xs font-bold tracking-widest uppercase">Course Library</span>
+            </button>
+            <button onClick={() => navigate('/skill-gap')} className="bg-zinc-900/50 border border-white/10 hover:bg-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center gap-3 transition-all text-zinc-400">
+              <Users size={24} />
+              <span className="text-xs font-bold tracking-widest uppercase">Manage Learners</span>
+            </button>
+          </section>
+
+        </div>
+
+        {/* RIGHT COLUMN (COURSE & AI INSIGHTS) */}
+        <div className="lg:col-span-7 space-y-8">
+          
+          {/* COURSE PERFORMANCE */}
+          <section className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+            <h3 className="text-xs font-bold tracking-[0.2em] text-zinc-400 uppercase mb-6 flex items-center gap-2">
+              <Activity size={14} className="text-emerald-400" /> Course Performance
+            </h3>
+
+            <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+              <div className="flex-1 space-y-1">
+                <h4 className="text-xl font-light text-white">Advanced Node.js</h4>
+                <p className="text-sm text-zinc-500">124 Learners · High Engagement</p>
+              </div>
+
+              <div className="flex gap-8">
+                <div>
+                  <div className="text-2xl font-light text-white">82%</div>
+                  <div className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase mt-1">Completion</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-light text-white">74%</div>
+                  <div className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase mt-1">Avg Score</div>
+                </div>
+              </div>
+            </div>
+
+            <div onClick={() => navigate('/skill-gap')} className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center cursor-pointer group">
+              <span className="text-sm font-bold tracking-widest text-indigo-400 uppercase group-hover:text-indigo-300 transition-colors">View Deep Analytics</span>
+              <ArrowRight size={16} className="text-indigo-400 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </section>
+
+          {/* AI CONTENT INSIGHT */}
+          <section className="bg-linear-to-br from-indigo-900/20 to-zinc-900/50 border border-indigo-500/20 rounded-2xl p-8 relative overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+            
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <Brain size={16} className="text-indigo-400" />
+              <h3 className="text-xs font-bold tracking-[0.2em] text-indigo-400 uppercase">Training Intelligence</h3>
+            </div>
+
+            <div className="space-y-6 relative z-10">
+              <div className="flex items-start gap-4">
+                <div className="mt-1 p-2 bg-amber-500/10 rounded-lg shrink-0">
+                  <AlertTriangle size={16} className="text-amber-500" />
+                </div>
+                <div>
+                  <h4 className="text-white font-medium mb-1">High Drop-Off Detected</h4>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    <strong className="text-zinc-200">38%</strong> of learners stopped during the <strong className="text-zinc-200">Database Normalization</strong> lesson. 
+                    Learners are consistently struggling with the practical implementation.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-black/30 border border-white/5 rounded-xl p-5">
+                <div className="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3">Recommended Action</div>
+                <div className="text-sm text-zinc-300">
+                  Consider adding an interactive exercise before the assessment to bridge the conceptual gap.
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button onClick={() => navigate('/assessments')} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold tracking-wider uppercase px-6 py-3 rounded-lg transition-colors cursor-pointer relative z-20">
+                  Generate Quiz
+                </button>
+                <button onClick={() => navigate('/skill-gap')} className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold tracking-wider uppercase px-6 py-3 rounded-lg transition-colors border border-white/5 cursor-pointer relative z-20">
+                  View Affected
+                </button>
+              </div>
+            </div>
+          </section>
+
         </div>
       </div>
+
     </div>
   );
 };

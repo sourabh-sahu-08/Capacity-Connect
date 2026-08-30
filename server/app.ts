@@ -19,6 +19,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/v1/competency', require('./routes/competency').default);
+app.use('/api/v1/manager', require('./routes/manager').default);
 
 app.get('/api/health', (req, res) => {
   res.json({

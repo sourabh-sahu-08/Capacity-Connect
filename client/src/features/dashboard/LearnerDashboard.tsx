@@ -1,96 +1,197 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { Flame, BookOpen, Clock, TrendingUp, PlayCircle } from 'lucide-react';
+import { ArrowRight, ChevronRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const KPICard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
-  <motion.div whileHover={{ scale: 1.02 }} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden group">
-    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-    <div className="flex justify-between items-start mb-4">
-      <div className="p-3 bg-zinc-950 rounded-lg text-indigo-400 border border-zinc-800 group-hover:border-indigo-500/50 transition-colors">
-        <Icon size={24} />
-      </div>
-      {trend && <div className="text-emerald-400 text-sm font-medium bg-emerald-400/10 px-2 py-1 rounded">{trend}</div>}
-    </div>
-    <h3 className="text-zinc-400 text-sm font-medium">{title}</h3>
-    <div className="text-3xl font-bold text-white mt-1">{value}</div>
-    {subtitle && <div className="text-zinc-500 text-xs mt-2">{subtitle}</div>}
-  </motion.div>
-);
+import { getCompetencyProfile, getSkillGaps } from '../../api/intelligenceApi';
 
 export const LearnerDashboard = () => {
   const user = useAuthStore(state => state.user);
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+  const token = useAuthStore(state => state.token);
+  const navigate = useNavigate();
+  const firstName = user?.name?.split(' ')[0] || 'SOURABH';
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
+  const [profile, setProfile] = useState<any>(null);
+  const [gaps, setGaps] = useState<any>(null);
+
+  useEffect(() => {
+    if (token) {
+      getCompetencyProfile(token).then(setProfile).catch(console.error);
+      getSkillGaps(token, 'dummy_role_id').then(setGaps).catch(console.error);
+    }
+  }, [token]);
+
+  const capabilityNodes = [
+    { id: '1', x: '50%', y: '10%', label: 'Architecture' },
+    { id: '2', x: '80%', y: '50%', label: 'Systems' },
+    { id: '3', x: '50%', y: '90%', label: 'Logic' },
+    { id: '4', x: '20%', y: '50%', label: 'UI/UX' },
+  ];
+
+  const overallScore = profile ? Math.round(profile.overallScore) : 78;
+  const growth = profile?.growth?.monthly ? `+${Math.round(profile.growth.monthly)}%` : '+6.4%';
+  const actionTitle = gaps?.nextBestAction?.title || 'Strengthen Backend Architecture.';
+  const actionImpact = gaps?.nextBestAction?.estimatedImpact || 14;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold">{greeting}, {user?.name?.split(' ')[0] || 'Learner'} 👋</h1>
-        <p className="text-zinc-400 mt-2">Continue building your capabilities and achieve your learning goals.</p>
-      </div>
+    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-indigo-500/30">
+      
+      {/* HERO / CAPABILITY CORE */}
+      <section className="relative flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+           <div className="w-[800px] h-[800px] border border-white/5 rounded-full" />
+           <div className="w-[600px] h-[600px] border border-white/5 rounded-full absolute" />
+           <div className="w-[400px] h-[400px] border border-white/5 rounded-full absolute" />
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard title="Learning Streak" value="12 Days" icon={Flame} trend="+2 days" />
-        <KPICard title="Courses Completed" value="08" icon={BookOpen} subtitle="Out of 12 Enrolled" />
-        <KPICard title="Learning Hours" value="46.5h" icon={Clock} subtitle="This Month" />
-        <KPICard title="Competency Growth" value="78 / 100" icon={TrendingUp} trend="+23%" />
-      </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 mb-20 z-10"
+        >
+          <h2 className="text-xs font-medium tracking-[0.2em] text-zinc-500 uppercase">
+            Good Evening, {firstName}
+          </h2>
+          <h1 className="text-sm font-medium tracking-[0.3em] text-zinc-300 uppercase">
+            Your capability system is evolving
+          </h1>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-xl font-bold">Continue Learning</h2>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-indigo-500/50 transition-colors cursor-pointer group">
-            <div className="p-6 flex flex-col sm:flex-row gap-6">
-              <div className="w-full sm:w-48 h-32 bg-zinc-800 rounded-lg flex-shrink-0 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=600&auto=format&fit=crop")' }}></div>
-              <div className="flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold group-hover:text-indigo-400 transition-colors">Advanced React Development</h3>
-                  <p className="text-sm text-zinc-400 mt-1">Instructor: Sarah Drasner</p>
-                </div>
-                <div className="mt-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-zinc-300">12 / 18 Lessons Completed</span>
-                    <span className="font-bold">72%</span>
-                  </div>
-                  <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded-full" style={{ width: '72%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-zinc-950 px-6 py-4 border-t border-zinc-800 flex justify-between items-center group-hover:bg-indigo-900/10 transition-colors">
-              <span className="text-sm text-zinc-400">Next: Custom Hooks & Performance</span>
-              <button className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 font-medium">
-                <PlayCircle size={18} /> Continue Learning
-              </button>
-            </div>
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-white to-zinc-600">
+            {overallScore}
+          </div>
+          <div className="text-sm font-bold tracking-[0.2em] text-indigo-400 mt-4 uppercase">
+            Capability Core
+          </div>
+          <div className="text-xs tracking-widest text-emerald-400/80 mt-2 font-medium">
+            {growth} THIS MONTH
           </div>
         </div>
 
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold">🧠 AI Learning Insight</h2>
-          <div className="bg-gradient-to-b from-indigo-900/20 to-zinc-900 border border-indigo-500/30 rounded-xl p-6 relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl"></div>
-            <p className="text-indigo-100/90 text-sm leading-relaxed mb-6">
-              Based on your recent assessments, improving your <strong>Node.js and Database Design</strong> skills will significantly increase your Backend Development competency score.
-            </p>
-            <div className="space-y-3 mb-6 relative z-10">
-              <div className="flex items-center gap-3 text-sm font-medium text-zinc-300 bg-zinc-950/50 p-3 rounded-lg border border-zinc-800">
-                <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">1</div>
-                Node.js Fundamentals
-              </div>
-              <div className="flex items-center gap-3 text-sm font-medium text-zinc-300 bg-zinc-950/50 p-3 rounded-lg border border-zinc-800">
-                <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">2</div>
-                REST API Architecture
+        {/* Constellation Nodes */}
+        <div className="absolute inset-0 pointer-events-none">
+          {capabilityNodes.map(node => (
+            <div 
+              key={node.id} 
+              className="absolute pointer-events-auto flex flex-col items-center gap-2 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 hover:scale-110 cursor-crosshair"
+              style={{ left: node.x, top: node.y }}
+              onMouseEnter={() => setHoveredNode(node.id)}
+              onMouseLeave={() => setHoveredNode(null)}
+            >
+              <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-white/20'}`} />
+              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors ${hoveredNode === node.id ? 'text-indigo-300' : 'text-zinc-600'}`}>
+                {node.label}
               </div>
             </div>
-            <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-bold transition-colors shadow-lg">
-              View Personalized Roadmap →
+          ))}
+          {/* Subtle connecting lines */}
+          <svg className="absolute inset-0 w-full h-full opacity-20" style={{ zIndex: -1 }}>
+            <line x1="20%" y1="50%" x2="50%" y2="50%" stroke="white" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="80%" y1="50%" x2="50%" y2="50%" stroke="white" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="10%" x2="50%" y2="50%" stroke="white" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="90%" x2="50%" y2="50%" stroke="white" strokeWidth="1" strokeDasharray="4 4" />
+          </svg>
+        </div>
+      </section>
+
+      {/* NEXT BEST ACTION */}
+      <section className="border-t border-white/5 pt-20">
+        <div className="flex flex-col md:flex-row items-end justify-between gap-10">
+          <div className="space-y-8 flex-1">
+            <h3 className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase flex items-center gap-2">
+              <Sparkles size={14} className="text-indigo-400" /> Next Best Action
+            </h3>
+            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-white leading-tight">
+              {actionTitle}
+            </h2>
+            <p className="text-zinc-400 max-w-md text-lg leading-relaxed">
+              Improving this competency could increase your target role readiness by <strong className="text-white font-medium">{actionImpact}%</strong>.
+            </p>
+          </div>
+          <div className="shrink-0 flex flex-col items-end gap-6">
+            <div className="text-sm font-medium tracking-widest text-zinc-500 uppercase">
+              Est. Effort � 4.5 Hours
+            </div>
+            <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-white hover:bg-zinc-200 text-black px-8 py-4 rounded-full transition-all">
+              <span className="text-sm font-bold tracking-widest uppercase">Start Path</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* HORIZONTAL TIMELINE */}
+      <section className="border-t border-white/5 pt-20">
+        <h3 className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase mb-16">
+          Career Evolution
+        </h3>
+        
+        <div className="relative">
+          <div className="absolute top-4 left-0 right-0 h-px bg-white/10"></div>
+          
+          <div className="grid grid-cols-3 gap-8 relative z-10">
+            {/* PAST */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/20 flex items-center justify-center mx-auto md:mx-0">
+                <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-zinc-600 uppercase mb-2">Past</div>
+                <h4 className="text-lg font-medium text-zinc-400">JavaScript Foundation</h4>
+                <div className="text-xs tracking-widest text-emerald-500/70 mt-2 uppercase">Completed</div>
+              </div>
+            </div>
+
+            {/* NOW */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-indigo-400 uppercase mb-2">Now</div>
+                <h4 className="text-lg font-medium text-white">Backend Architecture</h4>
+                <div className="text-xs tracking-widest text-zinc-400 mt-2 uppercase">In Progress</div>
+              </div>
+            </div>
+
+            {/* FUTURE */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-black border border-white/10 flex items-center justify-center mx-auto md:mx-0">
+                <div className="w-2 h-2 rounded-full border border-zinc-700"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-zinc-600 uppercase mb-2">Future</div>
+                <h4 className="text-lg font-medium text-zinc-500">Full Stack Engineer</h4>
+                <div className="text-xs tracking-widest text-zinc-600 mt-2 uppercase">Target</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INSIGHTS AS STORIES */}
+      <section className="border-t border-white/5 pt-20">
+        <h3 className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase mb-12">
+          Growth Story
+        </h3>
+        
+        <div className="group cursor-pointer">
+          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-white mb-8 group-hover:text-indigo-100 transition-colors">
+            +16%
+          </div>
+          <div className="max-w-2xl space-y-6">
+            <h4 className="text-xl md:text-2xl font-light text-zinc-300 leading-relaxed">
+              Competency growth over the last 90 days. Your strongest acceleration happened after completing <strong className="text-white font-medium">Advanced React Architecture</strong>.
+            </h4>
+            <div onClick={() => navigate('/competency-profile')} className="flex items-center gap-2 text-sm font-bold tracking-widest text-indigo-400 uppercase group-hover:text-indigo-300 transition-colors">
+              Explore Growth <ChevronRight size={16} />
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 };

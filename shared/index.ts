@@ -155,3 +155,97 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+
+export interface Skill {
+  _id: string;
+  name: string;
+  slug: string;
+  category: 'technical' | 'analytical' | 'communication' | 'leadership' | 'creative';
+  description: string;
+  parentSkill?: string;
+  difficultyLevel: 1 | 2 | 3 | 4 | 5;
+  organizationId?: string;
+  isActive: boolean;
+}
+
+export interface RoleRequirement {
+  _id: string;
+  roleName: string;
+  skills: Array<{
+    skillId: string | Skill;
+    requiredLevel: number;
+    importance: number; // 0-1
+    businessDemand: number; // 0-1
+  }>;
+}
+
+export interface CompetencyProfile {
+  _id: string;
+  userId: string;
+  overallScore: number;
+  roleReadiness: {
+    currentRole?: string;
+    targetRole?: string;
+    readinessScore: number;
+  };
+  competencyDNA: {
+    technical: number;
+    analytical: number;
+    communication: number;
+    leadership: number;
+    creativity: number;
+  };
+  skills: Array<{
+    skillId: string | Skill;
+    score: number;
+    confidence: number;
+    evidenceCount: number;
+    lastUpdated: string;
+  }>;
+  version: number;
+  lastCalculatedAt: string;
+}
+
+export interface CompetencySnapshot {
+  _id: string;
+  userId: string;
+  overallScore: number;
+  competencyDNA: {
+    technical: number;
+    analytical: number;
+    communication: number;
+    leadership: number;
+    creativity: number;
+  };
+  roleReadiness: number;
+  skills: Array<{
+    skillId: string;
+    score: number;
+  }>;
+  trigger: 'assessment' | 'course_completion' | 'manual' | 'scheduled';
+  createdAt: string;
+}
+
+export interface CompetencyEvidence {
+  _id: string;
+  userId: string;
+  skillId: string;
+  source: 'assessment' | 'course' | 'challenge' | 'trainer_review';
+  score: number;
+  weight: number;
+  metadata?: any;
+  createdAt: string;
+}
+
+export interface InsightEvent {
+  _id: string;
+  userId: string;
+  organizationId?: string;
+  type: 'COMPETENCY_IMPROVED' | 'READINESS_INCREASED' | 'CRITICAL_GAP_DETECTED' | 'LEARNING_PATH_UPDATED' | 'LEARNER_AT_RISK';
+  title: string;
+  description: string;
+  metadata?: any;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  isRead: boolean;
+  createdAt: string;
+}

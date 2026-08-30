@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 import User from '../models/User';
+import CompetencyProfile from '../models/CompetencyProfile';
 import { Role } from 'shared';
 
 const generateToken = (id: string, role: string) => {
@@ -30,6 +31,15 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       password: hashedPassword,
       role: role || Role.LEARNER,
       organization,
+    });
+
+    // Create empty profile
+    await CompetencyProfile.create({
+      userId: user._id,
+      overallScore: 0,
+      competencyDNA: { technical: 0, analytical: 0, communication: 0, leadership: 0, creativity: 0 },
+      roleReadiness: { readinessScore: 0 },
+      skills: []
     });
 
     if (user) {
@@ -74,7 +84,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
-    // req.user will be populated by authMiddleware
     const user = await User.findById((req as any).user.id).select('-password');
     res.json(user);
   } catch (error) {

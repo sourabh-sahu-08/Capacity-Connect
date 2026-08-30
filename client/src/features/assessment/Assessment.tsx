@@ -48,7 +48,7 @@ export const Assessment = () => {
         <h1 className="text-3xl font-bold">Assessment Complete</h1>
         
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-10 w-full text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-purple-500"></div>
           <div className="text-sm font-medium text-zinc-400 mb-2 uppercase tracking-widest">Overall Score</div>
           <div className="text-6xl font-extrabold text-indigo-400 mb-6">{percentage}%</div>
           <div className="flex justify-center gap-12 text-sm">

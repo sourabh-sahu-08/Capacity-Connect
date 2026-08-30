@@ -15,7 +15,11 @@ export const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.data, response.data.token);
-      navigate('/dashboard');
+      if (response.data.role === 'MANAGER' || response.data.role === 'TRAINER' || response.data.role === 'ADMIN') {
+        navigate('/manager-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     }

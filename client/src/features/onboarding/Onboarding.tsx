@@ -29,7 +29,12 @@ export const Onboarding = () => {
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
 
   const handleFinish = () => {
-    navigate('/dashboard');
+    const userRole = useAuthStore.getState().user?.role;
+    if (userRole === 'MANAGER' || userRole === 'TRAINER' || userRole === 'ADMIN') {
+      navigate('/manager-dashboard');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const renderStepContent = () => {

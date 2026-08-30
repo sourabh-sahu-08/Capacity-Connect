@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
+interface AuthRequest extends Request {
+  user?: any;
+}
 
 export const getOptions = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -33,17 +36,17 @@ export const getOptions = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const completeOnboarding = async (req: Request, res: Response): Promise<void> => {
+export const completeOnboarding = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { learningGoal, currentRole, targetRole, experienceLevel } = req.body;
     
-    if (!req.user || !req.user.userId) {
+    if (!req.user || !req.user._id) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.user.userId,
+      req.user._id,
       {
         $set: {
           'profile.learningGoal': learningGoal,
