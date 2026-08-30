@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Users, BookOpen, CheckCircle, AlertTriangle, Clock, 
   TrendingUp, TrendingDown, Brain, Activity, Target,
-  Bell, Plus, ChevronRight, MessageCircle, Presentation, Beaker
+  Bell, Plus, ChevronRight, MessageCircle, Presentation, Beaker, Trophy
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
