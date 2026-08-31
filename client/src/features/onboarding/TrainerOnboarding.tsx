@@ -20,7 +20,33 @@ export const TrainerOnboarding = () => {
 
   const nextStep = () => setCurrentStep(prev => prev + 1);
   
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    const token = useAuthStore.getState().token;
+    
+    try {
+      const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(
+        `${apiURL}/api/onboarding/complete-trainer`,
+        {
+          expertiseAreas: selectedExpertise,
+          availability: availability
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      // Update local state so it doesn't redirect again
+      const setAuth = useAuthStore.getState().setAuth;
+      const user = useAuthStore.getState().user;
+      if (user) {
+        setAuth({ ...user, trainerOnboardingCompleted: true }, token as string);
+      }
+      
+    } catch (err) {
+      console.error('Failed to complete trainer onboarding', err);
+    }
+    
     navigate('/trainer/dashboard');
   };
 
