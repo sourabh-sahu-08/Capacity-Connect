@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './features/auth/Login';
 import { Register } from './features/auth/Register';
+import { ForgotPassword } from './features/auth/ForgotPassword';
+import { ResetPassword } from './features/auth/ResetPassword';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { TrainerOnboarding } from './features/onboarding/TrainerOnboarding';
 import { CompetencyProfile } from './features/competency/CompetencyProfile';
@@ -45,6 +47,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route 
             path="/onboarding" 
             element={

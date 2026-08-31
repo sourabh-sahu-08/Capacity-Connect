@@ -1,4 +1,6 @@
-import express from 'express';
+const fs = require('fs');
+
+const content = `import express from 'express';
 import { registerUser, loginUser, getMe, forgotPassword, resetPassword } from '../controllers/authController';
 import { protect } from '../middleware/authMiddleware';
 
@@ -11,3 +13,6 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 
 export default router;
+`;
+
+fs.writeFileSync('server/routes/auth.ts', content, 'utf8');

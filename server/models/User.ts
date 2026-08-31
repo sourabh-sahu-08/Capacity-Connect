@@ -17,7 +17,9 @@ const userSchema = new Schema({
   },
   profileCompleted: { type: Boolean, default: false },
   learnerAssessmentCompleted: { type: Boolean, default: false },
-  trainerOnboardingCompleted: { type: Boolean, default: false }
+  trainerOnboardingCompleted: { type: Boolean, default: false },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

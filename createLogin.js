@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+const fs = require('fs');
+
+const loginContent = `import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '../../api/auth.api';
@@ -101,7 +103,7 @@ export const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+              placeholder="••••••••"
               required
             />
 
@@ -143,3 +145,6 @@ export const Login = () => {
     </AuthLayout>
   );
 };
+`;
+
+fs.writeFileSync('client/src/features/auth/Login.tsx', loginContent, 'utf8');

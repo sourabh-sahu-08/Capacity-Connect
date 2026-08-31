@@ -1,4 +1,6 @@
-import { Request, Response } from 'express';
+const fs = require('fs');
+
+const content = `import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sign, verify } from 'jsonwebtoken';
@@ -127,16 +129,12 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     });
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+    const resetUrl = \`\${frontendUrl}/reset-password/\${resetToken}\`;
 
     await sendEmail({
       to: user.email,
       subject: 'Capacity Connect - Password Reset Request',
-      text: `You requested a password reset. Please go to this link to reset your password: 
-
- ${resetUrl}
-
- This link expires in 15 minutes.`
+      text: \`You requested a password reset. Please go to this link to reset your password: \n\n \${resetUrl}\n\n This link expires in 15 minutes.\`
     });
 
     res.json({ success: true, message: successMsg });
@@ -177,3 +175,6 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: 'Server Error' });
   }
 };
+`;
+
+fs.writeFileSync('server/controllers/authController.ts', content, 'utf8');

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+const fs = require('fs');
+
+const registerContent = `import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '../../api/auth.api';
@@ -96,7 +98,7 @@ export const Register = () => {
           </motion.div>
         ) : (
           <motion.div
-            key={`step-${step}`}
+            key={\`step-\${step}\`}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -143,7 +145,7 @@ export const Register = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                    placeholder="••••••••"
                     required
                   />
                   <PasswordStrengthIndicator password={password} />
@@ -154,7 +156,7 @@ export const Register = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                  placeholder="••••••••"
                   isValid={password === confirmPassword && confirmPassword.length > 0}
                   error={confirmPassword.length > 0 && password !== confirmPassword ? "Passwords do not match" : undefined}
                   required
@@ -223,3 +225,6 @@ export const Register = () => {
     </AuthLayout>
   );
 };
+`;
+
+fs.writeFileSync('client/src/features/auth/Register.tsx', registerContent, 'utf8');
