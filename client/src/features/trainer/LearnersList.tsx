@@ -1,4 +1,5 @@
 // @ts-nocheck
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, Download } from 'lucide-react';
 
