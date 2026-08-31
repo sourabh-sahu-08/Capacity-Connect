@@ -18,9 +18,17 @@ export const Login = () => {
       if (response.data.role === 'MANAGER' || response.data.role === 'ADMIN') {
         navigate('/manager-dashboard');
       } else if (response.data.role === 'TRAINER') {
-        navigate('/trainer-dashboard');
+        if (response.data.trainerOnboardingCompleted === false) {
+          navigate('/onboarding-trainer');
+        } else {
+          navigate('/trainer-dashboard');
+        }
       } else {
-        navigate('/dashboard');
+        if (response.data.learnerAssessmentCompleted === false) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');

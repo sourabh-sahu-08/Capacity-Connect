@@ -18,7 +18,13 @@ export const Register = () => {
     try {
       const response = await authApi.register({ name, email, password, role, organization });
       setAuth(response.data, response.data.token);
-      navigate('/onboarding');
+      if (response.data.role === 'MANAGER' || response.data.role === 'ADMIN') {
+        navigate('/manager-dashboard');
+      } else if (response.data.role === 'TRAINER') {
+        navigate('/onboarding-trainer');
+      } else {
+        navigate('/onboarding');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
     }

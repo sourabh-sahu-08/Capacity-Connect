@@ -53,7 +53,7 @@ export const completeOnboarding = async (req: AuthRequest, res: Response): Promi
           'profile.currentRole': currentRole,
           'profile.targetRole': targetRole,
           'profile.experienceLevel': experienceLevel,
-          isOnboarded: true
+          learnerAssessmentCompleted: true
         }
       },
       { new: true }

@@ -12,6 +12,9 @@ export interface User {
   role: Role;
   organization?: string;
   profile?: UserProfile;
+  profileCompleted?: boolean;
+  learnerAssessmentCompleted?: boolean;
+  trainerOnboardingCompleted?: boolean;
   createdAt: string;
   updatedAt: string;
 }

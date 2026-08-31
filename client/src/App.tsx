@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Login } from './features/auth/Login';
 import { Register } from './features/auth/Register';
 import { Onboarding } from './features/onboarding/Onboarding';
+import { TrainerOnboarding } from './features/onboarding/TrainerOnboarding';
 import { CompetencyProfile } from './features/competency/CompetencyProfile';
 import { SkillGapAnalysis } from './features/competency/SkillGapAnalysis';
 import { LearningRoadmap } from './features/roadmap/LearningRoadmap';
@@ -25,8 +26,10 @@ const IndexRedirect = () => {
     return <Navigate to="/manager-dashboard" />;
   }
   if (user.role === "TRAINER") {
+    if (user.trainerOnboardingCompleted === false) return <Navigate to="/onboarding-trainer" />;
     return <Navigate to="/trainer-dashboard" />;
   }
+  if (user.learnerAssessmentCompleted === false) return <Navigate to="/onboarding" />;
   return <Navigate to="/dashboard" />;
 };
 
@@ -46,6 +49,14 @@ function App() {
             path="/onboarding" 
             element={
               useAuthStore().isAuthenticated ? <Onboarding /> : <Navigate to="/login" />
+            } 
+          />
+          <Route 
+            path="/onboarding-trainer" 
+            element={
+              useAuthStore().isAuthenticated ? <TrainerOnboarding /> : <Navigate to="/login" />
+            } 
+          /> : <Navigate to="/login" />
             } 
           />
           <Route 

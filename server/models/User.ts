@@ -15,7 +15,9 @@ const userSchema = new Schema({
     learningGoal: String,
     experienceLevel: String,
   },
-  isOnboarded: { type: Boolean, default: false }
+  profileCompleted: { type: Boolean, default: false },
+  learnerAssessmentCompleted: { type: Boolean, default: false },
+  trainerOnboardingCompleted: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
