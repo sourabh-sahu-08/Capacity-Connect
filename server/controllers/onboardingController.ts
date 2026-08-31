@@ -68,3 +68,30 @@ export const completeOnboarding = async (req: AuthRequest, res: Response): Promi
     res.status(500).json({ message: 'Server error during onboarding' });
   }
 };
+
+export const completeTrainerOnboarding = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user._id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          trainerOnboardingCompleted: true
+        }
+      },
+      { new: true }
+    ).select('-password');
+
+    res.json({
+      success: true,
+      message: 'Trainer onboarding completed successfully',
+      user: updatedUser
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error during onboarding' });
+  }
+};
