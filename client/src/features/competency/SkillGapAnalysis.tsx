@@ -48,7 +48,7 @@ export const SkillGapAnalysis = () => {
       {!analyzed ? (
         <button 
           onClick={() => setAnalyzed(true)}
-          className="w-full py-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-lg"
+          className="w-full py-4 bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-lg"
         >
           Analyze Competency Gap
         </button>
@@ -101,7 +101,7 @@ export const SkillGapAnalysis = () => {
               <p className="text-purple-100/80 leading-relaxed text-sm">
                 Your biggest development opportunity lies in backend architecture and cloud infrastructure. Completing the recommended learning path could improve your Full Stack Readiness Score by approximately 32%.
               </p>
-              <button className="mt-4 px-6 py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
+              <button className="mt-4 px-6 py-2 bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
                 Generate Learning Path →
               </button>
             </div>

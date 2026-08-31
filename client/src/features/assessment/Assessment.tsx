@@ -81,7 +81,7 @@ export const Assessment = () => {
           <button onClick={() => navigate('/dashboard')} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl font-medium transition-colors">
             Back to Dashboard
           </button>
-          <button onClick={() => navigate('/learning-hub')} className="flex-1 py-3 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-medium transition-colors">
+          <button onClick={() => navigate('/learning-hub')} className="flex-1 py-3 bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-medium transition-colors">
             Continue Learning
           </button>
         </div>
@@ -146,7 +146,7 @@ export const Assessment = () => {
         <button
           onClick={handleNext}
           disabled={selected === null}
-          className="px-8 py-3 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 disabled:bg-slate-100 disabled:text-slate-500 rounded-xl font-bold transition-colors"
+          className="px-8 py-3 bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 disabled:bg-slate-100 disabled:text-slate-500 rounded-xl font-bold transition-colors"
         >
           {currentIndex === QUESTIONS.length - 1 ? 'Submit Assessment' : 'Next Question'}
         </button>

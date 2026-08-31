@@ -137,7 +137,7 @@ export const CoursePlayer = () => {
                 <button 
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="w-10 h-10 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 disabled:opacity-50 rounded-xl flex items-center justify-center transition-colors shrink-0"
+                  className="w-10 h-10 bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 disabled:opacity-50 rounded-xl flex items-center justify-center transition-colors shrink-0"
                 >
                   <Send size={16} />
                 </button>
