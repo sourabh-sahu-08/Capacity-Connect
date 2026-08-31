@@ -6,6 +6,7 @@ import User from '../models/User';
 import CompetencyProfile from '../models/CompetencyProfile';
 import { Role } from 'shared';
 import { sendEmail } from '../services/emailService';
+import { NotificationService } from '../services/notificationService';
 
 const generateToken = (id: string, role: string, rememberMe: boolean = false) => {
   return sign({ id, role }, process.env.JWT_SECRET || 'secret', {
@@ -32,6 +33,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    
     const user = await User.create({
       name,
       email,
@@ -39,6 +41,25 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       role: role || Role.LEARNER,
       organization,
     });
+    
+    // Notify Admins
+    try {
+      const admins = await User.find({ role: Role.ADMIN });
+      for (const admin of admins) {
+        await NotificationService.createNotification({
+          recipient: admin.id,
+          role: Role.ADMIN,
+          type: 'new_user_registered',
+          title: 'New User Registered',
+          message: `${name} (${email}) just registered as a ${role || Role.LEARNER}.`,
+          priority: 'LOW',
+          category: 'System'
+        });
+      }
+    } catch (e) {
+      console.error('Failed to send admin notification', e);
+    }
+  
 
     await CompetencyProfile.create({
       userId: user._id,

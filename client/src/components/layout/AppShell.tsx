@@ -1,4 +1,5 @@
 import React from 'react';
+import { TopHeader } from './TopHeader';
 import { Sidebar } from './Sidebar';
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
@@ -6,11 +7,14 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
     <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-purple-500/30 font-sans">
       <Sidebar />
       
-      <main className="flex-1 w-full pl-28 pr-8 py-10 min-w-0 overflow-auto relative z-10">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden pl-20">
+        <TopHeader />
+        <main className="flex-1 w-full p-8 overflow-auto relative z-10">
         <div className="max-w-[1200px] mx-auto">
           {children}
         </div>
-      </main>
+        </main>
+      </div>
 
       {/* Floating AI Command placeholder */}
       <div className="fixed bottom-8 right-8 z-50 group">
