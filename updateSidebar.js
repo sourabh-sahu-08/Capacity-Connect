@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+const fs = require('fs');
+
+const sidebarContent = `import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, Layers, Zap, Hexagon, Trophy, Settings, LogOut } from 'lucide-react';
@@ -36,7 +38,7 @@ export const Sidebar = () => {
             to={item.path}
             onMouseEnter={() => setHoveredItem(item.name)}
             onMouseLeave={() => setHoveredItem(null)}
-            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-purple-50 text-purple-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+            className={({ isActive }) => \`relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 \${isActive ? 'bg-purple-50 text-purple-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}\`}
           >
             {({ isActive }) => (
               <>
@@ -85,3 +87,6 @@ export const Sidebar = () => {
     </div>
   );
 };
+`;
+
+fs.writeFileSync('client/src/components/layout/Sidebar.tsx', sidebarContent, 'utf8');

@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Layers, Zap, Hexagon, Trophy, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Hexagon, Crosshair, TrendingUp, Map, FileText, Bell, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
-const TRAINEE_NAV = [
-  { name: 'Core', icon: Hexagon, path: '/dashboard' },
-  { name: 'Discovery', icon: Compass, path: '/learning-hub' },
-  { name: 'Passport', icon: Layers, path: '/competency-profile' },
-  { name: 'Intelligence', icon: Zap, path: '/skill-gap' },
-  { name: 'Milestones', icon: Trophy, path: '/achievements' },
-  { name: 'System', icon: Settings, path: '/settings' },
+const NAV_ITEMS = [
+  { name: 'Overview', icon: LayoutDashboard, path: '/manager/dashboard' },
+  { name: 'Teams', icon: Users, path: '/manager/teams' },
+  { name: 'Capability Intelligence', icon: Hexagon, path: '/manager/capabilities' },
+  { name: 'Skill Gaps', icon: Crosshair, path: '/manager/skill-gaps' },
+  { name: 'Workforce Analytics', icon: TrendingUp, path: '/manager/analytics' },
+  { name: 'Readiness Planning', icon: Map, path: '/manager/readiness' },
+  { name: 'Reports', icon: FileText, path: '/manager/reports' },
 ];
 
-export const Sidebar = () => {
+export const ManagerSidebar = () => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const logout = useAuthStore(state => state.logout);
   const navigate = useNavigate();
@@ -25,18 +26,19 @@ export const Sidebar = () => {
   
   return (
     <div className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 bg-white border-r border-slate-200 z-50 shadow-sm">
-      <div className="w-10 h-10 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] rounded-lg flex items-center justify-center text-white font-bold tracking-tighter mb-8 cursor-pointer" onClick={() => navigate('/dashboard')}>
+      <div className="w-10 h-10 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] rounded-lg flex items-center justify-center text-white font-bold tracking-tighter mb-8 cursor-pointer" onClick={() => navigate('/manager/dashboard')}>
         C<span className="text-purple-200">C</span>
       </div>
 
       <div className="flex flex-col items-center gap-4 w-full px-3">
-        {TRAINEE_NAV.map((item, index) => (
+        {NAV_ITEMS.map((item, index) => (
           <NavLink 
             key={item.name + index} 
             to={item.path}
+            end={item.path === '/manager/dashboard'}
             onMouseEnter={() => setHoveredItem(item.name)}
             onMouseLeave={() => setHoveredItem(null)}
-            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-purple-50 text-purple-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-purple-50 text-purple-600 font-medium shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
           >
             {({ isActive }) => (
               <>
@@ -59,8 +61,22 @@ export const Sidebar = () => {
         ))}
       </div>
 
-      <div className="mt-auto w-full px-3">
-        <div className="w-8 h-px bg-slate-200 my-4 mx-auto" />
+      <div className="mt-auto w-full px-3 flex flex-col items-center gap-2">
+        <button 
+          onMouseEnter={() => setHoveredItem('Notifications')}
+          onMouseLeave={() => setHoveredItem(null)}
+          className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+        >
+          <Bell className="w-5 h-5 shrink-0 z-10" />
+        </button>
+        <button 
+          onMouseEnter={() => setHoveredItem('Settings')}
+          onMouseLeave={() => setHoveredItem(null)}
+          className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+        >
+          <Settings className="w-5 h-5 shrink-0 z-10" />
+        </button>
+        <div className="w-8 h-px bg-slate-200 my-2 mx-auto" />
         <button 
           onClick={handleLogout}
           onMouseEnter={() => setHoveredItem('Logout')}

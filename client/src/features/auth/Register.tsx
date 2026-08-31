@@ -57,7 +57,7 @@ export const Register = () => {
       setTimeout(() => {
         setAuth(response.data, response.data.token);
         if (role === 'MANAGER' || role === 'ADMIN') {
-          navigate('/manager-dashboard');
+          navigate('/manager/dashboard');
         } else if (role === 'TRAINER') {
           navigate('/onboarding-trainer');
         } else {

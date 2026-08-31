@@ -20,7 +20,7 @@ export const TrainerOnboarding = () => {
   const nextStep = () => setCurrentStep(prev => prev + 1);
   
   const handleFinish = () => {
-    navigate('/trainer-dashboard');
+    navigate('/trainer/dashboard');
   };
 
   const toggleSelection = (arr: string[], setArr: any, item: string) => {

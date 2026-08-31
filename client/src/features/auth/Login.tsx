@@ -35,10 +35,10 @@ export const Login = () => {
         const { role, trainerOnboardingCompleted, learnerAssessmentCompleted } = response.data;
         
         if (role === 'MANAGER' || role === 'ADMIN') {
-          navigate(role === 'ADMIN' ? '/admin-dashboard' : '/manager-dashboard');
+          navigate(role === 'ADMIN' ? '/admin-dashboard' : '/manager/dashboard');
         } else if (role === 'TRAINER') {
           if (!trainerOnboardingCompleted) navigate('/onboarding-trainer');
-          else navigate('/trainer-dashboard');
+          else navigate('/trainer/dashboard');
         } else {
           if (!learnerAssessmentCompleted) navigate('/onboarding');
           else navigate('/dashboard');

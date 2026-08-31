@@ -1,4 +1,5 @@
-import React from 'react';
+const fs = require('fs');
+const appTsx = `import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './store/authStore';
@@ -161,3 +162,5 @@ function App() {
 }
 
 export default App;
+`;
+fs.writeFileSync('client/src/App.tsx', appTsx, 'utf8');
