@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 
 const steps = [
@@ -30,12 +31,40 @@ export const Onboarding = () => {
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     const userRole = useAuthStore.getState().user?.role;
+    const token = useAuthStore.getState().token;
+    
+    try {
+      const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(
+        `${apiURL}/api/onboarding/complete`,
+        {
+          learningGoal: goal,
+          currentRole,
+          targetRole,
+          experienceLevel: 'Intermediate' // hardcoded for now or add state if exists
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      // Update local state so it doesn't redirect again
+      const setAuth = useAuthStore.getState().setAuth;
+      const user = useAuthStore.getState().user;
+      if (user) {
+        setAuth({ ...user, learnerAssessmentCompleted: true }, token as string);
+      }
+      
+    } catch (err) {
+      console.error('Failed to complete onboarding', err);
+    }
+    
     if (userRole === 'MANAGER' || userRole === 'ADMIN') {
-      navigate('/manager-dashboard');
+      navigate('/manager/dashboard');
     } else if (userRole === 'TRAINER') {
-      navigate('/trainer-dashboard');
+      navigate('/trainer/dashboard');
     } else {
       navigate('/dashboard');
     }
