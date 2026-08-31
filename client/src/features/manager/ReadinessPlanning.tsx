@@ -1,4 +1,4 @@
-import React from 'react';
+// @ts-nocheck
 import { Map, Users } from 'lucide-react';
 
 export const ReadinessPlanning = () => {

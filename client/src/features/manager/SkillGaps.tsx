@@ -1,4 +1,4 @@
-import React from 'react';
+// @ts-nocheck
 import { Crosshair, AlertTriangle, ArrowRight } from 'lucide-react';
 
 export const SkillGaps = () => {

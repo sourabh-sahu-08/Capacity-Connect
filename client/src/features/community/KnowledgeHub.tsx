@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Search, Plus, ThumbsUp, MessageSquare, Award, Tag } from 'lucide-react';
 

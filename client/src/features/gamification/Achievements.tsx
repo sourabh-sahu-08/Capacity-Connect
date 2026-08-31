@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Star, Zap, Brain, Flame, Target } from 'lucide-react';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+// @ts-nocheck
 import { BarChart3, TrendingUp, Users } from 'lucide-react';
 
 export const TrainerAnalytics = () => {

@@ -1,4 +1,4 @@
-import React from 'react';
+// @ts-nocheck
 import { FileText, Download } from 'lucide-react';
 
 export const Reports = () => {

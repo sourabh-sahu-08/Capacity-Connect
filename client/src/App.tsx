@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './store/authStore';
 
 // Layouts
@@ -14,15 +13,15 @@ import { Register } from './features/auth/Register';
 import { ForgotPassword } from './features/auth/ForgotPassword';
 import { ResetPassword } from './features/auth/ResetPassword';
 import { TrainerOnboarding } from './features/onboarding/TrainerOnboarding';
-import { Assessment } from './features/onboarding/Assessment';
+import { Assessment } from './features/assessment/Assessment';
 
 // Trainee Components
-import { Dashboard } from './features/dashboard/Dashboard';
+import { LearnerDashboard as Dashboard } from './features/dashboard/LearnerDashboard';
 import { LearningHub } from './features/learning/LearningHub';
 import { CoursePlayer } from './features/learning/CoursePlayer';
-import { CompetencyProfile } from './features/profile/CompetencyProfile';
-import { SkillGapAnalysis } from './features/intelligence/SkillGapAnalysis';
-import { Achievements } from './features/achievements/Achievements';
+import { CompetencyProfile } from './features/competency/CompetencyProfile';
+import { SkillGapAnalysis } from './features/competency/SkillGapAnalysis';
+import { Achievements } from './features/gamification/Achievements';
 
 // Trainer Components
 import { TrainerOverview } from './features/trainer/TrainerOverview';
@@ -45,7 +44,6 @@ import { ManagerAnalytics } from './features/manager/ManagerAnalytics';
 import { ReadinessPlanning } from './features/manager/ReadinessPlanning';
 import { Reports } from './features/manager/Reports';
 
-const queryClient = new QueryClient();
 
 // Auth Guards
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -98,8 +96,7 @@ const IndexRedirect = () => {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+          <BrowserRouter>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
@@ -156,7 +153,6 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-    </QueryClientProvider>
   );
 }
 

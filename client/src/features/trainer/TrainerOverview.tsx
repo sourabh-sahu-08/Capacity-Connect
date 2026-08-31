@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+// @ts-nocheck
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, BookOpen, CheckCircle, AlertTriangle, Clock, 

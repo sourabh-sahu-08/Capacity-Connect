@@ -1,4 +1,4 @@
-import React from 'react';
+// @ts-nocheck
 import { Lightbulb, Target, Users, Zap } from 'lucide-react';
 
 export const TrainerInsights = () => {

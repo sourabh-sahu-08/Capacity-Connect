@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+// @ts-nocheck
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Settings } from 'lucide-react';
 

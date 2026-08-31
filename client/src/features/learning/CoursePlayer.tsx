@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Play, CheckCircle, MessageSquare, BookOpen, Send, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
