@@ -81,7 +81,7 @@ export const ResetPassword = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="��������"
+                placeholder="Create a new password"
                 required
               />
               <PasswordStrengthIndicator password={password} />
@@ -92,7 +92,7 @@ export const ResetPassword = () => {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="��������"
+              placeholder="Confirm your new password"
               isValid={password === confirmPassword && confirmPassword.length > 0}
               error={confirmPassword.length > 0 && password !== confirmPassword ? "Passwords do not match" : undefined}
               required

@@ -92,7 +92,7 @@ export const Login = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="you@yourcompany.com"
               required
             />
 
@@ -101,7 +101,7 @@ export const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="��������"
+              placeholder="Enter your password"
               required
             />
 

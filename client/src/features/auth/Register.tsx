@@ -125,7 +125,7 @@ export const Register = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Jane Doe"
+                  placeholder="Your full name"
                   required
                 />
                 <AuthInput
@@ -133,7 +133,7 @@ export const Register = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jane@company.com"
+                  placeholder="you@yourcompany.com"
                   required
                 />
                 
@@ -143,7 +143,7 @@ export const Register = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="��������"
+                    placeholder="Create a strong password"
                     required
                   />
                   <PasswordStrengthIndicator password={password} />
@@ -154,7 +154,7 @@ export const Register = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="��������"
+                  placeholder="Re-enter your password"
                   isValid={password === confirmPassword && confirmPassword.length > 0}
                   error={confirmPassword.length > 0 && password !== confirmPassword ? "Passwords do not match" : undefined}
                   required
@@ -165,7 +165,7 @@ export const Register = () => {
                   type="text"
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Acme Corp"
+                  placeholder="Where do you work?"
                 />
 
                 <div className="pt-4 flex gap-3">

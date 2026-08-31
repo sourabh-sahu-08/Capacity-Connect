@@ -13,6 +13,7 @@ import { Login } from './features/auth/Login';
 import { Register } from './features/auth/Register';
 import { ForgotPassword } from './features/auth/ForgotPassword';
 import { ResetPassword } from './features/auth/ResetPassword';
+import { Landing } from './features/marketing/Landing';
 import { TrainerOnboarding } from './features/onboarding/TrainerOnboarding';
 import { Assessment } from './features/assessment/Assessment';
 import { Onboarding } from './features/onboarding/Onboarding';
@@ -86,7 +87,7 @@ const ManagerRoute = ({ children }: { children: React.ReactNode }) => {
 // Index Redirect logic based on role and onboarding status
 const IndexRedirect = () => {
   const user = useAuthStore((state) => state.user);
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Landing />;
 
   if (user.role === 'LEARNER') {
     return user.learnerAssessmentCompleted ? <Navigate to="/dashboard" replace /> : <Navigate to="/onboarding" replace />;
@@ -107,6 +108,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/home" element={<Landing />} />
 
           {/* Root Redirect */}
           <Route path="/" element={<IndexRedirect />} />

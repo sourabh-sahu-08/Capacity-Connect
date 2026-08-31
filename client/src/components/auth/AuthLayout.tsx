@@ -1,5 +1,4 @@
 import React from 'react';
-import { AuthBrandPanel } from './AuthBrandPanel';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -9,24 +8,29 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
   return (
-    <div className="min-h-screen bg-white flex text-slate-900 font-sans selection:bg-purple-500/30">
-      <AuthBrandPanel />
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 overflow-y-auto">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden mb-10 text-center">
-            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">
-              CAPACITY <span className="text-purple-600">CONNECT</span>
-            </h1>
-          </div>
-          
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">{title}</h2>
-            {subtitle && <p className="mt-2 text-slate-600">{subtitle}</p>}
-          </div>
-          
-          {children}
+    <div className="cc-auth">
+      {/* Fullscreen video background */}
+      <video
+        className="cc-auth-video"
+        src="/login.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      <div className="cc-auth-video-overlay" />
+
+      <aside className="cc-auth-aside">
+        <a className="cc-wordmark" href="/">CAPACITY <i>CONNECT</i></a>
+        <div className="cc-auth-brand-text">
+          <h2 className="cc-serif">Build stronger<br/>capabilities.</h2>
+          <p>Understand skills, identify capability gaps, and build smarter growth paths across your organization.</p>
         </div>
-      </div>
+      </aside>
+      <div className="cc-auth-form"><div className="cc-auth-form-inner">
+        <a className="cc-wordmark lg:hidden" href="/">CAPACITY <i>CONNECT</i></a>
+        <div className="mt-12 mb-8"><div className="cc-auth-kicker">YOUR WORKSPACE</div><h2 className="cc-serif">{title}</h2>{subtitle && <p className="cc-auth-subtitle">{subtitle}</p>}</div>{children}
+      </div></div>
     </div>
   );
 };

@@ -75,7 +75,7 @@ export const ForgotPassword = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="you@yourcompany.com"
               required
             />
 

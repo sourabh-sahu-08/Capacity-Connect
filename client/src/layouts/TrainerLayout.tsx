@@ -4,7 +4,7 @@ import { TrainerSidebar } from './TrainerSidebar';
 
 export const TrainerLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-purple-500/30 font-sans">
+    <div className="cc-app flex min-h-screen bg-slate-50 text-slate-900 selection:bg-purple-500/30 font-sans">
       <TrainerSidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden pl-20">
         <TopHeader />
