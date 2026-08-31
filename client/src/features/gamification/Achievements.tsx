@@ -21,7 +21,7 @@ export const Achievements = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white border border-slate-200 p-6 rounded-xl text-center">
           <div className="text-sm font-medium text-slate-600 uppercase tracking-widest mb-2">Total XP</div>
-          <div className="text-5xl font-extrabold text-indigo-600">2,450</div>
+          <div className="text-5xl font-extrabold text-purple-600">2,450</div>
         </div>
         <div className="bg-white border border-slate-200 p-6 rounded-xl text-center">
           <div className="text-sm font-medium text-slate-600 uppercase tracking-widest mb-2">Current Level</div>
@@ -45,7 +45,7 @@ export const Achievements = () => {
               className={`p-6 rounded-xl border ${ach.unlocked ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200/50 opacity-60'}`}
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${ach.unlocked ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${ach.unlocked ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-500'}`}>
                   <ach.icon size={24} />
                 </div>
                 <div>

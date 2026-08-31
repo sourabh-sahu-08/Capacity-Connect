@@ -35,7 +35,7 @@ export const LearnerDashboard = () => {
   const actionImpact = gaps?.nextBestAction?.estimatedImpact || 14;
 
   return (
-    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-indigo-500/30">
+    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
       
       {/* HERO / CAPABILITY CORE */}
       <section className="relative flex flex-col items-center justify-center min-h-[60vh]">
@@ -62,7 +62,7 @@ export const LearnerDashboard = () => {
           <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-slate-900 to-slate-500">
             {overallScore}
           </div>
-          <div className="text-sm font-bold tracking-[0.2em] text-indigo-600 mt-4 uppercase">
+          <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
             Capability Core
           </div>
           <div className="text-xs tracking-widest text-emerald-600/80 mt-2 font-medium">
@@ -80,8 +80,8 @@ export const LearnerDashboard = () => {
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
             >
-              <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-slate-300'}`} />
-              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors ${hoveredNode === node.id ? 'text-indigo-700' : 'text-slate-500'}`}>
+              <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-purple-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-slate-300'}`} />
+              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors ${hoveredNode === node.id ? 'text-purple-700' : 'text-slate-500'}`}>
                 {node.label}
               </div>
             </div>
@@ -98,7 +98,7 @@ export const LearnerDashboard = () => {
 
       {/* NEXT BEST ACTION */}
       <section className="mt-20">
-        <div className="bg-linear-to-br from-violet-50 to-indigo-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
+        <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
           <div className="space-y-8 flex-1">
             <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
               <Sparkles size={14} className="text-violet-600" /> Next Best Action
@@ -114,7 +114,7 @@ export const LearnerDashboard = () => {
             <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
               Est. Effort - 4.5 Hours
             </div>
-            <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
+            <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
               <span className="text-sm font-bold tracking-widest uppercase">Start Path</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
@@ -146,11 +146,11 @@ export const LearnerDashboard = () => {
 
             {/* NOW */}
             <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
               </div>
               <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-indigo-600 uppercase mb-2">Now</div>
+                <div className="text-xs font-medium tracking-[0.2em] text-purple-600 uppercase mb-2">Now</div>
                 <h4 className="text-lg font-medium text-slate-900">Backend Architecture</h4>
                 <div className="text-xs tracking-widest text-slate-600 mt-2 uppercase">In Progress</div>
               </div>
@@ -178,14 +178,14 @@ export const LearnerDashboard = () => {
         </h3>
         
         <div className="group cursor-pointer">
-          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-indigo-100 transition-colors">
+          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-purple-100 transition-colors">
             +16%
           </div>
           <div className="max-w-2xl space-y-6">
             <h4 className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed">
               Competency growth over the last 90 days. Your strongest acceleration happened after completing <strong className="text-slate-900 font-medium">Advanced React Architecture</strong>.
             </h4>
-            <div onClick={() => navigate('/competency-profile')} className="flex items-center gap-2 text-sm font-bold tracking-widest text-indigo-600 uppercase group-hover:text-indigo-700 transition-colors">
+            <div onClick={() => navigate('/competency-profile')} className="flex items-center gap-2 text-sm font-bold tracking-widest text-purple-600 uppercase group-hover:text-purple-700 transition-colors">
               Explore Growth <ChevronRight size={16} />
             </div>
           </div>

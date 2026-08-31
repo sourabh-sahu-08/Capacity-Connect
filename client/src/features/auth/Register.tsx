@@ -42,7 +42,7 @@ export const Register = () => {
                 name="name"
                 type="text"
                 required
-                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -55,7 +55,7 @@ export const Register = () => {
                 name="email"
                 type="email"
                 required
-                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +68,7 @@ export const Register = () => {
                 name="password"
                 type="password"
                 required
-                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -80,7 +80,7 @@ export const Register = () => {
                 id="organization"
                 name="organization"
                 type="text"
-                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
                 placeholder="Organization (Optional)"
                 value={organization}
                 onChange={(e) => setOrganization(e.target.value)}
@@ -91,7 +91,7 @@ export const Register = () => {
               <select
                 id="role"
                 name="role"
-                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="relative block w-full appearance-none rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-900 placeholder-zinc-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
@@ -105,13 +105,13 @@ export const Register = () => {
           <div>
             <button
               type="submit"
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900 transition-all duration-200"
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] py-2 px-4 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-zinc-900 transition-all duration-200"
             >
               Sign up
             </button>
           </div>
           <div className="text-center text-sm text-slate-600 mt-4">
-            Already have an account? <a href="/login" className="text-indigo-600 hover:text-indigo-700">Sign in</a>
+            Already have an account? <a href="/login" className="text-purple-600 hover:text-purple-700">Sign in</a>
           </div>
         </form>
       </div>

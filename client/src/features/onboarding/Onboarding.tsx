@@ -51,7 +51,7 @@ export const Onboarding = () => {
                 <button
                   key={opt}
                   onClick={() => { setGoal(opt); nextStep(); }}
-                  className={`w-full text-left p-4 rounded-lg border ${goal === opt ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-white'} hover:border-indigo-500 transition-colors`}
+                  className={`w-full text-left p-4 rounded-lg border ${goal === opt ? 'border-purple-500 bg-purple-50' : 'border-slate-200 bg-white'} hover:border-purple-500 transition-colors`}
                 >
                   {opt}
                 </button>
@@ -68,7 +68,7 @@ export const Onboarding = () => {
                 <button
                   key={role}
                   onClick={() => { setCurrentRole(role); nextStep(); }}
-                  className={`p-4 rounded-lg border ${currentRole === role ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-white'} hover:border-indigo-500 transition-colors`}
+                  className={`p-4 rounded-lg border ${currentRole === role ? 'border-purple-500 bg-purple-50' : 'border-slate-200 bg-white'} hover:border-purple-500 transition-colors`}
                 >
                   {role}
                 </button>
@@ -85,7 +85,7 @@ export const Onboarding = () => {
                 <button
                   key={role}
                   onClick={() => { setTargetRole(role); nextStep(); }}
-                  className={`p-4 rounded-lg border ${targetRole === role ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-white'} hover:border-indigo-500 transition-colors`}
+                  className={`p-4 rounded-lg border ${targetRole === role ? 'border-purple-500 bg-purple-50' : 'border-slate-200 bg-white'} hover:border-purple-500 transition-colors`}
                 >
                   {role}
                 </button>
@@ -108,7 +108,7 @@ export const Onboarding = () => {
                       setIsGenerating(true);
                       setTimeout(() => { setIsGenerating(false); nextStep(); }, 2000);
                     }}
-                    className="w-full text-left p-4 rounded-lg border border-slate-200 bg-slate-50 hover:border-indigo-500 transition-colors"
+                    className="w-full text-left p-4 rounded-lg border border-slate-200 bg-slate-50 hover:border-purple-500 transition-colors"
                   >
                     {ans}
                   </button>
@@ -122,16 +122,16 @@ export const Onboarding = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6 text-center">
             {isGenerating ? (
               <div className="py-12">
-                <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <h2 className="text-xl font-bold text-slate-900">Analyzing Your Skills...</h2>
                 <div className="mt-6 w-full max-w-md mx-auto h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 2 }} className="h-full bg-indigo-500" />
+                  <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 2 }} className="h-full bg-purple-500" />
                 </div>
               </div>
             ) : (
               <div className="py-8">
                 <h2 className="text-3xl font-bold text-slate-900 mb-2">Competency Profile Created</h2>
-                <div className="text-6xl font-extrabold text-indigo-600 my-8">72 <span className="text-2xl text-slate-500">/ 100</span></div>
+                <div className="text-6xl font-extrabold text-purple-600 my-8">72 <span className="text-2xl text-slate-500">/ 100</span></div>
                 <div className="grid grid-cols-2 gap-6 text-left max-w-lg mx-auto">
                   <div className="bg-white p-4 rounded-lg border border-slate-200">
                     <h3 className="text-emerald-600 font-medium mb-2">Strong Areas</h3>
@@ -152,7 +152,7 @@ export const Onboarding = () => {
                 </div>
                 <button
                   onClick={handleFinish}
-                  className="mt-10 px-8 py-3 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+                  className="mt-10 px-8 py-3 rounded-full bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white font-medium hover:bg-purple-700 transition-colors"
                 >
                   View My Learning Path
                 </button>
@@ -168,14 +168,14 @@ export const Onboarding = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <div className="w-full bg-white border-b border-slate-200 h-16 flex items-center px-8">
-        <h1 className="text-xl font-bold tracking-tighter">CAPACITY <span className="text-indigo-500">CONNECT</span></h1>
+        <h1 className="text-xl font-bold tracking-tighter">CAPACITY <span className="text-purple-500">CONNECT</span></h1>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           <div className="flex items-center justify-between mb-12">
             {steps.map((step, idx) => (
               <div key={step} className="flex flex-col items-center flex-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${idx <= currentStep ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${idx <= currentStep ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white' : 'bg-slate-100 text-slate-500'}`}>
                   {idx + 1}
                 </div>
                 <span className={`text-xs mt-2 ${idx <= currentStep ? 'text-slate-700' : 'text-slate-500'}`}>{step}</span>

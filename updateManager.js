@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+﻿const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,7 +71,7 @@ export const ManagerDashboard = () => {
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -81,7 +83,7 @@ export const ManagerDashboard = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Workforce Intelligence</h1>
-          <p className="text-sm text-slate-500">A real-time overview of your organization\'s capability and readiness.</p>
+          <p className="text-sm text-slate-500">A real-time overview of your organization\\'s capability and readiness.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
@@ -101,15 +103,15 @@ export const ManagerDashboard = () => {
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
           { label: 'Active Learners', value: executiveData.health.activeLearners },
-          { label: 'Avg Competency', value: `${executiveData.health.avgCompetency}%` },
-          { label: 'Workforce Readiness', value: `${executiveData.health.readiness}%` },
-          { label: 'Completion', value: `${executiveData.health.completion}%` },
+          { label: 'Avg Competency', value: \`\${executiveData.health.avgCompetency}%\` },
+          { label: 'Workforce Readiness', value: \`\${executiveData.health.readiness}%\` },
+          { label: 'Completion', value: \`\${executiveData.health.completion}%\` },
           { label: 'Teams At Risk', value: executiveData.health.teamsAtRisk, alert: true },
           { label: 'Critical Gaps', value: executiveData.health.criticalGaps, alert: true }
         ].map((kpi, idx) => (
-          <div key={idx} className={`bg-white border ${kpi.alert ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm`}>
+          <div key={idx} className={\`bg-white border \${kpi.alert ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm\`}>
             <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1">{kpi.label}</span>
-            <span className={`text-xl font-medium ${kpi.alert ? 'text-amber-600' : 'text-slate-900'}`}>{kpi.value}</span>
+            <span className={\`text-xl font-medium \${kpi.alert ? 'text-amber-600' : 'text-slate-900'}\`}>{kpi.value}</span>
           </div>
         ))}
       </section>
@@ -138,7 +140,7 @@ export const ManagerDashboard = () => {
                 )}
                 <div className="text-left">
                   <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400">Risk</span>
-                  <span className={`text-xs font-bold tracking-widest uppercase ${item.risk === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}`}>
+                  <span className={\`text-xs font-bold tracking-widest uppercase \${item.risk === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}\`}>
                     {item.risk}
                   </span>
                 </div>
@@ -157,7 +159,7 @@ export const ManagerDashboard = () => {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Team Capability Overview</h2>
-            <button className="text-[10px] font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Teams →</button>
+            <button className="text-[10px] font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All Teams →</button>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
             <div className="divide-y divide-slate-100">
@@ -168,7 +170,7 @@ export const ManagerDashboard = () => {
                       <h3 className="font-medium text-slate-900">{team.name}</h3>
                       <p className="text-xs text-slate-500">{team.members} Members</p>
                     </div>
-                    <span className={`px-2 py-1 rounded text-[9px] font-bold tracking-widest uppercase ${team.status === 'Healthy' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                    <span className={\`px-2 py-1 rounded text-[9px] font-bold tracking-widest uppercase \${team.status === 'Healthy' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}\`}>
                       {team.status}
                     </span>
                   </div>
@@ -184,7 +186,7 @@ export const ManagerDashboard = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-slate-500 mr-1">Trend:</span>
                       {team.trendDir === 'up' ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-amber-500" />}
-                      <span className={`font-medium ${team.trendDir === 'up' ? 'text-emerald-600' : 'text-amber-600'}`}>{team.trend}</span>
+                      <span className={\`font-medium \${team.trendDir === 'up' ? 'text-emerald-600' : 'text-amber-600'}\`}>{team.trend}</span>
                     </div>
                   </div>
                 </div>
@@ -212,7 +214,7 @@ export const ManagerDashboard = () => {
                 </div>
                 <div className="flex-1 text-right">
                   <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Gap Severity</span>
-                  <span className={`text-xs font-bold tracking-widest uppercase ${gap.severity === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}`}>{gap.severity}</span>
+                  <span className={\`text-xs font-bold tracking-widest uppercase \${gap.severity === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}\`}>{gap.severity}</span>
                 </div>
                 <div className="ml-4 shrink-0">
                   <button className="px-3 py-1.5 bg-white border border-slate-200 rounded-md text-[10px] font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
@@ -237,12 +239,12 @@ export const ManagerDashboard = () => {
                 <div key={role.id}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-slate-900">{role.role}</span>
-                    <span className="text-sm font-bold text-purple-600">{role.readiness}%</span>
+                    <span className="text-sm font-bold text-indigo-600">{role.readiness}%</span>
                   </div>
                   <div className="relative w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="absolute top-0 left-0 h-full bg-purple-500 rounded-full" style={{ width: `${role.readiness}%` }}></div>
+                    <div className="absolute top-0 left-0 h-full bg-indigo-500 rounded-full" style={{ width: \`\${role.readiness}%\` }}></div>
                     {/* Target Marker */}
-                    <div className="absolute top-0 h-full w-1 bg-slate-800 z-10" style={{ left: `${role.target}%` }} title={`Target: ${role.target}%`}></div>
+                    <div className="absolute top-0 h-full w-1 bg-slate-800 z-10" style={{ left: \`\${role.target}%\` }} title={\`Target: \${role.target}%\`}></div>
                   </div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 text-right">Target: {role.target}%</p>
                 </div>
@@ -274,7 +276,7 @@ export const ManagerDashboard = () => {
                 <p className="text-sm text-slate-800 font-medium">{executiveData.aiInsight.recommendation}</p>
               </div>
               
-              <button className="w-full py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-md text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm transition-colors">
+              <button className="w-full py-2 bg-indigo-600 text-white rounded-md text-xs font-bold tracking-widest uppercase hover:bg-indigo-700 shadow-sm transition-colors">
                 View Recommendation
               </button>
             </div>
@@ -292,7 +294,7 @@ export const ManagerDashboard = () => {
               <button 
                 key={range} 
                 onClick={() => setTimeframe(range)}
-                className={`px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase transition-colors ${timeframe === range ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                className={\`px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase transition-colors \${timeframe === range ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}\`}
               >
                 {range}
               </button>
@@ -360,7 +362,7 @@ export const ManagerDashboard = () => {
             <button 
               key={tab} 
               onClick={() => setActiveSecondaryTab(tab)}
-              className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${activeSecondaryTab === tab ? 'bg-purple-50 border border-purple-200 text-purple-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+              className={\`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all \${activeSecondaryTab === tab ? 'bg-indigo-50 border border-indigo-200 text-indigo-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}\`}
             >
               {tab}
             </button>
@@ -399,3 +401,5 @@ export const ManagerDashboard = () => {
     </div>
   );
 };
+`
+fs.writeFileSync('client/src/features/dashboard/ManagerDashboard.tsx', content, 'utf8');

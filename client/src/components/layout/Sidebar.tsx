@@ -49,8 +49,8 @@ export const Sidebar = () => {
   
   return (
     <div className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 bg-white border-r border-slate-200 z-50 shadow-sm">
-      <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold tracking-tighter mb-8">
-        C<span className="text-indigo-200">C</span>
+      <div className="w-10 h-10 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] rounded-lg flex items-center justify-center text-white font-bold tracking-tighter mb-8">
+        C<span className="text-purple-200">C</span>
       </div>
 
       <div className="flex flex-col items-center gap-4 w-full px-3">
@@ -60,7 +60,7 @@ export const Sidebar = () => {
             to={item.path}
             onMouseEnter={() => setHoveredItem(item.name)}
             onMouseLeave={() => setHoveredItem(null)}
-            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+            className={({ isActive }) => `relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${isActive ? 'bg-purple-50 text-purple-600 font-medium' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
           >
             {({ isActive }) => (
               <>

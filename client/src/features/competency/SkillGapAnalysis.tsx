@@ -26,7 +26,7 @@ export const SkillGapAnalysis = () => {
           <select 
             value={currentRole}
             onChange={(e) => setCurrentRole(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-purple-500"
           >
             <option>Frontend Developer</option>
             <option>Backend Developer</option>
@@ -37,7 +37,7 @@ export const SkillGapAnalysis = () => {
           <select 
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-purple-500"
           >
             <option>Full Stack Developer</option>
             <option>Cloud Architect</option>
@@ -48,7 +48,7 @@ export const SkillGapAnalysis = () => {
       {!analyzed ? (
         <button 
           onClick={() => setAnalyzed(true)}
-          className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold transition-colors shadow-lg"
+          className="w-full py-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-lg"
         >
           Analyze Competency Gap
         </button>
@@ -82,7 +82,7 @@ export const SkillGapAnalysis = () => {
                       <span>Required ({gap.required}%)</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full">
-                      <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${gap.required}%` }}></div>
+                      <div className="h-full bg-purple-500 rounded-full" style={{ width: `${gap.required}%` }}></div>
                     </div>
                   </div>
                 </div>
@@ -94,14 +94,14 @@ export const SkillGapAnalysis = () => {
             ))}
           </div>
 
-          <div className="bg-indigo-900/20 border border-indigo-500/30 p-6 rounded-xl flex gap-4 items-start">
+          <div className="bg-purple-900/20 border border-purple-500/30 p-6 rounded-xl flex gap-4 items-start">
             <div className="text-3xl">🧠</div>
             <div>
-              <h4 className="font-bold text-indigo-700 mb-2">AI Learning Insight</h4>
-              <p className="text-indigo-100/80 leading-relaxed text-sm">
+              <h4 className="font-bold text-purple-700 mb-2">AI Learning Insight</h4>
+              <p className="text-purple-100/80 leading-relaxed text-sm">
                 Your biggest development opportunity lies in backend architecture and cloud infrastructure. Completing the recommended learning path could improve your Full Stack Readiness Score by approximately 32%.
               </p>
-              <button className="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors">
+              <button className="mt-4 px-6 py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
                 Generate Learning Path →
               </button>
             </div>

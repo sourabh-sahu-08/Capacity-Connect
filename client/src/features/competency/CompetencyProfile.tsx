@@ -25,7 +25,7 @@ export const CompetencyProfile = () => {
           <p className="text-slate-600 mt-2">Your digital capability overview.</p>
         </div>
         <div className="text-right">
-          <div className="text-5xl font-extrabold text-indigo-600">78 <span className="text-xl text-slate-500">/ 100</span></div>
+          <div className="text-5xl font-extrabold text-purple-600">78 <span className="text-xl text-slate-500">/ 100</span></div>
           <div className="text-emerald-600 font-medium tracking-wide text-sm mt-1 uppercase">Advanced Learner</div>
         </div>
       </div>
@@ -38,7 +38,7 @@ export const CompetencyProfile = () => {
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillsData}>
                 <PolarGrid stroke="#e2e8f0" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Radar name="Competency" dataKey="A" stroke="#4f46e5" fill="#4f46e5" fillOpacity={0.5} />
+                <Radar name="Competency" dataKey="A" stroke="#9333ea" fill="#9333ea" fillOpacity={0.5} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -54,7 +54,7 @@ export const CompetencyProfile = () => {
                   <span className="text-slate-600">{skill.A}%</span>
                 </div>
                 <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-500 rounded-full transition-all duration-1000" style={{ width: `${skill.A}%` }}></div>
+                  <div className="h-full bg-purple-500 rounded-full transition-all duration-1000" style={{ width: `${skill.A}%` }}></div>
                 </div>
               </div>
             ))}
@@ -69,15 +69,15 @@ export const CompetencyProfile = () => {
             <AreaChart data={historyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#9333ea" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#9333ea" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" vertical={false} />
               <XAxis dataKey="name" stroke="#475569" tickLine={false} axisLine={false} />
               <YAxis stroke="#475569" tickLine={false} axisLine={false} domain={['dataMin - 10', 'dataMax + 10']} />
               <Tooltip contentStyle={{ backgroundColor: '#f1f5f9', borderColor: '#ffffff', borderRadius: '8px' }} />
-              <Area type="monotone" dataKey="score" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+              <Area type="monotone" dataKey="score" stroke="#9333ea" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>

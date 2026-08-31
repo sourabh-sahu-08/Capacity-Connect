@@ -39,7 +39,7 @@ export const KnowledgeHub = () => {
             <h1 className="text-3xl font-bold">Knowledge Hub</h1>
             <p className="text-slate-600 mt-2">Share insights, ask questions, and learn from peers.</p>
           </div>
-          <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+          <button className="flex items-center gap-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
             <Plus size={20} /> Ask Question
           </button>
         </div>
@@ -50,14 +50,14 @@ export const KnowledgeHub = () => {
             <input 
               type="text" 
               placeholder="Search discussions, tags..." 
-              className="w-full bg-white border border-slate-200 rounded-lg py-3 pl-10 pr-4 text-slate-900 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-lg py-3 pl-10 pr-4 text-slate-900 placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-colors"
             />
           </div>
         </div>
 
         <div className="flex gap-4 border-b border-slate-200 pb-px">
           {['Recent', 'Most Voted', 'Unanswered', 'My Posts'].map((tab, i) => (
-            <button key={tab} className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${i === 0 ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-600 hover:text-slate-800'}`}>
+            <button key={tab} className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${i === 0 ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-600 hover:text-slate-800'}`}>
               {tab}
             </button>
           ))}
@@ -68,22 +68,22 @@ export const KnowledgeHub = () => {
             <div key={post.id} className="bg-white border border-slate-200 p-6 rounded-xl hover:border-slate-300 transition-colors">
               <div className="flex gap-4">
                 <div className="flex flex-col items-center gap-2">
-                  <button className="text-slate-600 hover:text-indigo-600 p-1"><ThumbsUp size={20} /></button>
+                  <button className="text-slate-600 hover:text-purple-600 p-1"><ThumbsUp size={20} /></button>
                   <span className="font-bold text-lg">{post.upvotes}</span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">{post.avatar}</div>
+                    <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold">{post.avatar}</div>
                     <span className="text-sm font-medium text-slate-800">{post.author}</span>
                     <span className="text-xs text-slate-500">• {post.time}</span>
                   </div>
-                  <h3 className="text-xl font-bold mb-2 hover:text-indigo-600 cursor-pointer">{post.title}</h3>
+                  <h3 className="text-xl font-bold mb-2 hover:text-purple-600 cursor-pointer">{post.title}</h3>
                   <p className="text-slate-600 text-sm line-clamp-2 mb-4">{post.content}</p>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex gap-2">
                       {post.tags.map(tag => (
-                        <span key={tag} className="flex items-center gap-1 text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-1 rounded">
+                        <span key={tag} className="flex items-center gap-1 text-xs font-medium text-purple-700 bg-purple-50 px-2 py-1 rounded">
                           <Tag size={12} /> {tag}
                         </span>
                       ))}

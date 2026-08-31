@@ -70,7 +70,7 @@ export const TrainerDashboard = () => {
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -88,11 +88,11 @@ export const TrainerDashboard = () => {
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
             <Calendar size={14} /> Today
           </button>
-          <button className="flex items-center justify-center w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-indigo-600 hover:border-indigo-200 shadow-sm relative">
+          <button className="flex items-center justify-center w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-purple-600 hover:border-purple-200 shadow-sm relative">
             <Bell size={16} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-indigo-700 shadow-sm">
+          <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm">
             <Plus size={14} /> Create
           </button>
         </div>
@@ -121,7 +121,7 @@ export const TrainerDashboard = () => {
           <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase flex items-center gap-2">
             <AlertTriangle size={16} className="text-red-500" /> Today\'s Priorities
           </h2>
-          <button className="text-xs font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All</button>
+          <button className="text-xs font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All</button>
         </div>
         <div className="bg-white border border-red-200 rounded-xl shadow-sm overflow-hidden divide-y divide-slate-100">
           <div className="px-5 py-2 bg-red-50 text-[10px] font-bold tracking-widest text-red-600 uppercase">High Priority</div>
@@ -137,7 +137,7 @@ export const TrainerDashboard = () => {
                     {item.actionSecondary}
                   </button>
                 )}
-                <button className="px-4 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-bold tracking-widest uppercase hover:bg-indigo-700 shadow-sm">
+                <button className="px-4 py-1.5 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-md text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm">
                   {item.actionPrimary}
                 </button>
               </div>
@@ -152,7 +152,7 @@ export const TrainerDashboard = () => {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Course Performance</h2>
-            <button className="text-xs font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All Courses →</button>
+            <button className="text-xs font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Courses →</button>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
             <table className="w-full text-left border-collapse">
@@ -182,7 +182,7 @@ export const TrainerDashboard = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Insights</h2>
-            <button className="text-xs font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All →</button>
+            <button className="text-xs font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All →</button>
           </div>
           <div className="bg-violet-50 border border-violet-200 rounded-xl p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
@@ -193,10 +193,10 @@ export const TrainerDashboard = () => {
               <strong className="font-bold">{mockData.aiInsight.percentage}%</strong> of learners are struggling with <strong className="font-bold">{mockData.aiInsight.topic}</strong>. {mockData.aiInsight.details}
             </p>
             <div className="flex gap-2">
-              <button className="flex-1 py-1.5 bg-white border border-violet-200 text-indigo-600 rounded-md text-[10px] font-bold tracking-widest uppercase hover:bg-violet-100 shadow-sm">
+              <button className="flex-1 py-1.5 bg-white border border-violet-200 text-purple-600 rounded-md text-[10px] font-bold tracking-widest uppercase hover:bg-violet-100 shadow-sm">
                 View Analysis
               </button>
-              <button className="flex-1 py-1.5 bg-indigo-600 text-white rounded-md text-[10px] font-bold tracking-widest uppercase hover:bg-indigo-700 shadow-sm">
+              <button className="flex-1 py-1.5 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-md text-[10px] font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm">
                 Take Action
               </button>
             </div>
@@ -246,7 +246,7 @@ export const TrainerDashboard = () => {
             </tbody>
           </table>
           <div className="p-3 border-t border-slate-100 bg-slate-50 text-center">
-            <button className="text-xs font-bold tracking-widest text-indigo-600 uppercase hover:text-indigo-700">View All Learners →</button>
+            <button className="text-xs font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Learners →</button>
           </div>
         </div>
       </section>
@@ -257,7 +257,7 @@ export const TrainerDashboard = () => {
           <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Performance Analytics</h2>
           <div className="flex gap-2">
             {['7D', '30D', '90D'].map(range => (
-              <button key={range} className="text-[10px] font-bold tracking-widest text-slate-500 uppercase hover:text-indigo-600">{range}</button>
+              <button key={range} className="text-[10px] font-bold tracking-widest text-slate-500 uppercase hover:text-purple-600">{range}</button>
             ))}
           </div>
         </div>
@@ -279,7 +279,7 @@ export const TrainerDashboard = () => {
             <button 
               key={tab} 
               onClick={() => setActiveSecondaryTab(tab)}
-              className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${activeSecondaryTab === tab ? 'bg-indigo-50 border border-indigo-200 text-indigo-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+              className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${activeSecondaryTab === tab ? 'bg-purple-50 border border-purple-200 text-purple-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
             >
               {tab}
             </button>
@@ -310,7 +310,7 @@ export const TrainerDashboard = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">Next Session</p>
-                      <p className="text-sm font-medium text-indigo-600">{p.nextSession}</p>
+                      <p className="text-sm font-medium text-purple-600">{p.nextSession}</p>
                     </div>
                   </div>
                 ))}
@@ -336,7 +336,7 @@ export const TrainerDashboard = () => {
                   <div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Trained</p><p className="text-2xl font-light text-slate-900">{mockData.impactMetrics.trained}</p></div>
                   <div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Improvement</p><p className="text-2xl font-light text-emerald-600">{mockData.impactMetrics.improvement}</p></div>
                   <div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Validated</p><p className="text-2xl font-light text-slate-900">{mockData.impactMetrics.validated}</p></div>
-                  <div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Impact Score</p><p className="text-2xl font-light text-indigo-600">{mockData.impactMetrics.impactScore}/100</p></div>
+                  <div><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Impact Score</p><p className="text-2xl font-light text-purple-600">{mockData.impactMetrics.impactScore}/100</p></div>
                 </div>
               </motion.div>
             )}

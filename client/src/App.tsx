@@ -38,7 +38,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500/30">
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-purple-500/30">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

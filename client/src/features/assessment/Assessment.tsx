@@ -48,9 +48,9 @@ export const Assessment = () => {
         <h1 className="text-3xl font-bold">Assessment Complete</h1>
         
         <div className="bg-white border border-slate-200 rounded-xl p-10 w-full text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-purple-500"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-500 to-purple-500"></div>
           <div className="text-sm font-medium text-slate-600 mb-2 uppercase tracking-widest">Overall Score</div>
-          <div className="text-6xl font-extrabold text-indigo-600 mb-6">{percentage}%</div>
+          <div className="text-6xl font-extrabold text-purple-600 mb-6">{percentage}%</div>
           <div className="flex justify-center gap-12 text-sm">
             <div>
               <div className="text-slate-600 mb-1">Correct Answers</div>
@@ -81,7 +81,7 @@ export const Assessment = () => {
           <button onClick={() => navigate('/dashboard')} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl font-medium transition-colors">
             Back to Dashboard
           </button>
-          <button onClick={() => navigate('/learning-hub')} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-medium transition-colors">
+          <button onClick={() => navigate('/learning-hub')} className="flex-1 py-3 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 rounded-xl font-medium transition-colors">
             Continue Learning
           </button>
         </div>
@@ -105,7 +105,7 @@ export const Assessment = () => {
         <span>{Math.round((currentIndex / QUESTIONS.length) * 100)}% Completed</span>
       </div>
       <div className="w-full bg-slate-100 h-2 rounded-full mb-10 overflow-hidden">
-        <div className="bg-indigo-500 h-full transition-all duration-300" style={{ width: `${(currentIndex / QUESTIONS.length) * 100}%` }}></div>
+        <div className="bg-purple-500 h-full transition-all duration-300" style={{ width: `${(currentIndex / QUESTIONS.length) * 100}%` }}></div>
       </div>
 
       <div className="flex-1">
@@ -125,13 +125,13 @@ export const Assessment = () => {
                   onClick={() => setSelected(i)}
                   className={`w-full text-left p-5 rounded-xl border-2 transition-all ${
                     selected === i 
-                      ? 'border-indigo-500 bg-indigo-50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' 
+                      ? 'border-purple-500 bg-purple-50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' 
                       : 'border-slate-200 bg-white hover:border-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${selected === i ? 'border-indigo-500' : 'border-zinc-600'}`}>
-                      {selected === i && <div className="w-3 h-3 rounded-full bg-indigo-500"></div>}
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${selected === i ? 'border-purple-500' : 'border-zinc-600'}`}>
+                      {selected === i && <div className="w-3 h-3 rounded-full bg-purple-500"></div>}
                     </div>
                     <span className="text-lg">{opt}</span>
                   </div>
@@ -146,7 +146,7 @@ export const Assessment = () => {
         <button
           onClick={handleNext}
           disabled={selected === null}
-          className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-100 disabled:text-slate-500 rounded-xl font-bold transition-colors"
+          className="px-8 py-3 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 disabled:bg-slate-100 disabled:text-slate-500 rounded-xl font-bold transition-colors"
         >
           {currentIndex === QUESTIONS.length - 1 ? 'Submit Assessment' : 'Next Question'}
         </button>
