@@ -56,8 +56,6 @@ function App() {
             element={
               useAuthStore().isAuthenticated ? <TrainerOnboarding /> : <Navigate to="/login" />
             } 
-          /> : <Navigate to="/login" />
-            } 
           />
           <Route 
             path="/dashboard" 
