@@ -29,3 +29,5 @@
 .cc-hero p{max-width:560px}
 .cc-hero-meta{justify-content:center}
 .cc-hero{min-height:100svh;padding:0}
+
+.cc-app select option { background: #1e1e1e; color: #fff; }
