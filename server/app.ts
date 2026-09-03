@@ -36,6 +36,8 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/v1/competency', require('./routes/competency').default);
 app.use('/api/v1/manager', require('./routes/manager').default);
+app.use('/api/courses', require('./routes/courses').default);
+app.use('/api/assessments', require('./routes/assessments').default);
 
 app.get('/api/health', (req, res) => {
   res.json({
