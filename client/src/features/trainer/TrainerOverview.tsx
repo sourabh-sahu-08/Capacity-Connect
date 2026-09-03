@@ -66,10 +66,7 @@ export const TrainerOverview = () => {
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
             <Calendar size={14} /> Today
           </button>
-          <button className="flex items-center justify-center w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-purple-600 hover:border-purple-200 shadow-sm relative">
-            <Bell size={16} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          
           <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm">
             <Plus size={14} /> Create
           </button>
