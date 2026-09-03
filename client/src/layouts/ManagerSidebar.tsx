@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, Hexagon, Crosshair, TrendingUp, Map, FileText, Bell, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Hexagon, Crosshair, TrendingUp, Map, FileText, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 const NAV_ITEMS = [
@@ -63,13 +63,7 @@ export const ManagerSidebar = () => {
       </div>
 
       <div className="mt-auto w-full px-3 flex flex-col items-center gap-2">
-        <button 
-          onMouseEnter={() => setHoveredItem('Notifications')}
-          onMouseLeave={() => setHoveredItem(null)}
-          className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-        >
-          <Bell className="w-5 h-5 shrink-0 z-10" />
-        </button>
+        
         <button 
           onMouseEnter={() => setHoveredItem('Settings')}
           onMouseLeave={() => setHoveredItem(null)}
