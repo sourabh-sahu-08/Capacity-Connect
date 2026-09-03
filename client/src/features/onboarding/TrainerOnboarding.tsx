@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import { useAuthStore } from '../../store/authStore';
+
 
 const steps = ['Expertise', 'Experience', 'Methods', 'Objectives'];
 
@@ -28,8 +31,7 @@ export const TrainerOnboarding = () => {
       await axios.post(
         `${apiURL}/api/onboarding/complete-trainer`,
         {
-          expertiseAreas: selectedExpertise,
-          availability: availability
+          expertise, subjects, experience, type, learners, methods, objective
         },
         {
           headers: { Authorization: `Bearer ${token}` }

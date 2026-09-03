@@ -76,327 +76,165 @@ export const ManagerDashboard = () => {
   }
 
   return (
-    <div className="space-y-10 pb-32">
+    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
       
-      {/* 1. EXECUTIVE HEADER */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Workforce Intelligence</h1>
-          <p className="text-sm text-slate-500">A real-time overview of your organization\'s capability and readiness.</p>
+      {/* HERO / WORKFORCE CORE */}
+      <section className="relative flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+           <div className="w-[800px] h-[800px] border border-slate-100 rounded-full" />
+           <div className="w-[600px] h-[600px] border border-slate-100 rounded-full absolute" />
+           <div className="w-[400px] h-[400px] border border-slate-100 rounded-full absolute" />
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
-            <Building2 size={14} /> Team
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
-            <Filter size={14} /> Dept
-          </button>
-          <div className="h-6 w-px bg-slate-200 mx-1"></div>
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold tracking-widest uppercase text-slate-700 hover:bg-slate-200 shadow-sm">
-            <Calendar size={14} /> {timeframe}
-          </button>
-        </div>
-      </header>
 
-      {/* 2. ORGANIZATION HEALTH OVERVIEW */}
-      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {[
-          { label: 'Active Learners', value: executiveData.health.activeLearners },
-          { label: 'Avg Competency', value: `${executiveData.health.avgCompetency}%` },
-          { label: 'Workforce Readiness', value: `${executiveData.health.readiness}%` },
-          { label: 'Completion', value: `${executiveData.health.completion}%` },
-          { label: 'Teams At Risk', value: executiveData.health.teamsAtRisk, alert: true },
-          { label: 'Critical Gaps', value: executiveData.health.criticalGaps, alert: true }
-        ].map((kpi, idx) => (
-          <div key={idx} className={`bg-white border ${kpi.alert ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm`}>
-            <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1">{kpi.label}</span>
-            <span className={`text-xl font-medium ${kpi.alert ? 'text-amber-600' : 'text-slate-900'}`}>{kpi.value}</span>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 mb-20 z-10 text-center"
+        >
+          <h2 className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">
+            Workforce Intelligence
+          </h2>
+          <h1 className="text-sm font-medium tracking-[0.3em] text-slate-700 uppercase">
+            Organization capability & readiness
+          </h1>
+        </motion.div>
+
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-slate-900 to-slate-500">
+            {executiveData.kpis.overallCompetency}
           </div>
-        ))}
-      </section>
-
-      {/* 3. STRATEGIC ATTENTION */}
-      <section>
-        <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase mb-4 flex items-center gap-2">
-          <ShieldAlert size={16} className="text-rose-500" /> Strategic Attention
-        </h2>
-        <div className="bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden divide-y divide-slate-100">
-          {executiveData.strategicAttention.map((item) => (
-            <div key={item.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertTriangle size={14} className={item.risk === 'HIGH' ? 'text-rose-500' : 'text-amber-500'} />
-                  <h3 className="font-bold text-slate-900 text-sm">{item.target}</h3>
-                </div>
-                <p className="text-sm text-slate-600 ml-6">{item.issue}</p>
-              </div>
-              <div className="flex items-center justify-between md:justify-end gap-6 md:w-1/3">
-                {item.readiness && (
-                  <div className="text-left">
-                    <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400">Readiness</span>
-                    <span className="text-sm font-medium text-slate-900">{item.readiness}%</span>
-                  </div>
-                )}
-                <div className="text-left">
-                  <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400">Risk</span>
-                  <span className={`text-xs font-bold tracking-widest uppercase ${item.risk === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}`}>
-                    {item.risk}
-                  </span>
-                </div>
-                <button className="px-4 py-1.5 bg-white border border-slate-200 rounded-md text-[10px] font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm shrink-0">
-                  {item.actionLabel}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* 4. TEAM CAPABILITY OVERVIEW */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Team Capability Overview</h2>
-            <button className="text-[10px] font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Teams →</button>
+          <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
+            Competency Index
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="divide-y divide-slate-100">
-              {executiveData.teams.map(team => (
-                <div key={team.id} className="p-5 hover:bg-slate-50 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-medium text-slate-900">{team.name}</h3>
-                      <p className="text-xs text-slate-500">{team.members} Members</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-[9px] font-bold tracking-widest uppercase ${team.status === 'Healthy' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                      {team.status}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <div>
-                      <span className="text-slate-500 mr-2">Competency:</span>
-                      <span className="font-medium text-slate-900">{team.competency}%</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 mr-2">Readiness:</span>
-                      <span className="font-medium text-slate-900">{team.readiness}%</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-slate-500 mr-1">Trend:</span>
-                      {team.trendDir === 'up' ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-amber-500" />}
-                      <span className={`font-medium ${team.trendDir === 'up' ? 'text-emerald-600' : 'text-amber-600'}`}>{team.trend}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 5. CRITICAL SKILL GAPS */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Critical Capability Gaps</h2>
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden divide-y divide-slate-100">
-            {executiveData.criticalGaps.map((gap, idx) => (
-              <div key={gap.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-sm font-bold text-slate-400">{idx + 1}.</span>
-                    <h3 className="font-medium text-slate-900">{gap.skill}</h3>
-                  </div>
-                  <p className="text-xs text-slate-500 ml-6">Affected Employees: {gap.affected}</p>
-                </div>
-                <div className="flex-1 text-center hidden sm:block">
-                  <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Business Importance</span>
-                  <span className="text-xs font-medium text-slate-700">{gap.importance}</span>
-                </div>
-                <div className="flex-1 text-right">
-                  <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Gap Severity</span>
-                  <span className={`text-xs font-bold tracking-widest uppercase ${gap.severity === 'HIGH' ? 'text-rose-600' : 'text-amber-600'}`}>{gap.severity}</span>
-                </div>
-                <div className="ml-4 shrink-0">
-                  <button className="px-3 py-1.5 bg-white border border-slate-200 rounded-md text-[10px] font-bold tracking-widest uppercase text-slate-600 hover:bg-slate-50 shadow-sm">
-                    Analyze
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
-        
-        {/* 6. WORKFORCE READINESS */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Role Readiness</h2>
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <div className="space-y-6">
-              {executiveData.roleReadiness.map(role => (
-                <div key={role.id}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-slate-900">{role.role}</span>
-                    <span className="text-sm font-bold text-purple-600">{role.readiness}%</span>
-                  </div>
-                  <div className="relative w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="absolute top-0 left-0 h-full bg-purple-500 rounded-full" style={{ width: `${role.readiness}%` }}></div>
-                    {/* Target Marker */}
-                    <div className="absolute top-0 h-full w-1 bg-slate-800 z-10" style={{ left: `${role.target}%` }} title={`Target: ${role.target}%`}></div>
-                  </div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 text-right">Target: {role.target}%</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 7. CAPACITY AI EXECUTIVE INSIGHT */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">AI Executive Insight</h2>
-          <div className="bg-violet-50 border border-violet-200 rounded-xl p-6 shadow-sm relative overflow-hidden h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-4">
-              <Brain size={16} className="text-violet-600" />
-              <span className="text-xs font-bold tracking-widest text-violet-600 uppercase">✦ Capacity AI Insight</span>
-            </div>
-            
-            <h3 className="text-lg font-medium text-slate-900 mb-2">{executiveData.aiInsight.title}</h3>
-            <p className="text-sm text-slate-700 mb-6">{executiveData.aiInsight.description}</p>
-            
-            <div className="mt-auto space-y-4">
-              <div className="bg-white/50 border border-violet-100 rounded-lg p-3">
-                <span className="block text-[10px] font-bold tracking-widest uppercase text-violet-600 mb-1">Projected Impact</span>
-                <p className="text-sm text-slate-800 font-medium">{executiveData.aiInsight.impact}</p>
-              </div>
-              
-              <div className="bg-white/50 border border-violet-100 rounded-lg p-3">
-                <span className="block text-[10px] font-bold tracking-widest uppercase text-violet-600 mb-1">Recommended Action</span>
-                <p className="text-sm text-slate-800 font-medium">{executiveData.aiInsight.recommendation}</p>
-              </div>
-              
-              <button className="w-full py-2 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white rounded-md text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm transition-colors">
-                View Recommendation
-              </button>
-            </div>
-          </div>
-        </section>
-        
-      </div>
-
-      {/* 8. WORKFORCE GROWTH ANALYTICS & 9. TEAM COMPARISON */}
-      <section className="pt-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase">Growth & Comparison</h2>
-          <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-            {['7D', '30D', '90D', '1Y'].map(range => (
-              <button 
-                key={range} 
-                onClick={() => setTimeframe(range)}
-                className={`px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase transition-colors ${timeframe === range ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                {range}
-              </button>
-            ))}
+          <div className="text-xs tracking-widest text-emerald-600/80 mt-2 font-medium uppercase">
+            {executiveData.kpis.competencyGrowth} THIS MONTH
           </div>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[220px]">
-             <BarChart3 size={32} className="text-slate-300 mb-3" />
-             <span className="text-xs font-bold tracking-widest text-slate-400 uppercase text-center">Competency Growth Trend<br/>[ Chart Placeholder ]</span>
-          </div>
-          
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-              <h3 className="text-xs font-bold tracking-widest text-slate-600 uppercase">Team Comparison Matrix</h3>
-            </div>
-            <div className="p-0 overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="px-6 py-3 text-[10px] font-bold tracking-widest text-slate-500 uppercase bg-white sticky left-0 z-10">Metric</th>
-                    <th className="px-6 py-3 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Engineering</th>
-                    <th className="px-6 py-3 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Design</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest text-slate-500 uppercase bg-white sticky left-0 z-10">Competency</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">78%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">64%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">81%</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest text-slate-500 uppercase bg-white sticky left-0 z-10">Readiness</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">72%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">58%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-slate-900">84%</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest text-slate-500 uppercase bg-white sticky left-0 z-10">Growth</td>
-                    <td className="px-6 py-3 text-sm font-medium text-emerald-600">+8%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-emerald-600">+3%</td>
-                    <td className="px-6 py-3 text-sm font-medium text-emerald-600">+11%</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest text-slate-500 uppercase bg-white sticky left-0 z-10">Risk</td>
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest uppercase text-amber-600">Medium</td>
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest uppercase text-rose-600">High</td>
-                    <td className="px-6 py-3 text-xs font-bold tracking-widest uppercase text-emerald-600">Low</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* 10. SECONDARY INFORMATION */}
-      <section className="pt-10">
-        <h2 className="text-sm font-bold tracking-widest text-slate-900 uppercase mb-4">Organizational Updates</h2>
-        <div className="flex flex-wrap gap-2 mb-6">
-          {['Activity', 'Initiatives', 'Milestones'].map(tab => (
-            <button 
-              key={tab} 
-              onClick={() => setActiveSecondaryTab(tab)}
-              className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${activeSecondaryTab === tab ? 'bg-purple-50 border border-purple-200 text-purple-600' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+        {/* Constellation Nodes for Manager */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[
+            { id: '1', x: '50%', y: '10%', label: 'Engineering (78%)' },
+            { id: '2', x: '80%', y: '50%', label: 'Product (64%)' },
+            { id: '3', x: '50%', y: '90%', label: 'Design (81%)' },
+            { id: '4', x: '20%', y: '50%', label: 'Marketing (70%)' },
+          ].map(node => (
+            <div 
+              key={node.id} 
+              className="absolute pointer-events-auto flex flex-col items-center gap-2 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 hover:scale-110 cursor-crosshair"
+              style={{ left: node.x, top: node.y }}
             >
-              {tab}
-            </button>
+              <div className="w-3 h-3 rounded-full bg-slate-300 hover:bg-purple-400 hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] transition-all" />
+              <div className="text-[10px] tracking-[0.2em] uppercase font-bold text-slate-500 hover:text-purple-700 transition-colors">
+                {node.label}
+              </div>
+            </div>
           ))}
-        </div>
-        
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm min-h-[160px]">
-          <AnimatePresence mode="wait">
-            {activeSecondaryTab === 'Activity' && (
-              <motion.div key="1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <h3 className="text-xs font-bold tracking-widest text-slate-900 uppercase mb-4">Recent Activity</h3>
-                <div className="space-y-4">
-                  {executiveData.recentActivity.map(act => (
-                    <div key={act.id} className="flex justify-between items-center pb-3 border-b border-slate-100 last:border-0">
-                      <span className="text-sm text-slate-700">{act.text}</span>
-                      <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{act.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-            {activeSecondaryTab === 'Initiatives' && (
-              <motion.div key="2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center h-full pt-6">
-                <span className="text-xs font-bold tracking-widest text-slate-400 uppercase text-center">No active upcoming initiatives.</span>
-              </motion.div>
-            )}
-            {activeSecondaryTab === 'Milestones' && (
-              <motion.div key="3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center h-full pt-6">
-                <span className="text-xs font-bold tracking-widest text-slate-400 uppercase text-center">Organizational milestones will appear here.</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <svg className="absolute inset-0 w-full h-full opacity-20" style={{ zIndex: -1 }}>
+            <line x1="20%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="80%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="10%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="90%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+          </svg>
         </div>
       </section>
-      
+
+      {/* PRIORITY ACTION */}
+      <section className="mt-20">
+        <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
+          <div className="space-y-8 flex-1">
+            <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
+              <Brain size={14} className="text-violet-600" /> Strategic Insight
+            </h3>
+            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
+              {executiveData.aiInsight.headline}
+            </h2>
+            <p className="text-slate-600 max-w-md text-lg leading-relaxed">
+              {executiveData.aiInsight.impact} {executiveData.aiInsight.recommendation}
+            </p>
+          </div>
+          <div className="shrink-0 flex flex-col items-end gap-6">
+            <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
+              Action Required
+            </div>
+            <button className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
+              <span className="text-sm font-bold tracking-widest uppercase">Deploy Training</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* HORIZONTAL TIMELINE / WORKFLOW */}
+      <section className="border-t border-slate-100 pt-20">
+        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-16">
+          Capability Trajectory
+        </h3>
+        
+        <div className="relative">
+          <div className="absolute top-4 left-0 right-0 h-px bg-slate-200"></div>
+          
+          <div className="grid grid-cols-3 gap-8 relative z-10">
+            {/* PAST */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-white border border-slate-300 flex items-center justify-center mx-auto md:mx-0">
+                <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Q3 Objective</div>
+                <h4 className="text-lg font-medium text-slate-600">Cloud Architecture</h4>
+                <div className="text-xs tracking-widest text-emerald-600/70 mt-2 uppercase">Achieved Target</div>
+              </div>
+            </div>
+
+            {/* NOW */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-purple-600 uppercase mb-2">Current Focus</div>
+                <h4 className="text-lg font-medium text-slate-900">Machine Learning</h4>
+                <div className="text-xs tracking-widest text-slate-600 mt-2 uppercase">Accelerating</div>
+              </div>
+            </div>
+
+            {/* FUTURE */}
+            <div className="space-y-6">
+              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mx-auto md:mx-0">
+                <div className="w-2 h-2 rounded-full border border-slate-300"></div>
+              </div>
+              <div>
+                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Q1 Roadmap</div>
+                <h4 className="text-lg font-medium text-slate-500">Generative AI</h4>
+                <div className="text-xs tracking-widest text-slate-500 mt-2 uppercase">Planning Phase</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INSIGHTS AS STORIES */}
+      <section className="border-t border-slate-100 pt-20">
+        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-12">
+          Readiness Story
+        </h3>
+        
+        <div className="group cursor-pointer">
+          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-purple-100 transition-colors">
+            {executiveData.kpis.rolesFilled}%
+          </div>
+          <div className="max-w-2xl space-y-6">
+            <h4 className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed">
+              Target roles ready for deployment. The largest capability gap is currently situated in <strong className="text-slate-900 font-medium">Product Management</strong>.
+            </h4>
+            <div className="flex items-center gap-2 text-sm font-bold tracking-widest text-purple-600 uppercase group-hover:text-purple-700 transition-colors">
+              Explore Gap Analysis <ChevronRight size={16} />
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 };

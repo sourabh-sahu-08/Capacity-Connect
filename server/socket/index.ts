@@ -14,9 +14,9 @@ export const initializeSocket = (io: Server) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { user: { id: string, role: string } };
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string, role: string };
       // Attach user info to socket
-      (socket as any).user = decoded.user;
+      (socket as any).user = { id: decoded.id, role: decoded.role };
       next();
     } catch (err) {
       return next(new Error('Authentication error: Invalid token'));
