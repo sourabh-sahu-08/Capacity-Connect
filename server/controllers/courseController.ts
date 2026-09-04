@@ -33,7 +33,16 @@ export const getCourses = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    const courses = await Course.find({ trainerId: req.user._id }).sort({ createdAt: -1 });
+    // If query contains ?myCourses=true, return only courses by this trainer
+    let query: any = { status: 'Active' };
+    if (req.query.myCourses === 'true') {
+      query = { trainerId: req.user._id };
+    }
+
+    const courses = await Course.find(query)
+      .populate('trainerId', 'name')
+      .sort({ createdAt: -1 });
+      
     res.json(courses);
   } catch (error) {
     console.error('Get Courses Error:', error);

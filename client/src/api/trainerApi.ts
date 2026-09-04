@@ -1,7 +1,7 @@
 import api from './axios';
 
 export const getCourses = async () => {
-  const response = await api.get('/api/courses');
+  const response = await api.get('/api/courses?myCourses=true');
   return response.data;
 };
 
