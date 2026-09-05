@@ -1,198 +1,77 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { ArrowRight, ChevronRight, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { getCompetencyProfile, getSkillGaps } from '../../api/intelligenceApi';
+import { learnerDashboardData as data } from './learnerDashboard.data';
+import { ArrowRight, Award, Bell, BookOpen, Brain, Check, ChevronRight, Circle, Clock3, Flame, Play, ShieldCheck, Star, Target, TrendingUp, Zap } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
+const activity = [{ day: 'Mon', hours: 2 }, { day: 'Tue', hours: 1 }, { day: 'Wed', hours: 3 }, { day: 'Thu', hours: 2 }, { day: 'Fri', hours: 4 }, { day: 'Sat', hours: 1 }, { day: 'Sun', hours: 3 }];
+const activityIcons = { course: BookOpen, assessment: Target, certificate: Award, competency: TrendingUp };
+
+const SectionHeading = ({ eyebrow, title, action, onAction }) => (
+  <div className="mb-5 flex items-end justify-between gap-4">
+    <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-purple-300">{eyebrow}</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-white">{title}</h2></div>
+    {action && <button onClick={onAction} className="flex items-center gap-1 text-xs font-semibold text-slate-400 transition-colors hover:text-white">{action}<ChevronRight size={14} /></button>}
+  </div>
+);
+
+const ProgressBar = ({ value, color = 'bg-purple-400' }) => <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} /></div>;
 
 export const LearnerDashboard = () => {
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
   const navigate = useNavigate();
-  const firstName = user?.name?.split(' ')[0] || 'SOURABH';
-  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [gaps, setGaps] = useState<any>(null);
+  const firstName = user?.name?.split(' ')[0] || 'Learner';
 
   useEffect(() => {
-    if (token) {
-      getCompetencyProfile(token).then(setProfile).catch(console.error);
-      getSkillGaps(token, 'dummy_role_id').then(setGaps).catch(console.error);
-    }
+    let active = true;
+    const load = async () => {
+      if (token) {
+        try { const result = await getCompetencyProfile(token); if (active) setProfile(result); } catch { /* Mock data keeps the dashboard useful when the service is unavailable. */ }
+        try { await getSkillGaps(token, 'dummy_role_id'); } catch { /* Skill gaps are replaced by the API when available. */ }
+      }
+      if (active) setLoading(false);
+    };
+    load();
+    return () => { active = false; };
   }, [token]);
 
-  const capabilityNodes = [
-    { id: '1', x: '50%', y: '10%', label: 'Architecture' },
-    { id: '2', x: '80%', y: '50%', label: 'Systems' },
-    { id: '3', x: '50%', y: '90%', label: 'Logic' },
-    { id: '4', x: '20%', y: '50%', label: 'UI/UX' },
+  if (loading) return <div className="space-y-6 pb-24 animate-pulse"><div className="h-48 rounded-2xl bg-white/[.06]" /><div className="grid grid-cols-2 gap-3 lg:grid-cols-6">{[1, 2, 3, 4, 5, 6].map(item => <div key={item} className="h-24 rounded-xl bg-white/[.06]" />)}</div><div className="h-72 rounded-2xl bg-white/[.06]" /></div>;
+
+  const overall = profile?.overallScore ? Math.round(profile.overallScore) : 78;
+  const stats = [
+    { label: 'Active courses', value: '4', note: '2 due this month', icon: BookOpen, accent: 'text-purple-300' }, { label: 'Completed courses', value: '8', note: '2 this quarter', icon: Check, accent: 'text-emerald-300' }, { label: 'Learning hours', value: '32h', note: '12h this week', icon: Clock3, accent: 'text-sky-300' }, { label: 'Avg. assessment', value: '84%', note: 'Strong momentum', icon: Target, accent: 'text-amber-300' }, { label: 'Certificates', value: '5', note: 'All verified', icon: Award, accent: 'text-pink-300' }, { label: 'Learning streak', value: '7 days', note: 'Keep it going', icon: Flame, accent: 'text-orange-300' },
   ];
 
-  const overallScore = profile ? Math.round(profile.overallScore) : 78;
-  const growth = profile?.growth?.monthly ? `+${Math.round(profile.growth.monthly)}%` : '+6.4%';
-  const actionTitle = gaps?.nextBestAction?.title || 'Strengthen Backend Architecture.';
-  const actionImpact = gaps?.nextBestAction?.estimatedImpact || 14;
-
   return (
-    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
-      
-      {/* HERO / CAPABILITY CORE */}
-      <section className="relative flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
-           <div className="w-[800px] h-[800px] border border-slate-100 rounded-full" />
-           <div className="w-[600px] h-[600px] border border-slate-100 rounded-full absolute" />
-           <div className="w-[400px] h-[400px] border border-slate-100 rounded-full absolute" />
-        </div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4 mb-20 z-10"
-        >
-          <h2 className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">
-            Good Evening, {firstName}
-          </h2>
-          <h1 className="text-sm font-medium tracking-[0.3em] text-slate-700 uppercase">
-            Your capability system is evolving
-          </h1>
-        </motion.div>
-
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-slate-900 to-slate-500">
-            {overallScore}
-          </div>
-          <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
-            Capability Core
-          </div>
-          <div className="text-xs tracking-widest text-emerald-600/80 mt-2 font-medium">
-            {growth} THIS MONTH
-          </div>
-        </div>
-
-        {/* Constellation Nodes */}
-        <div className="absolute inset-0 pointer-events-none">
-          {capabilityNodes.map(node => (
-            <div 
-              key={node.id} 
-              className="absolute pointer-events-auto flex flex-col items-center gap-2 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 hover:scale-110 cursor-crosshair"
-              style={{ left: node.x, top: node.y }}
-              onMouseEnter={() => setHoveredNode(node.id)}
-              onMouseLeave={() => setHoveredNode(null)}
-            >
-              <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-purple-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-slate-300'}`} />
-              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors ${hoveredNode === node.id ? 'text-purple-700' : 'text-slate-500'}`}>
-                {node.label}
-              </div>
-            </div>
-          ))}
-          {/* Subtle connecting lines */}
-          <svg className="absolute inset-0 w-full h-full opacity-20" style={{ zIndex: -1 }}>
-            <line x1="20%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-            <line x1="80%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-            <line x1="50%" y1="10%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-            <line x1="50%" y1="90%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-          </svg>
+    <div className="space-y-10 pb-28">
+      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#211b3a] via-[#151525] to-[#101318] p-6 sm:p-8">
+        <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="relative flex flex-col justify-between gap-7 lg:flex-row lg:items-center">
+          <div className="max-w-2xl"><div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300"><Zap size={14} /> Learner workspace</div><h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Good morning, {firstName} <span aria-hidden="true">👋</span></h1><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">Continue your learning journey and build the competencies you need for your next opportunity.</p><div className="mt-6 flex flex-wrap items-center gap-3"><button onClick={() => navigate(`/course/${data.courses[0].id}`)} className="inline-flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-400"><Play size={15} fill="currentColor" /> Continue learning <ArrowRight size={15} /></button><span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[.04] px-3 py-2 text-xs text-slate-300"><Flame size={14} className="text-orange-300" /> 7 day streak</span></div></div>
+          <div className="flex items-center gap-5 rounded-xl border border-white/10 bg-black/10 px-5 py-4"><div className="relative grid h-20 w-20 place-items-center rounded-full" style={{ background: `conic-gradient(#a78bfa ${overall}%, rgba(255,255,255,.1) 0)` }}><div className="grid h-16 w-16 place-items-center rounded-full bg-[#17172a] text-2xl font-semibold text-white">{overall}</div></div><div><p className="text-xs uppercase tracking-wider text-slate-400">Overall progress</p><p className="mt-1 text-sm font-medium text-white">Capability readiness</p><p className="mt-2 text-xs text-emerald-300">+6% this month</p></div></div>
         </div>
       </section>
 
-      {/* NEXT BEST ACTION */}
-      <section className="mt-20">
-        <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
-          <div className="space-y-8 flex-1">
-            <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
-              <Sparkles size={14} className="text-violet-600" /> Next Best Action
-            </h3>
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
-              {actionTitle}
-            </h2>
-            <p className="text-slate-600 max-w-md text-lg leading-relaxed">
-              Improving this competency could increase your target role readiness by <strong className="text-slate-900 font-medium">+{actionImpact}%</strong>.
-            </p>
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-6">
-            <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
-              Est. Effort - 4.5 Hours
-            </div>
-            <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
-              <span className="text-sm font-bold tracking-widest uppercase">Start Path</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </div>
-      </section>
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">{stats.map(({ label, value, note, icon: Icon, accent }) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.045] p-4 transition hover:border-white/20 hover:bg-white/[.07]"><Icon size={17} className={accent} /><p className="mt-4 text-2xl font-semibold text-white">{value}</p><p className="mt-1 text-xs font-medium text-slate-300">{label}</p><p className="mt-2 text-[10px] text-slate-500">{note}</p></div>)}</section>
 
-      {/* HORIZONTAL TIMELINE */}
-      <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-16">
-          Career Evolution
-        </h3>
-        
-        <div className="relative">
-          <div className="absolute top-4 left-0 right-0 h-px bg-slate-200"></div>
-          
-          <div className="grid grid-cols-3 gap-8 relative z-10">
-            {/* PAST */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-300 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Past</div>
-                <h4 className="text-lg font-medium text-slate-600">JavaScript Foundation</h4>
-                <div className="text-xs tracking-widest text-emerald-600/70 mt-2 uppercase">Completed</div>
-              </div>
-            </div>
+      <section><SectionHeading eyebrow="Priority learning" title="Continue learning" action="View all courses" onAction={() => navigate('/learning-hub')} /><div className="grid gap-4 lg:grid-cols-2">{data.courses.map(course => <article key={course.id} className="overflow-hidden rounded-xl border border-white/10 bg-white/[.045] transition hover:border-purple-300/40"><div className="flex flex-col sm:flex-row"><img src={course.image} alt="" className="h-40 w-full object-cover sm:h-auto sm:w-44" /><div className="flex-1 p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] uppercase tracking-wider text-purple-300">{course.category}</p><h3 className="mt-1 font-semibold text-white">{course.title}</h3><p className="mt-1 text-xs text-slate-400">with {course.trainer} · {course.level}</p></div><span className="text-lg font-semibold text-purple-200">{course.progress}%</span></div><div className="mt-5"><div className="mb-2 flex justify-between text-[11px] text-slate-400"><span>{course.modules}</span><span>{course.lastAccessed}</span></div><ProgressBar value={course.progress} /></div><button onClick={() => navigate(`/course/${course.id}`)} className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-purple-300">Continue learning <ArrowRight size={14} /></button></div></div></article>)}</div></section>
 
-            {/* NOW */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-purple-600 uppercase mb-2">Now</div>
-                <h4 className="text-lg font-medium text-slate-900">Backend Architecture</h4>
-                <div className="text-xs tracking-widest text-slate-600 mt-2 uppercase">In Progress</div>
-              </div>
-            </div>
+      <div className="grid gap-8 xl:grid-cols-[1.15fr_.85fr]"><section><SectionHeading eyebrow="Next up" title="Upcoming assessments" action="View assessments" onAction={() => navigate('/learning-hub')} /><div className="divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[.045]">{data.assessments.map(item => <div key={item.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3"><div className={`mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg ${item.status === 'Due soon' ? 'bg-amber-400/10 text-amber-300' : item.status === 'Completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-sky-400/10 text-sky-300'}`}><Target size={15} /></div><div><p className="text-sm font-medium text-white">{item.title}</p><p className="mt-1 text-xs text-slate-400">{item.course} · {item.questions} questions · {item.duration}</p><p className="mt-2 text-[11px] text-slate-500">Deadline: {item.deadline}</p></div></div><div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end"><span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{item.status}</span>{item.status !== 'Completed' && <button className="rounded-md border border-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-purple-300/50 hover:text-white">Start</button>}</div></div>)}</div></section><section><SectionHeading eyebrow="Your rhythm" title="Learning activity" /><div className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="mb-3 flex items-end justify-between"><div><p className="text-3xl font-semibold text-white">12<span className="text-base text-slate-500"> / 15h</span></p><p className="text-xs text-slate-400">Weekly learning goal</p></div><span className="text-xs font-medium text-emerald-300">80% complete</span></div><div className="h-44"><ResponsiveContainer width="100%" height="100%"><AreaChart data={activity} margin={{ top: 10, right: 5, left: -24, bottom: 0 }}><defs><linearGradient id="learningFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a78bfa" stopOpacity={0.4} /><stop offset="100%" stopColor="#a78bfa" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" vertical={false} /><XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} /><YAxis tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: '#1b1a2b', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: 12 }} /><Area type="monotone" dataKey="hours" stroke="#a78bfa" fill="url(#learningFill)" strokeWidth={2} /></AreaChart></ResponsiveContainer></div></div></section></div>
 
-            {/* FUTURE */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full border border-slate-300"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Future</div>
-                <h4 className="text-lg font-medium text-slate-500">Full Stack Engineer</h4>
-                <div className="text-xs tracking-widest text-slate-500 mt-2 uppercase">Target</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section><SectionHeading eyebrow="Curated for your growth" title="Recommended for you" action="Explore courses" onAction={() => navigate('/learning-hub')} /><div className="grid gap-4 md:grid-cols-3">{data.recommendations.map(course => <article key={course.id} className="overflow-hidden rounded-xl border border-white/10 bg-white/[.045] transition hover:-translate-y-0.5 hover:border-purple-300/40"><img src={course.image} alt="" className="h-32 w-full object-cover" /><div className="p-4"><div className="flex items-center justify-between text-[11px] text-slate-400"><span>{course.level}</span><span className="flex items-center gap-1 text-amber-200"><Star size={12} fill="currentColor" /> {course.rating}</span></div><h3 className="mt-2 font-semibold text-white">{course.title}</h3><p className="mt-1 text-xs text-slate-400">{course.trainer} · {course.duration}</p><p className="mt-4 rounded-md bg-purple-400/10 p-2.5 text-xs leading-5 text-purple-200"><Brain size={13} className="mr-1 inline" /> {course.reason}</p><button onClick={() => navigate('/learning-hub')} className="mt-4 text-xs font-semibold text-white hover:text-purple-300">View course <ArrowRight size={13} className="ml-1 inline" /></button></div></article>)}</div></section>
 
-      {/* INSIGHTS AS STORIES */}
-      <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-12">
-          Growth Story
-        </h3>
-        
-        <div className="group cursor-pointer">
-          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-purple-100 transition-colors">
-            +16%
-          </div>
-          <div className="max-w-2xl space-y-6">
-            <h4 className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed">
-              Competency growth over the last 90 days. Your strongest acceleration happened after completing <strong className="text-slate-900 font-medium">Advanced React Architecture</strong>.
-            </h4>
-            <div onClick={() => navigate('/competency-profile')} className="flex items-center gap-2 text-sm font-bold tracking-widest text-purple-600 uppercase group-hover:text-purple-700 transition-colors">
-              Explore Growth <ChevronRight size={16} />
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="grid gap-8 xl:grid-cols-[1.1fr_.9fr]"><section><SectionHeading eyebrow="Capability intelligence" title="My competencies" action="Full profile" onAction={() => navigate('/competency-profile')} /><div className="rounded-xl border border-white/10 bg-white/[.045] p-5"><div className="space-y-5">{data.competencies.map(item => <div key={item.name}><div className="mb-2 flex items-center justify-between text-xs"><span className="font-medium text-slate-200">{item.name}</span><span className="text-slate-400">{item.score}% · {item.level}</span></div><div className="relative"><ProgressBar value={item.score} color="bg-emerald-300" /><span className="absolute -top-1.5 h-4 w-px bg-purple-300/70" style={{ left: `${item.target}%` }} /></div><p className="mt-1 text-[10px] text-slate-500">Target level: {item.target}%</p></div>)}</div></div></section><section><SectionHeading eyebrow="Close the gap" title="Your skill gaps" action="View analysis" onAction={() => navigate('/skill-gap')} /><div className="space-y-3">{data.skillGaps.map(gap => <div key={gap.name} className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-medium text-white">{gap.name}</h3><p className="mt-1 text-xs text-slate-400">{gap.current} <span className="mx-1 text-slate-600">→</span> {gap.target}</p></div><span className="text-lg font-semibold text-amber-200">{gap.score}%</span></div><ProgressBar value={gap.score} color="bg-amber-300" /><p className="mt-3 text-xs text-slate-400">Recommended: <span className="text-slate-200">{gap.recommendation}</span></p><button onClick={() => navigate('/skill-gap')} className="mt-3 text-xs font-semibold text-purple-200 hover:text-white">View recommendation <ArrowRight size={13} className="ml-1 inline" /></button></div>)}</div></section></div>
 
+      <section><SectionHeading eyebrow="Your next opportunity" title="Recommended learning path" /><div className="overflow-x-auto rounded-xl border border-white/10 bg-white/[.045] p-5"><div className="flex min-w-[680px] items-start">{data.learningPath.map((item, index) => <React.Fragment key={item.title}><div className="flex w-36 flex-col items-center text-center"><div className={`grid h-9 w-9 place-items-center rounded-full border ${item.state === 'complete' ? 'border-emerald-300/50 bg-emerald-300/10 text-emerald-300' : item.state === 'current' ? 'border-purple-300 bg-purple-400/20 text-purple-200 shadow-[0_0_20px_rgba(167,139,250,.2)]' : 'border-white/15 text-slate-500'}`}>{item.state === 'complete' ? <Check size={15} /> : item.state === 'current' ? <Play size={13} fill="currentColor" /> : <Circle size={10} />}</div><p className={`mt-3 text-xs ${item.state === 'current' ? 'font-semibold text-white' : 'text-slate-400'}`}>{item.title}</p><p className="mt-1 text-[10px] uppercase tracking-wider text-slate-600">{item.state}</p></div>{index < data.learningPath.length - 1 && <div className={`mt-4 h-px flex-1 ${item.state === 'complete' ? 'bg-emerald-300/50' : 'bg-white/10'}`} />}</React.Fragment>)}</div></div></section>
+
+      <div className="grid gap-8 lg:grid-cols-2"><section><SectionHeading eyebrow="Proof of progress" title="Certificates" action="View all" onAction={() => navigate('/achievements')} /><div className="grid gap-3 sm:grid-cols-2">{data.certificates.map(certificate => <div key={certificate.id} className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="mb-4 flex items-center justify-between"><div className="grid h-9 w-9 place-items-center rounded-lg bg-amber-300/10 text-amber-200"><Award size={17} /></div><span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300"><ShieldCheck size={13} /> Verified</span></div><h3 className="text-sm font-semibold text-white">{certificate.title}</h3><p className="mt-1 text-xs text-slate-400">{certificate.course}</p><p className="mt-3 text-[10px] text-slate-500">Issued {certificate.date} · {certificate.id}</p><div className="mt-4 flex gap-3"><button className="text-xs font-semibold text-purple-200 hover:text-white">View</button><button className="text-xs font-semibold text-slate-400 hover:text-white">Download</button></div></div>)}</div></section><section><SectionHeading eyebrow="Momentum" title="Recent activity" /><div className="rounded-xl border border-white/10 bg-white/[.045] p-4">{data.activity.map(item => { const Icon = activityIcons[item.type]; return <div key={item.text} className="flex gap-3 border-b border-white/10 py-3 last:border-0"><div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-purple-400/10 text-purple-200"><Icon size={13} /></div><div><p className="text-xs text-slate-200">{item.text}</p><p className="mt-1 text-[10px] text-slate-500">{item.time}</p></div></div>; })}</div></section></div>
+
+      <section><SectionHeading eyebrow="Stay informed" title="Notifications" action="View all" onAction={() => navigate('/notifications')} /><div className="grid gap-3 md:grid-cols-3">{data.notifications.map(item => <button key={item.text} onClick={() => navigate('/notifications')} className="rounded-xl border border-white/10 bg-white/[.045] p-4 text-left transition hover:border-white/20"><div className="flex items-start gap-3"><Bell size={15} className={item.unread ? 'text-purple-300' : 'text-slate-500'} /><div><p className="text-xs text-slate-200">{item.text}</p><p className="mt-2 text-[10px] text-slate-500">{item.time}{item.unread && <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-purple-300" />}</p></div></div></button>)}</div></section>
     </div>
   );
 };

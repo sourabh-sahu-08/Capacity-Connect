@@ -2,15 +2,17 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Compass, Layers, Zap, Hexagon, Trophy, Settings, LogOut } from 'lucide-react';
+import { BarChart3, BookOpen, Brain, Compass, FileCheck, Hexagon, Layers, LogOut, Settings, Trophy, UserRound } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const TRAINEE_NAV = [
-  { name: 'Core', icon: Hexagon, path: '/dashboard' },
-  { name: 'Discovery', icon: Compass, path: '/learning-hub' },
-  { name: 'Passport', icon: Layers, path: '/competency-profile' },
-  { name: 'Intelligence', icon: Zap, path: '/skill-gap' },
-  { name: 'Milestones', icon: Trophy, path: '/achievements' },
+  { name: 'Dashboard', icon: Hexagon, path: '/dashboard' },
+  { name: 'Explore courses', icon: Compass, path: '/learning-hub' },
+  { name: 'My learning', icon: BookOpen, path: '/learning-hub' },
+  { name: 'Assessments', icon: FileCheck, path: '/learning-hub' },
+  { name: 'Progress', icon: BarChart3, path: '/competency-profile' },
+  { name: 'Competencies', icon: Brain, path: '/competency-profile' },
+  { name: 'Certificates', icon: Trophy, path: '/achievements' },
   { name: 'System', icon: Settings, path: '/settings' },
 ];
 
@@ -25,7 +27,7 @@ export const Sidebar = () => {
   };
   
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-20 flex flex-col items-center py-8 bg-white border-r border-slate-200 z-50 shadow-sm">
+    <div className="fixed left-0 top-0 bottom-0 z-50 hidden w-20 flex-col items-center bg-white py-8 shadow-sm md:flex">
       <div className="w-10 h-10 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] rounded-lg flex items-center justify-center text-white font-bold tracking-tighter mb-8 cursor-pointer" onClick={() => navigate('/dashboard')}>
         C<span className="text-purple-200">C</span>
       </div>
@@ -82,6 +84,10 @@ export const Sidebar = () => {
             )}
           </AnimatePresence>
         </button>
+      </div>
+      <div className="fixed bottom-0 left-0 right-0 flex h-16 items-center justify-around border-t border-slate-200 bg-white px-2 md:hidden">
+        {TRAINEE_NAV.slice(0, 5).map(item => <NavLink key={`mobile-${item.name}`} to={item.path} className={({ isActive }) => `grid h-11 w-14 place-items-center rounded-lg ${isActive ? 'text-purple-600' : 'text-slate-500'}`} aria-label={item.name}><item.icon size={19} /></NavLink>)}
+        <button onClick={handleLogout} className="grid h-11 w-14 place-items-center rounded-lg text-slate-500" aria-label="Log out"><LogOut size={19} /></button>
       </div>
     </div>
   );
