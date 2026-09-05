@@ -123,6 +123,7 @@ function App() {
 
           {/* Trainee Routes (using AppShell) */}
           <Route path="/dashboard" element={<ProtectedRoute><TraineeRoute><AppShell><Dashboard /></AppShell></TraineeRoute></ProtectedRoute>} />
+          <Route path="/learner/dashboard" element={<ProtectedRoute><TraineeRoute><AppShell><Dashboard /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/learning-hub" element={<ProtectedRoute><TraineeRoute><AppShell><LearningHub /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/course/:id" element={<ProtectedRoute><TraineeRoute><AppShell><CoursePlayer /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/competency-profile" element={<ProtectedRoute><TraineeRoute><AppShell><CompetencyProfile /></AppShell></TraineeRoute></ProtectedRoute>} />
