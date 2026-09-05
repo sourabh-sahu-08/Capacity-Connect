@@ -7,6 +7,7 @@ import authRoutes from './routes/auth';
 import onboardingRoutes from './routes/onboarding';
 import notificationRoutes from './routes/notifications';
 import { initializeSocket } from './socket';
+import prisma from './config/prisma';
 
 dotenv.config();
 
@@ -21,7 +22,6 @@ const io = new Server(httpServer, {
   }
 });
 initializeSocket(io);
-
 
 // Middleware
 app.use(cors());
@@ -49,7 +49,12 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  try {
+    await prisma.$connect();
+    console.log('PostgreSQL Connected: Neon');
+  } catch (err) {
+    console.error('PostgreSQL Connection Failed:', err);
+  }
 });
-
