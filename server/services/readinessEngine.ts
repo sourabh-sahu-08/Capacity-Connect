@@ -1,7 +1,10 @@
-import RoleRequirement from '../models/RoleRequirement';
+import prisma from '../config/prisma';
 
 export const calculateRoleReadiness = async (roleId: string, userSkills: Array<{skillId: any, score: number}>) => {
-  const role = await RoleRequirement.findById(roleId).exec();
+  const role = await prisma.roleRequirement.findUnique({
+    where: { id: roleId },
+    include: { skills: true }
+  });
   if (!role) return { readinessScore: 0, criticalGaps: [], matchingSkills: [] };
 
   let totalWeightedScore = 0;
@@ -9,7 +12,7 @@ export const calculateRoleReadiness = async (roleId: string, userSkills: Array<{
   const criticalGaps: any[] = [];
   const matchingSkills: any[] = [];
 
-  role.skills.forEach(req => {
+  role.skills.forEach((req: any) => {
     const userSkill = userSkills.find(s => s.skillId.toString() === req.skillId.toString());
     const currentScore = userSkill ? userSkill.score : 0;
     

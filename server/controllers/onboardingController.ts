@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
+import prisma from '../config/prisma';
 interface AuthRequest extends Request {
   user?: any;
 }
@@ -40,24 +40,12 @@ export const completeOnboarding = async (req: AuthRequest, res: Response): Promi
   try {
     const { learningGoal, currentRole, targetRole, experienceLevel } = req.body;
     
-    if (!req.user || !req.user._id) {
+    if (!req.user || !req.user.id) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $set: {
-          'profile.learningGoal': learningGoal,
-          'profile.currentRole': currentRole,
-          'profile.targetRole': targetRole,
-          'profile.experienceLevel': experienceLevel,
-          learnerAssessmentCompleted: true
-        }
-      },
-      { new: true }
-    ).select('-password');
+    const updatedUser = await prisma.user.update({ where: { id: req.user.id }, data: { learningGoal, currentRole, targetRole, experienceLevel, learnerAssessmentCompleted: true }, select: { id: true, name: true, email: true, role: true, profileCompleted: true, learnerAssessmentCompleted: true, trainerOnboardingCompleted: true, organization: true } });
 
     res.json({
       success: true,
@@ -71,20 +59,12 @@ export const completeOnboarding = async (req: AuthRequest, res: Response): Promi
 
 export const completeTrainerOnboarding = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user || !req.user._id) {
+    if (!req.user || !req.user.id) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $set: {
-          trainerOnboardingCompleted: true
-        }
-      },
-      { new: true }
-    ).select('-password');
+    const updatedUser = await prisma.user.update({ where: { id: req.user.id }, data: { trainerOnboardingCompleted: true }, select: { id: true, name: true, email: true, role: true, profileCompleted: true, learnerAssessmentCompleted: true, trainerOnboardingCompleted: true, organization: true } });
 
     res.json({
       success: true,

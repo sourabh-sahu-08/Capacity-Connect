@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import onboardingRoutes from './routes/onboarding';
 import notificationRoutes from './routes/notifications';
@@ -23,8 +22,6 @@ const io = new Server(httpServer, {
 });
 initializeSocket(io);
 
-// Connect Database
-connectDB();
 
 // Middleware
 app.use(cors());
@@ -55,3 +52,4 @@ const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

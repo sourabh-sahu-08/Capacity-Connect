@@ -1,6 +1,6 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware';
-import Notification from '../models/Notification';
+import prisma from '../config/prisma';
 import { NotificationService } from '../services/notificationService';
 
 const router = express.Router();
@@ -12,8 +12,7 @@ router.get('/', protect, async (req: any, res) => {
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    const query: any = { recipient: req.user.id };
-    
+    const query: any = { recipientId: req.user.id };
     if (req.query.isRead !== undefined) {
       query.isRead = req.query.isRead === 'true';
     }
@@ -21,15 +20,12 @@ router.get('/', protect, async (req: any, res) => {
       query.priority = req.query.priority;
     }
 
-    const notifications = await Notification.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const notifications = await prisma.notification.findMany({ where: query, orderBy: { createdAt: 'desc' }, skip, take: limit });
 
-    const total = await Notification.countDocuments(query);
+    const total = await prisma.notification.count({ where: query });
 
     res.json({
-      notifications,
+      notifications: notifications.map(n => ({ ...n, _id: n.id, recipient: n.recipientId })),
       total,
       page,
       totalPages: Math.ceil(total / limit)
@@ -42,7 +38,7 @@ router.get('/', protect, async (req: any, res) => {
 // GET unread count
 router.get('/unread-count', protect, async (req: any, res) => {
   try {
-    const count = await Notification.countDocuments({ recipient: req.user.id, isRead: false });
+    const count = await prisma.notification.count({ where: { recipientId: req.user.id, isRead: false } });
     res.json({ unreadCount: count });
   } catch (err) {
     res.status(500).send('Server Error');

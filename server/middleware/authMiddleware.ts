@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
-import User from '../models/User';
+import prisma from '../config/prisma';
 
 export interface AuthRequest extends Request {
   user?: any;
@@ -14,7 +14,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
       token = req.headers.authorization.split(' ')[1];
       const decoded: any = verify(token, process.env.JWT_SECRET || 'secret');
 
-      req.user = await User.findById(decoded.id).select('-password');
+      req.user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { id: true, name: true, email: true, role: true, profileCompleted: true, learnerAssessmentCompleted: true, trainerOnboardingCompleted: true, organization: true } });
       next();
     } catch (error) {
       console.error(error);

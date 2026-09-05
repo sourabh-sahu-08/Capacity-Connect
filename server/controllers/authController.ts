@@ -1,9 +1,8 @@
+import prisma from '../config/prisma';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sign, verify } from 'jsonwebtoken';
-import User from '../models/User';
-import CompetencyProfile from '../models/CompetencyProfile';
 import { Role } from 'shared';
 import { sendEmail } from '../services/emailService';
 import { NotificationService } from '../services/notificationService';
@@ -24,7 +23,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await prisma.user.findUnique({ where: { email } });
     if (userExists) {
       res.status(400).json({ message: 'User already exists' });
       return;
@@ -34,17 +33,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     const hashedPassword = await bcrypt.hash(password, salt);
 
     
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: role || Role.LEARNER,
-      organization,
-    });
+    const user = await prisma.user.create({ data: { name, email, password: hashedPassword, role: role || Role.LEARNER, organization } });
     
     // Notify Admins
     try {
-      const admins = await User.find({ role: Role.ADMIN });
+      const admins = await prisma.user.findMany({ where: { role: Role.ADMIN } });
       for (const admin of admins) {
         await NotificationService.createNotification({
           recipient: admin.id,
@@ -61,13 +54,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     }
   
 
-    await CompetencyProfile.create({
-      userId: user._id,
-      overallScore: 0,
-      competencyDNA: { technical: 0, analytical: 0, communication: 0, leadership: 0, creativity: 0 },
-      roleReadiness: { readinessScore: 0 },
-      skills: []
-    });
+    await prisma.competencyProfile.create({ data: { userId: user.id, overallScore: 0, dnaTechnical: 0, dnaAnalytical: 0, dnaCommunication: 0, dnaLeadership: 0, dnaCreativity: 0, readinessScore: 0 } });
 
     if (user) {
       res.status(201).json({
@@ -93,7 +80,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, rememberMe } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
@@ -117,7 +104,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await User.findById((req as any).user.id).select('-password');
+    const user = await prisma.user.findUnique({ where: { id: (req as any).user.id }, select: { id: true, name: true, email: true, role: true, profileCompleted: true, learnerAssessmentCompleted: true, trainerOnboardingCompleted: true, organization: true } });
     res.json(user);
   } catch (error) {
     console.error('GetMe Error:', error);
@@ -128,7 +115,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     // Always return success even if user not found, to prevent email enumeration
     const successMsg = 'If an account exists with this email, password reset instructions have been sent.';
@@ -142,10 +129,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     const expireTime = Date.now() + 15 * 60 * 1000; // 15 mins
 
-    await User.findByIdAndUpdate(user._id, {
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: new Date(expireTime)
-    });
+    await prisma.user.update({ where: { id: user.id }, data: { resetPasswordToken: hashedToken, resetPasswordExpire: new Date(expireTime) } });
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
@@ -174,10 +158,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
     
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() }
-    });
+    const user = await prisma.user.findFirst({ where: { resetPasswordToken: hashedToken, resetPasswordExpire: { gt: new Date() } } });
 
     if (!user) {
       res.status(400).json({ success: false, message: 'Invalid or expired reset token.' });
@@ -187,10 +168,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     const salt = await bcrypt.genSalt(10);
     const newHashedPassword = await bcrypt.hash(password, salt);
 
-    await User.findByIdAndUpdate(user._id, {
-      password: newHashedPassword,
-      $unset: { resetPasswordToken: 1, resetPasswordExpire: 1 }
-    });
+    await prisma.user.update({ where: { id: user.id }, data: { password: newHashedPassword, resetPasswordToken: null, resetPasswordExpire: null } });
 
     res.json({ success: true, message: 'Password reset successfully.' });
   } catch (error) {

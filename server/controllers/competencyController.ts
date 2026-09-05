@@ -1,29 +1,43 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import CompetencyProfile from '../models/CompetencyProfile';
-import RoleRequirement from '../models/RoleRequirement';
+import prisma from '../config/prisma';
 import { analyzeSkillGaps } from '../services/skillGapEngine';
 import { getNextBestAction } from '../services/recommendationEngine';
-import CompetencySnapshot from '../models/CompetencySnapshot';
 import { runCapacityCycle } from '../services/capacityCycleService';
 
 export const getProfile = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user._id;
-    const profile = await CompetencyProfile.findOne({ userId }).populate('skills.skillId').exec();
+    const userId = (req as any).user.id;
+    const profile = await prisma.competencyProfile.findUnique({
+      where: { userId },
+      include: { skills: { include: { skill: true } } }
+    });
     if (!profile) {
       return res.status(404).json({ error: 'Profile not found' });
     }
     
     // Get growth
-    const snapshots = await CompetencySnapshot.find({ userId }).sort({ createdAt: -1 }).limit(2).exec();
+    const snapshots = await prisma.competencySnapshot.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 2
+    });
     const previousScore = snapshots.length > 1 ? snapshots[1].overallScore : profile.overallScore;
     const growth = profile.overallScore - previousScore;
 
     res.json({
       overallScore: profile.overallScore,
-      competencyDNA: profile.competencyDNA,
-      roleReadiness: profile.roleReadiness,
+      competencyDNA: {
+        technical: profile.dnaTechnical,
+        analytical: profile.dnaAnalytical,
+        communication: profile.dnaCommunication,
+        leadership: profile.dnaLeadership,
+        creativity: profile.dnaCreativity,
+      },
+      roleReadiness: {
+        currentRole: profile.currentRole,
+        targetRole: profile.targetRole,
+        readinessScore: profile.readinessScore,
+      },
       growth: { monthly: growth, previousScore }
     });
   } catch (error) {
@@ -34,12 +48,12 @@ export const getProfile = async (req: Request, res: Response) => {
 
 export const getSkillGaps = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = (req as any).user.id;
     let { targetRoleId } = req.body;
     
-    if (!targetRoleId || !mongoose.Types.ObjectId.isValid(targetRoleId)) {
-      const firstRole = await RoleRequirement.findOne().exec();
-      if (firstRole) targetRoleId = firstRole._id.toString();
+    if (!targetRoleId) {
+      const firstRole = await prisma.roleRequirement.findFirst();
+      if (firstRole) targetRoleId = firstRole.id;
     }
 
     const gaps = await analyzeSkillGaps(userId, targetRoleId);
@@ -54,7 +68,7 @@ export const getSkillGaps = async (req: Request, res: Response) => {
 
 export const triggerCycle = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = (req as any).user.id;
     const { targetRoleId, trigger } = req.body;
     const result = await runCapacityCycle(userId, targetRoleId, trigger);
     res.json(result);
