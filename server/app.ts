@@ -3,11 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import onboardingRoutes from './routes/onboarding';
 import notificationRoutes from './routes/notifications';
 import { initializeSocket } from './socket';
+import prisma from './config/prisma';
 
 dotenv.config();
 
@@ -23,9 +23,6 @@ const io = new Server(httpServer, {
 });
 initializeSocket(io);
 
-// Connect Database
-connectDB();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -36,6 +33,8 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/v1/competency', require('./routes/competency').default);
 app.use('/api/v1/manager', require('./routes/manager').default);
+app.use('/api/courses', require('./routes/courses').default);
+app.use('/api/assessments', require('./routes/assessments').default);
 
 app.get('/api/health', (req, res) => {
   res.json({
@@ -50,6 +49,12 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  try {
+    await prisma.$connect();
+    console.log('PostgreSQL Connected: Neon');
+  } catch (err) {
+    console.error('PostgreSQL Connection Failed:', err);
+  }
 });

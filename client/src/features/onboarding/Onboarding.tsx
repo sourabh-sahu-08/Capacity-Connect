@@ -196,12 +196,15 @@ export const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <div className="w-full bg-white border-b border-slate-200 h-16 flex items-center px-8">
-        <h1 className="text-xl font-bold tracking-tighter">CAPACITY <span className="text-purple-500">CONNECT</span></h1>
+    <div className="cc-app min-h-screen flex flex-col relative isolation-isolate" style={{ backgroundColor: "#050505" }}>
+      
+      
+      <div className="relative z-10 flex flex-col min-h-screen w-full">
+      <div className="w-full h-16 flex items-center px-8 border-b border-white/10" style={{ background: "rgba(10,10,12,0.28)", backdropFilter: "blur(14px)" }}>
+        <span className="cc-wordmark">CAPACITY <i>CONNECT</i></span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-2xl rounded-2xl p-8" style={{ background: "rgba(10,10,12,0.28)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(14px)" }}>
           <div className="flex items-center justify-between mb-12">
             {steps.map((step, idx) => (
               <div key={step} className="flex flex-col items-center flex-1">
@@ -218,6 +221,7 @@ export const Onboarding = () => {
             </AnimatePresence>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

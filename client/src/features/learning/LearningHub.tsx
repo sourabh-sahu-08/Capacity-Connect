@@ -1,5 +1,8 @@
 // @ts-nocheck
 import React from 'react';
+import api from '../../api/axios';
+import { useState, useEffect } from 'react';
+
 import { Search, Filter, Star, Clock } from 'lucide-react';
 
 const COURSES = [
@@ -9,6 +12,34 @@ const COURSES = [
 ];
 
 export const LearningHub = () => {
+
+  const [dbCourses, setDbCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/courses')
+      .then(res => {
+        setDbCourses(res.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Merge static placeholder courses with DB courses so it looks good even if DB is empty, or just use DB courses.
+  // The user asked "why the courses i made as trainer not shown". We should show both, or replace static ones. Let's just prepend DB courses.
+  const allCourses = [
+    ...dbCourses.map(c => ({
+      id: c._id,
+      title: c.title,
+      instructor: c.trainerId?.name || 'Unknown Instructor',
+      duration: '4h', // Mock duration since we don't have it in schema yet
+      difficulty: 'Intermediate', // Mock
+      rating: 5.0, // Mock
+      img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop' // Generic tech image
+    })),
+    ...COURSES
+  ];
+
   return (
     <div className="p-8 space-y-8 text-slate-900 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -40,7 +71,7 @@ export const LearningHub = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {COURSES.map(course => (
+        {loading ? <div className="col-span-full py-10 flex justify-center"><div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div></div> : allCourses.map(course => (
           <div key={course.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden group cursor-pointer hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-300">
             <div className="h-48 w-full bg-cover bg-center" style={{ backgroundImage: `url(${course.img})` }}></div>
             <div className="p-5">

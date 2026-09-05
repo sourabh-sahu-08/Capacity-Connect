@@ -1,11 +1,9 @@
-import CompetencyProfile from '../models/CompetencyProfile';
-import InsightEvent from '../models/InsightEvent';
-import User from '../models/User';
+import prisma from '../config/prisma';
 
 export const getWorkforceOverview = async () => {
-  const learners = await User.countDocuments({ role: 'LEARNER' });
+  const learners = await prisma.user.count({ where: { role: 'LEARNER' } });
   
-  const profiles = await CompetencyProfile.find().exec();
+  const profiles = await prisma.competencyProfile.findMany();
   const totalCompetency = profiles.reduce((sum, p) => sum + p.overallScore, 0);
   const avgCompetency = learners > 0 ? (totalCompetency / profiles.length) : 0;
 
@@ -17,13 +15,16 @@ export const getWorkforceOverview = async () => {
 };
 
 export const getAttentionQueue = async () => {
-  const alerts = await InsightEvent.find({ 
-    type: { $in: ['LEARNER_AT_RISK', 'CRITICAL_GAP_DETECTED'] }, 
-    isRead: false 
-  }).populate('userId', 'name').exec();
+  const alerts = await prisma.insightEvent.findMany({
+    where: {
+      type: { in: ['LEARNER_AT_RISK', 'CRITICAL_GAP_DETECTED'] },
+      isRead: false
+    },
+    include: { user: { select: { name: true } } }
+  });
   
-  return alerts.map(a => ({
-    learner: (a.userId as any).name || 'Unknown Learner',
+  return alerts.map((a: any) => ({
+    learner: a.user?.name || 'Unknown Learner',
     riskScore: a.priority === 'CRITICAL' ? 85 : 55,
     reason: a.description,
     recommendedIntervention: 'Schedule mentor session'

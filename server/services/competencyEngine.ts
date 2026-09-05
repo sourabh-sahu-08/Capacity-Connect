@@ -1,9 +1,7 @@
-import CompetencyProfile from '../models/CompetencyProfile';
-import CompetencyEvidence from '../models/CompetencyEvidence';
-import Skill from '../models/Skill';
+import prisma from '../config/prisma';
 
 export const calculateSkillScore = async (userId: string, skillId: string): Promise<number> => {
-  const evidenceList = await CompetencyEvidence.find({ userId, skillId }).exec();
+  const evidenceList = await prisma.competencyEvidence.findMany({ where: { userId, skillId } });
   if (!evidenceList || evidenceList.length === 0) return 0;
 
   let totalWeightedScore = 0;
@@ -18,7 +16,10 @@ export const calculateSkillScore = async (userId: string, skillId: string): Prom
 };
 
 export const calculateCompetencyDNA = async (userId: string) => {
-  const profile = await CompetencyProfile.findOne({ userId }).populate('skills.skillId').exec();
+  const profile = await prisma.competencyProfile.findUnique({
+    where: { userId },
+    include: { skills: { include: { skill: true } } }
+  });
   if (!profile) return null;
 
   const dna = {
@@ -28,8 +29,8 @@ export const calculateCompetencyDNA = async (userId: string) => {
     technical: 0, analytical: 0, communication: 0, leadership: 0, creativity: 0
   };
 
-  profile.skills.forEach(userSkill => {
-    const skill = userSkill.skillId as any;
+  profile.skills.forEach((userSkill: any) => {
+    const skill = userSkill.skill;
     if (skill && skill.category) {
       const cat = skill.category as keyof typeof dna;
       if (dna[cat] !== undefined) {

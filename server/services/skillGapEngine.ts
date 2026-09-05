@@ -1,18 +1,22 @@
-import mongoose from 'mongoose';
-import RoleRequirement from '../models/RoleRequirement';
-import CompetencyProfile from '../models/CompetencyProfile';
+import prisma from '../config/prisma';
 
 export const analyzeSkillGaps = async (userId: string, roleId: string) => {
-  if (!mongoose.Types.ObjectId.isValid(roleId)) return [];
+  if (!roleId) return [];
   
-  const profile = await CompetencyProfile.findOne({ userId }).exec();
-  const role = await RoleRequirement.findById(roleId).populate('skills.skillId').exec();
+  const profile = await prisma.competencyProfile.findUnique({
+    where: { userId },
+    include: { skills: true }
+  });
+  const role = await prisma.roleRequirement.findUnique({
+    where: { id: roleId },
+    include: { skills: { include: { skill: true } } }
+  });
 
   if (!profile || !role) return [];
 
-  const gaps = role.skills.map(req => {
-    const skillDoc = req.skillId as any;
-    const userSkill = profile.skills.find(s => s.skillId && s.skillId.toString() === skillDoc._id.toString());
+  const gaps = role.skills.map((req: any) => {
+    const skillDoc = req.skill;
+    const userSkill = profile.skills.find(s => s.skillId === skillDoc.id);
     const currentScore = userSkill ? userSkill.score : 0;
     const gap = Math.max(0, req.requiredLevel - currentScore);
     
@@ -25,7 +29,7 @@ export const analyzeSkillGaps = async (userId: string, roleId: string) => {
     else if (priorityScore >= 20) severity = 'MEDIUM';
 
     return {
-      skillId: skillDoc._id,
+      skillId: skillDoc.id,
       skillName: skillDoc.name,
       currentScore,
       requiredScore: req.requiredLevel,
@@ -35,5 +39,5 @@ export const analyzeSkillGaps = async (userId: string, roleId: string) => {
     };
   });
 
-  return gaps.sort((a, b) => b.priorityScore - a.priorityScore);
+  return gaps.sort((a: any, b: any) => b.priorityScore - a.priorityScore);
 };

@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import Notification from '../models/Notification';
+import prisma from '../config/prisma';
 import { getIO } from '../socket';
 
 export const NotificationService = {
@@ -16,11 +15,20 @@ export const NotificationService = {
     actionUrl?: string;
   }) => {
     try {
-      // 1. Create Notification in MongoDB
-      const notification = await Notification.create({
-        ...data,
-        recipient: new mongoose.Types.ObjectId(data.recipient),
-        ...(data.relatedEntityId && { relatedEntityId: new mongoose.Types.ObjectId(data.relatedEntityId) })
+      // 1. Create Notification in PostgreSQL
+      const notification = await prisma.notification.create({
+        data: {
+          recipientId: data.recipient,
+          role: data.role,
+          type: data.type,
+          title: data.title,
+          message: data.message,
+          priority: data.priority || 'LOW',
+          category: data.category,
+          relatedEntityType: data.relatedEntityType,
+          relatedEntityId: data.relatedEntityId,
+          actionUrl: data.actionUrl,
+        }
       });
 
       // 2. Emit Socket.IO event to specific user room
@@ -28,7 +36,7 @@ export const NotificationService = {
       io.to(`user:${data.recipient}`).emit('notification:new', notification);
 
       // 3. Emit count update
-      const unreadCount = await Notification.countDocuments({ recipient: data.recipient, isRead: false });
+      const unreadCount = await prisma.notification.count({ where: { recipientId: data.recipient, isRead: false } });
       io.to(`user:${data.recipient}`).emit('notification:count_updated', { unreadCount });
 
       return notification;
@@ -39,23 +47,29 @@ export const NotificationService = {
   },
 
   markAsRead: async (notificationId: string, userId: string) => {
-    const notification = await Notification.findOneAndUpdate(
-      { _id: notificationId, recipient: userId },
-      { isRead: true, readAt: new Date() },
-      { new: true }
-    );
-    return notification;
+    const notification = await prisma.notification.updateMany({
+      where: { id: notificationId, recipientId: userId },
+      data: { isRead: true, readAt: new Date() }
+    });
+    if (notification.count === 0) return null;
+    return prisma.notification.findUnique({ where: { id: notificationId } });
   },
 
   markAllAsRead: async (userId: string) => {
-    await Notification.updateMany(
-      { recipient: userId, isRead: false },
-      { isRead: true, readAt: new Date() }
-    );
+    await prisma.notification.updateMany({
+      where: { recipientId: userId, isRead: false },
+      data: { isRead: true, readAt: new Date() }
+    });
   },
 
   deleteNotification: async (notificationId: string, userId: string) => {
-    const notification = await Notification.findOneAndDelete({ _id: notificationId, recipient: userId });
-    return notification;
+    try {
+      const notification = await prisma.notification.findFirst({ where: { id: notificationId, recipientId: userId } });
+      if (!notification) return null;
+      await prisma.notification.delete({ where: { id: notificationId } });
+      return notification;
+    } catch {
+      return null;
+    }
   }
 };

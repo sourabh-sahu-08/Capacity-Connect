@@ -1,7 +1,10 @@
-import CompetencyEvidence from '../models/CompetencyEvidence';
+import prisma from '../config/prisma';
 
 export const calculateLearnerRisk = async (userId: string) => {
-  const latestEvidence = await CompetencyEvidence.findOne({ userId }).sort({ createdAt: -1 }).exec();
+  const latestEvidence = await prisma.competencyEvidence.findFirst({
+    where: { userId },
+    orderBy: { createdAt: 'desc' }
+  });
   
   let inactivityScore = 0;
   if (latestEvidence) {
