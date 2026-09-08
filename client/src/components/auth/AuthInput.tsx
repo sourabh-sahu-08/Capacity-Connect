@@ -14,13 +14,13 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
     const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
 
     return (
-      <div className="space-y-1 w-full">
-        <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <div className="space-y-0.5 w-full">
+        <label className="block text-xs font-medium text-slate-300">{label}</label>
         <div className="relative">
           <input
             ref={ref}
             type={inputType}
-            className={`block w-full appearance-none rounded-lg border px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 sm:text-sm transition-colors ${
+            className={`block w-full appearance-none rounded-lg border px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs sm:text-sm transition-colors ${
               error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 
               isValid ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500' : 
               'border-slate-200 focus:border-purple-500'
@@ -28,9 +28,9 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
             {...props}
           />
           
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-2">
-            {isValid && !error && <CheckCircle className="h-5 w-5 text-emerald-500" />}
-            {error && <AlertCircle className="h-5 w-5 text-red-500" />}
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 gap-1.5">
+            {isValid && !error && <CheckCircle className="h-4 w-4 text-emerald-500" />}
+            {error && <AlertCircle className="h-4 w-4 text-red-500" />}
             
             {isPassword && (
               <button
@@ -38,12 +38,12 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
                 onClick={() => setShowPassword(!showPassword)}
                 className="text-slate-400 hover:text-slate-600 focus:outline-none"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             )}
           </div>
         </div>
-        {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+        {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
       </div>
     );
   }

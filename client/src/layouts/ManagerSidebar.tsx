@@ -65,11 +65,24 @@ export const ManagerSidebar = () => {
       <div className="mt-auto w-full px-3 flex flex-col items-center gap-2">
         
         <button 
-          onMouseEnter={() => setHoveredItem('Settings')}
+          onClick={() => navigate('/profile')}
+          onMouseEnter={() => setHoveredItem('Profile & Settings')}
           onMouseLeave={() => setHoveredItem(null)}
           className="relative flex items-center justify-center w-12 h-12 mx-auto rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-900 hover:bg-slate-50"
         >
           <Settings className="w-5 h-5 shrink-0 z-10" />
+          <AnimatePresence>
+            {hoveredItem === 'Profile & Settings' && (
+              <motion.div 
+                initial={{ opacity: 0, x: 10, scale: 0.9 }}
+                animate={{ opacity: 1, x: 20, scale: 1 }}
+                exit={{ opacity: 0, x: 10, scale: 0.9 }}
+                className="absolute left-full ml-4 px-3 py-1.5 bg-white border border-slate-200 rounded-md whitespace-nowrap text-xs font-medium text-slate-900 tracking-wider shadow-lg"
+              >
+                Profile & Settings
+              </motion.div>
+            )}
+          </AnimatePresence>
         </button>
         <div className="w-8 h-px bg-slate-200 my-2 mx-auto" />
         <button 

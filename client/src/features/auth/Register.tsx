@@ -103,23 +103,23 @@ export const Register = () => {
             transition={{ duration: 0.2 }}
           >
             {error && (
-              <div className="p-4 mb-6 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
-                <div className="text-sm text-red-800">{error}</div>
+              <div className="p-2.5 mb-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2.5">
+                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={15} />
+                <div className="text-xs text-red-800">{error}</div>
               </div>
             )}
             
             {step === 1 && (
-              <div className="space-y-6">
+              <div className="space-y-3.5">
                 <RoleSelector selectedRole={role} onSelect={setRole} />
-                <div className="pt-4">
+                <div className="pt-2">
                   <AuthButton onClick={handleNextStep}>Continue &rarr;</AuthButton>
                 </div>
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <AuthInput
                   label="Full Name"
                   type="text"
@@ -168,9 +168,9 @@ export const Register = () => {
                   placeholder="Where do you work?"
                 />
 
-                <div className="pt-4 flex gap-3">
-                  <button type="button" onClick={handlePrevStep} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-500">
-                    <ArrowLeft size={20} />
+                <div className="pt-2 flex gap-2">
+                  <button type="button" onClick={handlePrevStep} className="p-2 border border-slate-200/20 rounded-lg hover:bg-slate-50/10 transition-colors text-slate-400">
+                    <ArrowLeft size={18} />
                   </button>
                   <AuthButton onClick={handleNextStep} disabled={!name || !email || !password || password !== confirmPassword}>Review Details &rarr;</AuthButton>
                 </div>
@@ -178,31 +178,31 @@ export const Register = () => {
             )}
 
             {step === 3 && (
-              <div className="space-y-6">
-                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-4">
+              <div className="space-y-3.5">
+                <div className="bg-slate-50 rounded-lg p-3.5 border border-slate-100 space-y-2.5 text-xs">
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Joining As</span>
-                    <p className="font-medium text-slate-900 mt-1">{role.charAt(0) + role.slice(1).toLowerCase()}</p>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Joining As</span>
+                    <p className="font-medium text-slate-200 mt-0.5">{role.charAt(0) + role.slice(1).toLowerCase()}</p>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</span>
-                    <p className="font-medium text-slate-900 mt-1">{name}</p>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Name</span>
+                    <p className="font-medium text-slate-200 mt-0.5">{name}</p>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</span>
-                    <p className="font-medium text-slate-900 mt-1">{email}</p>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Email</span>
+                    <p className="font-medium text-slate-200 mt-0.5">{email}</p>
                   </div>
                   {organization && (
                     <div>
-                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Organization</span>
-                      <p className="font-medium text-slate-900 mt-1">{organization}</p>
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Organization</span>
+                      <p className="font-medium text-slate-200 mt-0.5">{organization}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-2 flex gap-3">
-                  <button type="button" onClick={handlePrevStep} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-500" disabled={isLoading}>
-                    <ArrowLeft size={20} />
+                <div className="pt-1 flex gap-2">
+                  <button type="button" onClick={handlePrevStep} className="p-2 border border-slate-200/20 rounded-lg hover:bg-slate-50/10 transition-colors text-slate-400" disabled={isLoading}>
+                    <ArrowLeft size={18} />
                   </button>
                   <AuthButton onClick={handleSubmit} isLoading={isLoading} loadingText="Creating Account...">Create Account &rarr;</AuthButton>
                 </div>
@@ -210,9 +210,9 @@ export const Register = () => {
             )}
 
             {step === 1 && (
-              <div className="text-center text-sm text-slate-600 mt-8">
+              <div className="text-center text-xs text-slate-400 mt-3.5">
                 Already have an account?{' '}
-                <Link to="/login" className="font-semibold text-purple-600 hover:text-purple-500">
+                <Link to="/login" className="font-semibold text-purple-400 hover:text-purple-300">
                   Sign In
                 </Link>
               </div>

@@ -25,6 +25,9 @@ import { CoursePlayer } from './features/learning/CoursePlayer';
 import { CompetencyProfile } from './features/competency/CompetencyProfile';
 import { SkillGapAnalysis } from './features/competency/SkillGapAnalysis';
 import { Achievements } from './features/gamification/Achievements';
+import { UserProfile } from './features/profile/UserProfile';
+import { PublicProfile } from './features/profile/PublicProfile';
+import { DiscoverNetwork } from './features/network/DiscoverNetwork';
 import { NotificationProvider } from './features/notifications/NotificationProvider';
 import { NotificationCenter } from './features/notifications/NotificationCenter';
 
@@ -130,7 +133,11 @@ function App() {
           <Route path="/skill-gap" element={<ProtectedRoute><TraineeRoute><AppShell><SkillGapAnalysis /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/achievements" element={<ProtectedRoute><TraineeRoute><AppShell><Achievements /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><AppShell><NotificationCenter /></AppShell></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><AppShell><div className="p-8">Settings Page Stub</div></AppShell></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/profile/:id" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
+          <Route path="/network" element={<ProtectedRoute><DiscoverNetwork /></ProtectedRoute>} />
+          <Route path="/discover" element={<ProtectedRoute><DiscoverNetwork /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><UserProfile defaultTab="security" /></ProtectedRoute>} />
 
           {/* Trainer Routes (using TrainerLayout internally) */}
           <Route path="/trainer">

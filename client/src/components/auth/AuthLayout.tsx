@@ -27,10 +27,17 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
           <p>Understand skills, identify capability gaps, and build smarter growth paths across your organization.</p>
         </div>
       </aside>
-      <div className="cc-auth-form"><div className="cc-auth-form-inner">
-        <a className="cc-wordmark lg:hidden" href="/">CAPACITY <i>CONNECT</i></a>
-        <div className="mt-12 mb-8"><div className="cc-auth-kicker">YOUR WORKSPACE</div><h2 className="cc-serif">{title}</h2>{subtitle && <p className="cc-auth-subtitle">{subtitle}</p>}</div>{children}
-      </div></div>
+      <div className="cc-auth-form">
+        <div className="cc-auth-form-inner">
+          <a className="cc-wordmark lg:hidden block mb-3" href="/">CAPACITY <i>CONNECT</i></a>
+          <div className="mb-4">
+            <div className="cc-auth-kicker">YOUR WORKSPACE</div>
+            <h2 className="cc-serif">{title}</h2>
+            {subtitle && <p className="cc-auth-subtitle">{subtitle}</p>}
+          </div>
+          {children}
+        </div>
+      </div>
     </div>
   );
 };

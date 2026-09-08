@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, BookOpen, Brain, Compass, FileCheck, Hexagon, Layers, LogOut, Settings, Trophy, UserRound } from 'lucide-react';
+import { BarChart3, BookOpen, Brain, Compass, FileCheck, Hexagon, Layers, LogOut, Settings, Trophy, UserRound, Users } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const TRAINEE_NAV = [
@@ -13,7 +13,8 @@ const TRAINEE_NAV = [
   { name: 'Progress', icon: BarChart3, path: '/competency-profile' },
   { name: 'Competencies', icon: Brain, path: '/competency-profile' },
   { name: 'Certificates', icon: Trophy, path: '/achievements' },
-  { name: 'System', icon: Settings, path: '/settings' },
+  { name: 'Network & Peers', icon: Users, path: '/network' },
+  { name: 'Profile & Settings', icon: UserRound, path: '/profile' },
 ];
 
 export const Sidebar = () => {
