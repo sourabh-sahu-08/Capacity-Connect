@@ -185,6 +185,12 @@ export const userApi = {
   createRecommendation: (userId: string, data: { relationship: string; content: string }) =>
     api.post<{ success: boolean; message: string; recommendation: Recommendation }>(`/api/users/${userId}/recommendations`, data),
 
+  requestRecommendation: (data: { targetUserId: string; message?: string; relationship?: string }) =>
+    api.post<{ success: boolean; message: string }>(`/api/users/recommendations/request`, data),
+
+  getGivenRecommendations: () =>
+    api.get<{ success: boolean; recommendations: Recommendation[] }>(`/api/users/recommendations/given`),
+
   respondRecommendation: (recommendationId: string, status: 'ACCEPTED' | 'REJECTED') =>
     api.put<{ success: boolean; message: string; recommendation: Recommendation }>(`/api/users/recommendations/${recommendationId}/status`, { status }),
 

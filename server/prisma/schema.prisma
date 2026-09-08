@@ -8,11 +8,11 @@ datasource db {
 }
 
 model User {
-  id                         String               @id @default(uuid())
+  id                         String                 @id @default(uuid())
   name                       String
-  email                      String               @unique
+  email                      String                 @unique
   password                   String
-  role                       String               @default("LEARNER")
+  role                       String                 @default("LEARNER")
   organization               String?
   avatar                     String?
   bio                        String?
@@ -20,23 +20,23 @@ model User {
   targetRole                 String?
   learningGoal               String?
   experienceLevel            String?
-  profileCompleted           Boolean              @default(false)
-  learnerAssessmentCompleted Boolean              @default(false)
-  trainerOnboardingCompleted Boolean              @default(false)
+  profileCompleted           Boolean                @default(false)
+  learnerAssessmentCompleted Boolean                @default(false)
+  trainerOnboardingCompleted Boolean                @default(false)
   resetPasswordToken         String?
   resetPasswordExpire        DateTime?
-  createdAt                  DateTime             @default(now())
-  updatedAt                  DateTime             @updatedAt
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
   githubUrl                  String?
   linkedinUrl                String?
   twitterUrl                 String?
   websiteUrl                 String?
   location                   String?
-  skillsList                 String[]             @default([])
-  followers                  Follow[]             @relation("UserFollowers")
-  following                  Follow[]             @relation("UserFollowing")
-  endorsementsReceived       SkillEndorsement[]   @relation("UserEndorsementsReceived")
-  endorsementsGiven          SkillEndorsement[]   @relation("UserEndorsementsGiven")
+  skillsList                 String[]               @default([])
+  followers                  Follow[]               @relation("UserFollowers")
+  following                  Follow[]               @relation("UserFollowing")
+  endorsementsReceived       SkillEndorsement[]     @relation("UserEndorsementsReceived")
+  endorsementsGiven          SkillEndorsement[]     @relation("UserEndorsementsGiven")
   assessments                Assessment[]
   competencyEvidences        CompetencyEvidence[]
   competencyProfile          CompetencyProfile?
@@ -45,8 +45,10 @@ model User {
   insightEvents              InsightEvent[]
   notifications              Notification[]
   projects                   UserProject[]
-  sentRecommendations        Recommendation[]     @relation("SentRecommendations")
-  receivedRecommendations    Recommendation[]     @relation("ReceivedRecommendations")
+  sentRecommendations        Recommendation[]       @relation("SentRecommendations")
+  receivedRecommendations    Recommendation[]       @relation("ReceivedRecommendations")
+  submissions                AssessmentSubmission[] @relation("UserSubmissions")
+  gradedSubmissions          AssessmentSubmission[] @relation("GradedSubmissions")
 }
 
 model Skill {
@@ -205,17 +207,40 @@ model Course {
 }
 
 model Assessment {
-  id        String   @id @default(uuid())
-  title     String
-  courseId  String
-  trainerId String
-  type      String   @default("Project")
-  maxScore  Float    @default(100)
-  status    String   @default("Active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  trainer   User     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  id          String                 @id @default(uuid())
+  title       String
+  courseId    String
+  trainerId   String
+  type        String                 @default("Project")
+  maxScore    Float                  @default(100)
+  status      String                 @default("Active")
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  course      Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  trainer     User                   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  submissions AssessmentSubmission[]
+}
+
+model AssessmentSubmission {
+  id           String     @id @default(uuid())
+  assessmentId String
+  userId       String
+  githubUrl    String?
+  demoUrl      String?
+  notes        String?
+  status       String     @default("PENDING") // PENDING, GRADED, REJECTED
+  score        Float?
+  feedback     String?
+  gradedAt     DateTime?
+  gradedById   String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user         User       @relation("UserSubmissions", fields: [userId], references: [id], onDelete: Cascade)
+  gradedBy     User?      @relation("GradedSubmissions", fields: [gradedById], references: [id])
+
+  @@index([assessmentId])
+  @@index([userId])
 }
 
 model Follow {

@@ -45,6 +45,8 @@ import type { UserProject, Recommendation } from '../../api/user.api';
 import { FollowListModal } from './FollowListModal';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import { ProjectModal } from './ProjectModal';
+import { ProjectPreviewModal } from './ProjectPreviewModal';
+import { RequestRecommendationModal } from './RequestRecommendationModal';
 import { AppShell } from '../../components/layout/AppShell';
 import { TrainerLayout } from '../../layouts/TrainerLayout';
 import { ManagerLayout } from '../../layouts/ManagerLayout';
@@ -119,10 +121,16 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
   const [projects, setProjects] = useState<UserProject[]>([]);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<UserProject | null>(null);
+  const [previewProject, setPreviewProject] = useState<UserProject | null>(null);
+  const [projectSearchQuery, setProjectSearchQuery] = useState('');
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
 
   // Recommendations state
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [pendingRecommendations, setPendingRecommendations] = useState<Recommendation[]>([]);
+  const [givenRecommendations, setGivenRecommendations] = useState<Recommendation[]>([]);
+  const [recSubTab, setRecSubTab] = useState<'received' | 'given'>('received');
+  const [requestRecModalOpen, setRequestRecModalOpen] = useState(false);
   const [respondingRecId, setRespondingRecId] = useState<string | null>(null);
 
   // Social follower stats & modal
@@ -187,6 +195,12 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
         userApi.getRecommendations(user.id).then(res => {
           setRecommendations(res.data.recommendations || []);
           setPendingRecommendations(res.data.pendingRecommendations || []);
+        }).catch(console.error);
+
+        userApi.getGivenRecommendations().then(res => {
+          if (res.data?.recommendations) {
+            setGivenRecommendations(res.data.recommendations);
+          }
         }).catch(console.error);
       }
     }
@@ -869,10 +883,11 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
           exit={{ opacity: 0, y: -10 }}
           className="space-y-6"
         >
+          {/* Header & Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-6">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <FolderGit2 size={18} className="text-purple-400" /> Engineering Portfolio & Projects
+                <FolderGit2 size={18} className="text-purple-400" /> Engineering Portfolio & Projects ({projects.length})
               </h3>
               <p className="text-xs text-slate-400 mt-1">
                 Showcase your production apps, open-source repositories, and technical accomplishments.
@@ -887,115 +902,189 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
             </button>
           </div>
 
-          {projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((proj) => (
-                <div
-                  key={proj.id}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] hover:border-purple-500/30 transition-all"
+          {/* Search & Tag Filter Bar */}
+          {projects.length > 0 && (
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white/[0.02] border border-white/5 p-3 rounded-xl">
+              <input
+                type="text"
+                value={projectSearchQuery}
+                onChange={(e) => setProjectSearchQuery(e.target.value)}
+                placeholder="Search projects by title or description..."
+                className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none focus:border-purple-500 min-w-[240px]"
+              />
+
+              {/* Tag filters */}
+              <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTagFilter(null)}
+                  className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                    selectedTagFilter === null
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                  }`}
                 >
-                  <div className="relative h-40 w-full overflow-hidden bg-slate-950">
-                    <img
-                      src={
-                        proj.imageUrl ||
-                        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80'
-                      }
-                      alt={proj.title}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
-
-                    {proj.featured && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1 rounded-md bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                        <Star size={11} className="fill-white" /> Featured
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditProject(proj)}
-                      className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-slate-200 hover:text-white hover:bg-purple-600 transition-colors"
-                      title="Edit Project"
-                    >
-                      <Edit3 size={13} />
-                    </button>
-
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <h4 className="text-sm font-bold text-white line-clamp-1">{proj.title}</h4>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col justify-between p-4 space-y-4">
-                    <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
-                      {proj.description}
-                    </p>
-
-                    {proj.tags && proj.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {proj.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className="rounded-md bg-purple-500/15 border border-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-300"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 border-t border-white/5 pt-3 text-xs">
-                      {proj.demoUrl && (
-                        <a
-                          href={proj.demoUrl.startsWith('http') ? proj.demoUrl : `https://${proj.demoUrl}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-3 py-1.5 font-semibold text-white transition-colors"
-                        >
-                          <Globe size={13} /> Live Demo
-                        </a>
-                      )}
-                      {proj.githubUrl && (
-                        <a
-                          href={proj.githubUrl.startsWith('http') ? proj.githubUrl : `https://${proj.githubUrl}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={`flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 font-semibold text-slate-300 hover:text-white hover:border-white/20 transition-colors ${
-                            proj.demoUrl ? 'flex-initial' : 'flex-1'
-                          }`}
-                        >
-                          <GithubIcon size={13} /> Code
-                        </a>
-                      )}
-                      {!proj.demoUrl && !proj.githubUrl && (
-                        <span className="text-[11px] text-slate-500 italic">No links added</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 mb-3">
-                <FolderGit2 size={26} />
+                  All ({projects.length})
+                </button>
+                {Array.from(new Set(projects.flatMap((p) => p.tags || []))).slice(0, 8).map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setSelectedTagFilter(selectedTagFilter === tag ? null : tag)}
+                    className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                      selectedTagFilter === tag
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'bg-white/[0.04] text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
-              <h4 className="text-sm font-bold text-white">No Projects Added Yet</h4>
-              <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
-                Add your side projects, engineering accomplishments, and repositories to display on your public profile.
-              </p>
-              <button
-                type="button"
-                onClick={handleOpenAddProject}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-600/30 transition-all"
-              >
-                <Plus size={15} /> Add Your First Project
-              </button>
             </div>
           )}
+
+          {/* Projects Grid */}
+          {(() => {
+            const filteredProjects = projects.filter((p) => {
+              const matchesSearch =
+                !projectSearchQuery ||
+                p.title.toLowerCase().includes(projectSearchQuery.toLowerCase()) ||
+                p.description.toLowerCase().includes(projectSearchQuery.toLowerCase());
+              const matchesTag =
+                !selectedTagFilter || (p.tags && p.tags.includes(selectedTagFilter));
+              return matchesSearch && matchesTag;
+            });
+
+            if (filteredProjects.length === 0 && projects.length > 0) {
+              return (
+                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-8 text-center text-xs text-slate-400">
+                  No projects matching your filter. Try adjusting search or tag filter.
+                </div>
+              );
+            }
+
+            if (projects.length === 0) {
+              return (
+                <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 mb-3">
+                    <FolderGit2 size={26} />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">No Projects Added Yet</h4>
+                  <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
+                    Add your side projects, engineering accomplishments, and repositories to display on your public profile.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleOpenAddProject}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-600/30 transition-all"
+                  >
+                    <Plus size={15} /> Add Your First Project
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProjects.map((proj) => (
+                  <div
+                    key={proj.id}
+                    className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/5 transition-all cursor-pointer"
+                    onClick={() => setPreviewProject(proj)}
+                  >
+                    <div className="relative h-40 w-full overflow-hidden bg-slate-950">
+                      <img
+                        src={
+                          proj.imageUrl ||
+                          'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80'
+                        }
+                        alt={proj.title}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+
+                      {proj.featured && (
+                        <div className="absolute top-3 left-3 flex items-center gap-1 rounded-md bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                          <Star size={11} className="fill-white" /> Featured
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditProject(proj);
+                        }}
+                        className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-slate-200 hover:text-white hover:bg-purple-600 transition-colors"
+                        title="Edit Project"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <h4 className="text-sm font-bold text-white line-clamp-1">{proj.title}</h4>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col justify-between p-4 space-y-4">
+                      <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
+                        {proj.description}
+                      </p>
+
+                      {proj.tags && proj.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {proj.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="rounded-md bg-purple-500/15 border border-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-300"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div
+                        className="flex items-center gap-2 border-t border-white/5 pt-3 text-xs"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {proj.demoUrl && (
+                          <a
+                            href={proj.demoUrl.startsWith('http') ? proj.demoUrl : `https://${proj.demoUrl}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-3 py-1.5 font-semibold text-white transition-colors"
+                          >
+                            <Globe size={13} /> Live Demo
+                          </a>
+                        )}
+                        {proj.githubUrl && (
+                          <a
+                            href={proj.githubUrl.startsWith('http') ? proj.githubUrl : `https://${proj.githubUrl}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 font-semibold text-slate-300 hover:text-white hover:border-white/20 transition-colors ${
+                              proj.demoUrl ? 'flex-initial' : 'flex-1'
+                            }`}
+                          >
+                            <GithubIcon size={13} /> Code
+                          </a>
+                        )}
+                        {!proj.demoUrl && !proj.githubUrl && (
+                          <span className="text-[11px] text-slate-500 italic">Click card for preview</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </motion.div>
       )}
 
-      {/* TAB: Recommendations */}
+      {/* TAB 3: Recommendations */}
       {activeTab === 'recommendations' && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -1003,157 +1092,284 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
           exit={{ opacity: 0, y: -10 }}
           className="space-y-6"
         >
-          {/* Header */}
+          {/* Header & Sub-tab Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-6">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Quote size={18} className="text-purple-400 fill-purple-400/20" /> Recommendations & Testimonials
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Manage received recommendations from mentors, managers, and engineering peers.
+                Manage received recommendations and request testimonials from your network.
               </p>
             </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRequestRecModalOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition-all"
+              >
+                <Sparkles size={14} /> Request Recommendation
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(`/profile/${user?.id}`)}
+                className="flex items-center gap-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] border border-purple-500/30 px-3.5 py-2 text-xs font-semibold text-purple-300 transition-all"
+              >
+                <Eye size={14} /> Public View
+              </button>
+            </div>
+          </div>
+
+          {/* Sub-tabs: Received vs Given */}
+          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
             <button
               type="button"
-              onClick={() => navigate(`/profile/${user?.id}`)}
-              className="flex items-center gap-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] border border-purple-500/30 px-3.5 py-2 text-xs font-semibold text-purple-300 transition-all self-start sm:self-auto"
+              onClick={() => setRecSubTab('received')}
+              className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                recSubTab === 'received'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white bg-white/[0.03]'
+              }`}
             >
-              <Eye size={14} /> View on Public Profile
+              Received Testimonials ({recommendations.length})
+              {pendingRecommendations.length > 0 && (
+                <span className="ml-1.5 rounded-full bg-amber-400 px-1.5 py-0.2 text-[10px] font-black text-slate-950">
+                  {pendingRecommendations.length}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setRecSubTab('given')}
+              className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+                recSubTab === 'given'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white bg-white/[0.03]'
+              }`}
+            >
+              Given by Me ({givenRecommendations.length})
             </button>
           </div>
 
-          {/* Pending Approval Section */}
-          {pendingRecommendations.length > 0 && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-slate-950 text-xs font-bold">
-                    {pendingRecommendations.length}
-                  </span>
-                  <h4 className="text-sm font-bold text-amber-200">
-                    Recommendations Awaiting Your Approval
-                  </h4>
-                </div>
-                <span className="text-[11px] text-amber-400">
-                  Visible publicly once accepted
-                </span>
-              </div>
+          {recSubTab === 'received' && (
+            <div className="space-y-6">
+              {/* Pending Approval Section */}
+              {pendingRecommendations.length > 0 && (
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-slate-950 text-xs font-bold">
+                        {pendingRecommendations.length}
+                      </span>
+                      <h4 className="text-sm font-bold text-amber-200">
+                        Recommendations Awaiting Your Approval
+                      </h4>
+                    </div>
+                    <span className="text-[11px] text-amber-400">
+                      Visible publicly once accepted
+                    </span>
+                  </div>
 
-              <div className="space-y-3">
-                {pendingRecommendations.map((pending) => (
-                  <div
-                    key={pending.id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl bg-purple-900/60 text-purple-200 font-bold text-xs flex items-center justify-center overflow-hidden border border-purple-500/30">
-                          {pending.author.avatar ? (
-                            <img src={pending.author.avatar} alt={pending.author.name} className="h-full w-full object-cover" />
-                          ) : (
-                            pending.author.name.charAt(0)
-                          )}
+                  <div className="space-y-3">
+                    {pendingRecommendations.map((pending) => (
+                      <div
+                        key={pending.id}
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"
+                      >
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-3">
+                            <div className="h-9 w-9 rounded-xl bg-purple-900/60 text-purple-200 font-bold text-xs flex items-center justify-center overflow-hidden border border-purple-500/30">
+                              {pending.author.avatar ? (
+                                <img src={pending.author.avatar} alt={pending.author.name} className="h-full w-full object-cover" />
+                              ) : (
+                                pending.author.name.charAt(0)
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-white">{pending.author.name}</span>
+                              <span className="text-[11px] text-slate-400 block">
+                                {pending.relationship} {pending.author.organization ? `at ${pending.author.organization}` : ''}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-300 italic bg-black/20 p-3 rounded-lg border border-white/5">
+                            "{pending.content}"
+                          </p>
                         </div>
-                        <div>
-                          <span className="text-xs font-bold text-white">{pending.author.name}</span>
-                          <span className="text-[11px] text-slate-400 block">
-                            {pending.relationship}  {pending.author.organization ? `at ${pending.author.organization}` : ''}
-                          </span>
+
+                        <div className="flex items-center gap-2 self-end md:self-center">
+                          <button
+                            type="button"
+                            onClick={() => handleRespondRec(pending.id, 'REJECTED')}
+                            disabled={respondingRecId === pending.id}
+                            className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition-colors"
+                          >
+                            Decline
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRespondRec(pending.id, 'ACCEPTED')}
+                            disabled={respondingRecId === pending.id}
+                            className="flex items-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-600/30 transition-all"
+                          >
+                            <Check size={14} /> Accept & Feature
+                          </button>
                         </div>
                       </div>
-                      <p className="text-xs text-slate-300 italic bg-black/20 p-3 rounded-lg border border-white/5">
-                        "{pending.content}"
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-end md:self-center">
-                      <button
-                        type="button"
-                        onClick={() => handleRespondRec(pending.id, 'REJECTED')}
-                        disabled={respondingRecId === pending.id}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition-colors"
-                      >
-                        Decline
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRespondRec(pending.id, 'ACCEPTED')}
-                        disabled={respondingRecId === pending.id}
-                        className="flex items-center gap-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-600/30 transition-all"
-                      >
-                        <Check size={14} /> Accept & Feature
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Accepted List */}
+              {recommendations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {recommendations.map((rec) => (
+                    <div
+                      key={rec.id}
+                      className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4 hover:border-purple-500/30 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 shrink-0 rounded-xl bg-purple-900/60 text-purple-200 font-bold text-sm flex items-center justify-center overflow-hidden border border-purple-500/30">
+                            {rec.author.avatar ? (
+                              <img src={rec.author.avatar} alt={rec.author.name} className="h-full w-full object-cover" />
+                            ) : (
+                              rec.author.name.charAt(0)
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-sm font-bold text-white block">{rec.author.name}</span>
+                            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] font-medium text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30">
+                                {rec.relationship}
+                              </span>
+                              {rec.author.organization && (
+                                <span className="text-[10px] text-slate-400">
+                                  • {rec.author.organization}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRec(rec.id)}
+                          className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
+                          title="Remove Recommendation"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+
+                      <div className="rounded-lg bg-white/[0.02] border border-white/5 p-3.5 text-xs text-slate-300 italic leading-relaxed">
+                        "{rec.content}"
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-white/5">
+                        <span className="text-emerald-400 font-medium flex items-center gap-1">
+                          <CheckCircle2 size={12} /> Active on Profile
+                        </span>
+                        <span>{new Date(rec.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 mb-3">
+                    <Quote size={24} className="fill-purple-400/20" />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">No Testimonials Received Yet</h4>
+                  <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
+                    Colleagues, managers, and mentors can write recommendations directly on your public profile or you can send a direct request.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setRequestRecModalOpen(true)}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition-all"
+                  >
+                    <Sparkles size={14} /> Request Your First Recommendation
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Accepted List */}
-          {recommendations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {recommendations.map((rec) => (
-                <div
-                  key={rec.id}
-                  className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4 hover:border-purple-500/30 transition-all"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 rounded-xl bg-purple-900/60 text-purple-200 font-bold text-sm flex items-center justify-center overflow-hidden border border-purple-500/30">
-                        {rec.author.avatar ? (
-                          <img src={rec.author.avatar} alt={rec.author.name} className="h-full w-full object-cover" />
-                        ) : (
-                          rec.author.name.charAt(0)
-                        )}
-                      </div>
-                      <div>
-                        <span className="text-sm font-bold text-white block">{rec.author.name}</span>
-                        <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] font-medium text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30">
-                            {rec.relationship}
+          {/* Given by Me Sub-tab */}
+          {recSubTab === 'given' && (
+            <div className="space-y-4">
+              {givenRecommendations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {givenRecommendations.map((rec) => (
+                    <div
+                      key={rec.id}
+                      className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 shrink-0 rounded-xl bg-indigo-900/60 text-indigo-200 font-bold text-sm flex items-center justify-center overflow-hidden border border-indigo-500/30">
+                            {rec.recipient?.avatar ? (
+                              <img src={rec.recipient.avatar} alt={rec.recipient.name} className="h-full w-full object-cover" />
+                            ) : (
+                              rec.recipient?.name?.charAt(0) || 'U'
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-xs text-slate-400 block">Written for:</span>
+                            <span className="text-sm font-bold text-white">{rec.recipient?.name || 'User'}</span>
+                            <span className="text-[10px] text-purple-300 block mt-0.5">{rec.relationship}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            rec.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+                            rec.status === 'REJECTED' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
+                            'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          }`}>
+                            {rec.status}
                           </span>
-                          {rec.author.organization && (
-                            <span className="text-[10px] text-slate-400">
-                              • {rec.author.organization}
-                            </span>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRec(rec.id)}
+                            className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
+                            title="Delete Recommendation"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
+
+                      <div className="rounded-lg bg-white/[0.02] border border-white/5 p-3.5 text-xs text-slate-300 italic leading-relaxed">
+                        "{rec.content}"
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-white/5">
+                        <span>Submitted on {new Date(rec.createdAt).toLocaleDateString()}</span>
+                        <a
+                          href={`/profile/${rec.recipientId}`}
+                          className="text-purple-400 hover:text-purple-300 font-medium"
+                        >
+                          View Profile →
+                        </a>
+                      </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteRec(rec.id)}
-                      className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
-                      title="Remove Recommendation"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-
-                  <div className="rounded-lg bg-white/[0.02] border border-white/5 p-3.5 text-xs text-slate-300 italic leading-relaxed">
-                    "{rec.content}"
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-white/5">
-                    <span className="text-emerald-400 font-medium flex items-center gap-1">
-                      <CheckCircle2 size={12} /> Active on Profile
-                    </span>
-                    <span>{new Date(rec.createdAt).toLocaleDateString()}</span>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 mb-3">
-                <Quote size={24} className="fill-purple-400/20" />
-              </div>
-              <h4 className="text-sm font-bold text-white">No Testimonials Received Yet</h4>
-              <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
-                Colleagues, managers, and mentors can write recommendations directly on your public profile.
-              </p>
+              ) : (
+                <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-400 mb-3">
+                    <Sparkles size={24} />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">No Recommendations Written Yet</h4>
+                  <p className="mt-1 text-xs text-slate-400 max-w-sm mx-auto">
+                    Visit the public profile of colleagues or trainees in Discover Network to write testimonials for them!
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </motion.div>
@@ -1474,6 +1690,35 @@ export const UserProfileView = ({ defaultTab = 'profile' }: { defaultTab?: strin
         project={selectedProject}
         onSuccess={handleProjectSuccess}
         onDelete={handleProjectDelete}
+      />
+
+      {/* Project Interactive Preview Modal */}
+      <ProjectPreviewModal
+        isOpen={!!previewProject}
+        onClose={() => setPreviewProject(null)}
+        project={previewProject}
+        authorName={name || user?.name}
+        authorAvatar={avatar || user?.avatar}
+        isOwner={true}
+        onEdit={(proj) => {
+          setPreviewProject(null);
+          handleOpenEditProject(proj);
+        }}
+      />
+
+      {/* Request Recommendation Modal */}
+      <RequestRecommendationModal
+        isOpen={requestRecModalOpen}
+        onClose={() => setRequestRecModalOpen(false)}
+        currentUserId={user?.id || ''}
+        onSuccess={() => {
+          // Re-fetch given recommendations if needed
+          userApi.getGivenRecommendations().then((res) => {
+            if (res.data?.recommendations) {
+              setGivenRecommendations(res.data.recommendations);
+            }
+          });
+        }}
       />
 
       {/* Followers / Following Modal */}

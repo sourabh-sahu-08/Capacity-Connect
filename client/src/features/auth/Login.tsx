@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '../../api/auth.api';
@@ -9,9 +9,9 @@ import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem('remembered_email') || '');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem('remembered_email'));
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -19,12 +19,26 @@ export const Login = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('remembered_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
+      if (rememberMe) {
+        localStorage.setItem('remembered_email', email.trim());
+      } else {
+        localStorage.removeItem('remembered_email');
+      }
+
       const response = await authApi.login({ email, password, rememberMe });
       
       setSuccess(true);
@@ -43,7 +57,7 @@ export const Login = () => {
           if (!learnerAssessmentCompleted) navigate('/onboarding');
           else navigate('/dashboard');
         }
-      }, 1200);
+      }, 1000);
 
     } catch (err: any) {
       setIsLoading(false);

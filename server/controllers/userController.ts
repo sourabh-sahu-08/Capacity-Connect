@@ -1143,4 +1143,104 @@ export const deleteRecommendation = async (req: Request, res: Response): Promise
   }
 };
 
+// 15. Request a Recommendation from a Peer/Trainer
+export const requestRecommendation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const requesterId = (req as any).user?.id;
+    const { targetUserId, message, relationship } = req.body;
+
+    if (!requesterId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    if (!targetUserId) {
+      res.status(400).json({ message: 'Target user ID is required' });
+      return;
+    }
+
+    if (requesterId === targetUserId) {
+      res.status(400).json({ message: 'You cannot request a recommendation from yourself' });
+      return;
+    }
+
+    const requester = await prisma.user.findUnique({
+      where: { id: requesterId },
+      select: { id: true, name: true, avatar: true },
+    });
+
+    const targetUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: { id: true, name: true, role: true },
+    });
+
+    if (!targetUser) {
+      res.status(404).json({ message: 'Target user not found' });
+      return;
+    }
+
+    // Send in-app notification
+    try {
+      await NotificationService.createNotification({
+        recipient: targetUserId,
+        role: targetUser.role as any,
+        type: 'course_enrolled',
+        title: 'Recommendation Request ✍️',
+        message: `${requester?.name || 'A connection'} requested a recommendation from you: "${message || 'Would you mind writing a quick recommendation for my profile?'}"`,
+        priority: 'MEDIUM',
+        category: 'Network',
+        actionUrl: `/profile/${requesterId}?tab=recommendations&write=true`,
+      });
+    } catch (notifErr) {
+      console.error('Failed to dispatch recommendation request notification', notifErr);
+    }
+
+    res.json({
+      success: true,
+      message: `Recommendation request sent to ${targetUser.name}!`,
+    });
+  } catch (error) {
+    console.error('Request Recommendation Error:', error);
+    res.status(500).json({ message: 'Failed to send recommendation request' });
+  }
+};
+
+// 16. Get Recommendations Given by Current User
+export const getGivenRecommendations = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const currentUserId = (req as any).user?.id;
+
+    if (!currentUserId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const given = await (prisma as any).recommendation.findMany({
+      where: { authorId: currentUserId },
+      include: {
+        recipient: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            role: true,
+            currentRole: true,
+            organization: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({
+      success: true,
+      recommendations: given,
+    });
+  } catch (error) {
+    console.error('Get Given Recommendations Error:', error);
+    res.status(500).json({ message: 'Failed to fetch given recommendations' });
+  }
+};
+
+
 

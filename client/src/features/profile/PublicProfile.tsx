@@ -40,6 +40,7 @@ import { useAuthStore } from '../../store/authStore';
 import { FollowListModal } from './FollowListModal';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import { ProjectModal } from './ProjectModal';
+import { ProjectPreviewModal } from './ProjectPreviewModal';
 import { RecommendationModal } from './RecommendationModal';
 import { AppShell } from '../../components/layout/AppShell';
 import { TrainerLayout } from '../../layouts/TrainerLayout';
@@ -83,6 +84,7 @@ export const PublicProfileView: React.FC = () => {
   // Project Modal states
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<UserProject | null>(null);
+  const [previewProject, setPreviewProject] = useState<UserProject | null>(null);
 
   // Recommendation Modal states
   const [recommendationModalOpen, setRecommendationModalOpen] = useState(false);
@@ -626,7 +628,8 @@ export const PublicProfileView: React.FC = () => {
                   {projects.slice(0, 2).map((proj) => (
                     <div
                       key={proj.id}
-                      className="group flex flex-col overflow-hidden rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-purple-200 hover:shadow-md transition-all"
+                      onClick={() => setPreviewProject(proj)}
+                      className="group flex flex-col overflow-hidden rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all cursor-pointer"
                     >
                       <div className="relative h-28 w-full overflow-hidden bg-slate-800">
                         <img
@@ -645,7 +648,10 @@ export const PublicProfileView: React.FC = () => {
                           <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{proj.title}</h4>
                           <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{proj.description}</p>
                         </div>
-                        <div className="flex items-center gap-3 pt-2 text-[11px] font-bold">
+                        <div
+                          className="flex items-center gap-3 pt-2 text-[11px] font-bold"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {proj.demoUrl && (
                             <a
                               href={proj.demoUrl.startsWith('http') ? proj.demoUrl : `https://${proj.demoUrl}`}
@@ -816,7 +822,8 @@ export const PublicProfileView: React.FC = () => {
               {projects.map((project) => (
                 <div
                   key={project.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg hover:border-purple-200 transition-all"
+                  onClick={() => setPreviewProject(project)}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-xl hover:border-purple-300 transition-all cursor-pointer"
                 >
                   {/* Card Cover Photo */}
                   <div className="relative h-44 w-full overflow-hidden bg-slate-900">
@@ -840,7 +847,10 @@ export const PublicProfileView: React.FC = () => {
                     {/* Self Edit Trigger */}
                     {isSelf && (
                       <button
-                        onClick={() => handleOpenEditProject(project)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditProject(project);
+                        }}
                         className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-slate-700 shadow-sm hover:bg-white hover:text-purple-600 backdrop-blur-xs transition-colors"
                         title="Edit Project"
                       >
@@ -877,7 +887,10 @@ export const PublicProfileView: React.FC = () => {
                     )}
 
                     {/* Action Links */}
-                    <div className="flex items-center gap-2 border-t border-slate-100 pt-3">
+                    <div
+                      className="flex items-center gap-2 border-t border-slate-100 pt-3"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {project.demoUrl && (
                         <a
                           href={project.demoUrl.startsWith('http') ? project.demoUrl : `https://${project.demoUrl}`}
@@ -903,7 +916,7 @@ export const PublicProfileView: React.FC = () => {
                       )}
 
                       {!project.demoUrl && !project.githubUrl && (
-                        <span className="text-[11px] text-slate-400 italic">No external links provided</span>
+                        <span className="text-[11px] text-slate-400 italic">Click card for preview</span>
                       )}
                     </div>
                   </div>
@@ -1212,6 +1225,20 @@ export const PublicProfileView: React.FC = () => {
         project={selectedProject}
         onSuccess={handleProjectSuccess}
         onDelete={handleProjectDelete}
+      />
+
+      {/* Project Interactive Preview Modal */}
+      <ProjectPreviewModal
+        isOpen={!!previewProject}
+        onClose={() => setPreviewProject(null)}
+        project={previewProject}
+        authorName={profile.name}
+        authorAvatar={profile.avatar}
+        isOwner={isSelf}
+        onEdit={isSelf ? (p) => {
+          setPreviewProject(null);
+          handleOpenEditProject(p);
+        } : undefined}
       />
 
       {/* Recommendation Modal */}

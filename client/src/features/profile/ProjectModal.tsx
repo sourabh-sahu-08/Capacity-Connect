@@ -232,9 +232,45 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
             {/* Tech Stack Tags */}
             <div>
-              <label className="flex items-center gap-1 text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                <Tag size={13} className="text-purple-600" /> Tech Stack Tags (comma-separated)
+              <label className="flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <span className="flex items-center gap-1"><Tag size={13} className="text-purple-600" /> Tech Stack & Competency Tags</span>
+                <span className="text-[10px] text-slate-400 font-normal">Click tags or type comma-separated</span>
               </label>
+              
+              {/* Quick Tag Suggestions */}
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Python', 'TailwindCSS', 'Docker', 'AI/ML', 'Next.js', 'GraphQL', 'AWS', 'Prisma'].map((tag) => {
+                  const currentTags = tagsInput.split(',').map((t) => t.trim().toLowerCase());
+                  const isIncluded = currentTags.includes(tag.toLowerCase());
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        if (isIncluded) {
+                          const updated = tagsInput
+                            .split(',')
+                            .map((t) => t.trim())
+                            .filter((t) => t.toLowerCase() !== tag.toLowerCase())
+                            .join(', ');
+                          setTagsInput(updated);
+                        } else {
+                          const updated = tagsInput ? `${tagsInput.trim()}, ${tag}` : tag;
+                          setTagsInput(updated);
+                        }
+                      }}
+                      className={`rounded-lg px-2 py-0.5 text-[11px] font-semibold transition-all ${
+                        isIncluded
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {isIncluded ? `✓ ${tag}` : `+ ${tag}`}
+                    </button>
+                  );
+                })}
+              </div>
+
               <input
                 type="text"
                 value={tagsInput}
