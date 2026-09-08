@@ -14,7 +14,9 @@ import {
   getUserRecommendations,
   createRecommendation,
   respondToRecommendation,
-  deleteRecommendation
+  deleteRecommendation,
+  requestRecommendation,
+  getGivenRecommendations
 } from '../controllers/userController';
 import { protect } from '../middleware/authMiddleware';
 
@@ -27,6 +29,8 @@ router.put('/projects/:projectId', protect, updateUserProject);
 router.delete('/projects/:projectId', protect, deleteUserProject);
 
 // Recommendations routes
+router.get('/recommendations/given', protect, getGivenRecommendations);
+router.post('/recommendations/request', protect, requestRecommendation);
 router.put('/recommendations/:recommendationId/status', protect, respondToRecommendation);
 router.delete('/recommendations/:recommendationId', protect, deleteRecommendation);
 
@@ -41,3 +45,4 @@ router.get('/:id/followers', protect, getUserFollowers);
 router.get('/:id/following', protect, getUserFollowing);
 
 export default router;
+

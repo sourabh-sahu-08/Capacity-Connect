@@ -9,7 +9,7 @@ import { NotificationService } from '../services/notificationService';
 
 const generateToken = (id: string, role: string, rememberMe: boolean = false) => {
   return sign({ id, role }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: rememberMe ? '30d' : '1d',
+    expiresIn: rememberMe ? '90d' : '30d',
   });
 };
 

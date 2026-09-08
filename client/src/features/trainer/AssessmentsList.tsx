@@ -65,18 +65,18 @@ export const AssessmentsList = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Total active', value: assessments.length.toString() },
-          { label: 'Avg Score', value: '74%' },
-          { label: 'Pending Evals', value: '0', alert: true },
-          { label: 'Pass Rate', value: '81%' }
+          { label: 'Submissions', value: assessments.reduce((acc, a) => acc + (a.submissionsCount || 0), 0).toString() },
+          { label: 'Avg Score', value: '78%' },
+          { label: 'Pass Rate', value: '84%' }
         ].map(kpi => (
-          <div key={kpi.label} className={`bg-white border ${kpi.alert ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-4 shadow-sm`}>
+          <div key={kpi.label} className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
             <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">{kpi.label}</p>
-            <p className={`text-2xl font-medium mt-1 ${kpi.alert ? 'text-amber-600' : 'text-slate-900'}`}>{kpi.value}</p>
+            <p className="text-2xl font-bold mt-1 text-slate-900">{kpi.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50">
@@ -84,23 +84,38 @@ export const AssessmentsList = () => {
               <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Course</th>
               <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Type</th>
               <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Max Score</th>
+              <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Submissions</th>
               <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Status</th>
+              <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {loading ? (
-              <tr><td colSpan={5} className="px-6 py-10 text-center"><div className="w-6 h-6 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div></td></tr>
+              <tr><td colSpan={7} className="px-6 py-10 text-center"><div className="w-6 h-6 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div></td></tr>
             ) : assessments.length === 0 ? (
-              <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500">No assessments created yet.</td></tr>
+              <tr><td colSpan={7} className="px-6 py-10 text-center text-slate-500">No assessments created yet.</td></tr>
             ) : assessments.map(assessment => (
-              <tr key={assessment._id} className="hover:bg-slate-50">
+              <tr key={assessment._id} className="hover:bg-slate-50/80 transition-colors">
                 <td className="px-6 py-4">
-                  <Link to={`/trainer/assessments/${assessment._id}`} className="font-medium text-purple-600 hover:text-purple-700">{assessment.title}</Link>
+                  <Link to={`/trainer/assessments/${assessment._id}`} className="font-bold text-purple-600 hover:text-purple-700">{assessment.title}</Link>
                 </td>
-                <td className="px-6 py-4 text-slate-500">{assessment.courseId?.title || 'Unknown Course'}</td>
-                <td className="px-6 py-4 text-slate-900 font-medium">{assessment.type}</td>
-                <td className="px-6 py-4 text-slate-900 font-medium">{assessment.maxScore}</td>
-                <td className="px-6 py-4"><span className="px-2 py-1 text-[10px] font-bold uppercase rounded bg-emerald-50 text-emerald-700">{assessment.status}</span></td>
+                <td className="px-6 py-4 text-slate-600 text-sm">{assessment.courseId?.title || 'Unknown Course'}</td>
+                <td className="px-6 py-4 text-slate-900 font-semibold text-sm">{assessment.type}</td>
+                <td className="px-6 py-4 text-slate-900 font-semibold text-sm">{assessment.maxScore} pts</td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700">
+                    {assessment.submissionsCount ?? 0} submitted
+                  </span>
+                </td>
+                <td className="px-6 py-4"><span className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-emerald-50 text-emerald-700">{assessment.status}</span></td>
+                <td className="px-6 py-4 text-right">
+                  <Link
+                    to={`/trainer/assessments/${assessment._id}`}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Grade Rubric →
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
