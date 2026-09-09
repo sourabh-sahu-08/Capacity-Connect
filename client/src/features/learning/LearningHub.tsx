@@ -10,6 +10,10 @@ export const LearningHub = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('ALL');
+  const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([
@@ -44,9 +48,11 @@ export const LearningHub = () => {
           <h1 className="text-3xl font-light tracking-tight text-slate-900">Learning Hub</h1>
           <p className="text-slate-600 mt-2 text-lg">Discover premium courses to build your competencies.</p>
         </div>
-        <div className="flex gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 sm:w-80">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
               placeholder="Search courses, skills..." 

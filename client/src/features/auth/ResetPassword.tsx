@@ -66,12 +66,12 @@ export const ResetPassword = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onSubmit={handleSubmit} 
-            className="space-y-5"
+            className="space-y-2.5"
           >
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
-                <div className="text-sm text-red-800">{error}</div>
+              <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2.5">
+                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={15} />
+                <div className="text-xs text-red-800">{error}</div>
               </div>
             )}
             
@@ -98,7 +98,7 @@ export const ResetPassword = () => {
               required
             />
 
-            <div className="pt-2">
+            <div className="pt-1">
               <AuthButton type="submit" isLoading={isLoading} loadingText="Resetting..." disabled={!password || password !== confirmPassword}>
                 Reset Password
               </AuthButton>

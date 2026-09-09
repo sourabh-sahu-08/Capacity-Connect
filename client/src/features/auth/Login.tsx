@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '../../api/auth.api';
@@ -9,9 +9,9 @@ import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem('remembered_email') || '');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem('remembered_email'));
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -19,12 +19,26 @@ export const Login = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('remembered_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
+      if (rememberMe) {
+        localStorage.setItem('remembered_email', email.trim());
+      } else {
+        localStorage.removeItem('remembered_email');
+      }
+
       const response = await authApi.login({ email, password, rememberMe });
       
       setSuccess(true);
@@ -43,7 +57,7 @@ export const Login = () => {
           if (!learnerAssessmentCompleted) navigate('/onboarding');
           else navigate('/dashboard');
         }
-      }, 1200);
+      }, 1000);
 
     } catch (err: any) {
       setIsLoading(false);
@@ -75,13 +89,13 @@ export const Login = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onSubmit={handleSubmit} 
-            className="space-y-5"
+            className="space-y-3"
           >
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
-                <div className="text-sm text-red-800">
-                  <span className="font-semibold block mb-1">Unable to sign in</span>
+              <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2.5">
+                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={15} />
+                <div className="text-xs text-red-800">
+                  <span className="font-semibold block">Unable to sign in</span>
                   {error}
                 </div>
               </div>
@@ -105,7 +119,7 @@ export const Login = () => {
               required
             />
 
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center justify-between pt-0.5">
               <div className="flex items-center">
                 <input
                   id="remember-me"
@@ -113,27 +127,27 @@ export const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-600"
+                  className="h-3.5 w-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-600"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
+                <label htmlFor="remember-me" className="ml-1.5 block text-xs text-slate-300">
                   Remember me
                 </label>
               </div>
               
-              <Link to="/forgot-password" className="text-sm font-medium text-purple-600 hover:text-purple-500">
+              <Link to="/forgot-password" className="text-xs font-medium text-purple-400 hover:text-purple-300">
                 Forgot password?
               </Link>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-1">
               <AuthButton type="submit" isLoading={isLoading} loadingText="Signing in...">
                 Sign In &rarr;
               </AuthButton>
             </div>
 
-            <div className="text-center text-sm text-slate-600 mt-6">
+            <div className="text-center text-xs text-slate-400 mt-3">
               Don't have an account?{' '}
-              <Link to="/register" className="font-semibold text-purple-600 hover:text-purple-500">
+              <Link to="/register" className="font-semibold text-purple-400 hover:text-purple-300">
                 Create Account
               </Link>
             </div>

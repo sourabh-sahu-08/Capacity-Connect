@@ -8,5 +8,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["scripts", "seed.ts", "prisma.config.ts", "dist", "node_modules"]
 }

@@ -8,11 +8,11 @@ datasource db {
 }
 
 model User {
-  id                         String               @id @default(uuid())
+  id                         String                 @id @default(uuid())
   name                       String
-  email                      String               @unique
+  email                      String                 @unique
   password                   String
-  role                       String               @default("LEARNER")
+  role                       String                 @default("LEARNER")
   organization               String?
   avatar                     String?
   bio                        String?
@@ -20,9 +20,9 @@ model User {
   targetRole                 String?
   learningGoal               String?
   experienceLevel            String?
-  profileCompleted           Boolean              @default(false)
-  learnerAssessmentCompleted Boolean              @default(false)
-  trainerOnboardingCompleted Boolean              @default(false)
+  profileCompleted           Boolean                @default(false)
+  learnerAssessmentCompleted Boolean                @default(false)
+  trainerOnboardingCompleted Boolean                @default(false)
   resetPasswordToken         String?
   resetPasswordExpire        DateTime?
   createdAt                  DateTime             @default(now())

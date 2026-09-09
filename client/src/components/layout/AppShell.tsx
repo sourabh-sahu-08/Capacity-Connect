@@ -7,9 +7,9 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
     <div className="cc-app flex min-h-screen bg-slate-50 text-slate-900 selection:bg-purple-500/30 font-sans">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden pl-20">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden pl-0 pb-16 md:pl-20 md:pb-0">
         <TopHeader />
-        <main className="flex-1 w-full p-8 overflow-auto relative z-10">
+        <main className="relative z-10 w-full flex-1 overflow-auto p-4 md:p-8">
         <div className="max-w-[1200px] mx-auto">
           {children}
         </div>

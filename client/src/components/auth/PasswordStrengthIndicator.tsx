@@ -26,27 +26,27 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthProps> = ({ pas
   }
 
   return (
-    <div className="space-y-2 mt-2 p-3 bg-slate-50 rounded-lg border border-slate-100">
-      <div className="flex justify-between items-center text-xs">
-        <span className="font-medium text-slate-700">Password strength:</span>
-        <span className={score === 3 ? 'text-emerald-600 font-semibold' : 'text-slate-600'}>{password ? strengthLabel : ''}</span>
+    <div className="space-y-1 mt-1 p-2 bg-slate-50 rounded-lg border border-slate-100">
+      <div className="flex justify-between items-center text-[11px]">
+        <span className="font-medium text-slate-400">Password strength:</span>
+        <span className={score === 3 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}>{password ? strengthLabel : ''}</span>
       </div>
-      <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex gap-1">
+      <div className="h-1 w-full bg-slate-200/20 rounded-full overflow-hidden flex gap-1">
         <div className={`h-full flex-1 ${password.length > 0 ? colorClass : 'bg-transparent'} transition-all`} />
         <div className={`h-full flex-1 ${score >= 2 ? colorClass : 'bg-transparent'} transition-all`} />
         <div className={`h-full flex-1 ${score >= 3 ? colorClass : 'bg-transparent'} transition-all`} />
       </div>
-      <ul className="text-xs text-slate-600 space-y-1 mt-2">
-        <li className="flex items-center gap-2">
-          <Check size={14} className={hasLength ? 'text-emerald-500' : 'text-slate-300'} /> At least 8 characters
-        </li>
-        <li className="flex items-center gap-2">
-          <Check size={14} className={hasUpper ? 'text-emerald-500' : 'text-slate-300'} /> One uppercase letter
-        </li>
-        <li className="flex items-center gap-2">
-          <Check size={14} className={hasNumber ? 'text-emerald-500' : 'text-slate-300'} /> One number
-        </li>
-      </ul>
+      <div className="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-0.5">
+        <div className="flex items-center gap-1">
+          <Check size={11} className={hasLength ? 'text-emerald-400 shrink-0' : 'text-slate-500 shrink-0'} /> 8+ chars
+        </div>
+        <div className="flex items-center gap-1">
+          <Check size={11} className={hasUpper ? 'text-emerald-400 shrink-0' : 'text-slate-500 shrink-0'} /> 1 Uppercase
+        </div>
+        <div className="flex items-center gap-1">
+          <Check size={11} className={hasNumber ? 'text-emerald-400 shrink-0' : 'text-slate-500 shrink-0'} /> 1 Number
+        </div>
+      </div>
     </div>
   );
 };

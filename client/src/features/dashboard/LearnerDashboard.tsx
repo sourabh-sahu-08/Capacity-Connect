@@ -40,15 +40,14 @@ export const LearnerDashboard = () => {
   const topRecommendation = recommended[0];
 
   return (
-    <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
-      
-      {/* HERO / CAPABILITY CORE */}
-      <section className="relative flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
-           <div className="w-[800px] h-[800px] border border-slate-100 rounded-full" />
-           <div className="w-[600px] h-[600px] border border-slate-100 rounded-full absolute" />
-           <div className="w-[400px] h-[400px] border border-slate-100 rounded-full absolute" />
+    <div className="space-y-10 pb-28">
+      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#211b3a] via-[#151525] to-[#101318] p-6 sm:p-8">
+        <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="relative flex flex-col justify-between gap-7 lg:flex-row lg:items-center">
+          <div className="max-w-2xl"><div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300"><Zap size={14} /> Learner workspace</div><h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Good morning, {firstName} <span aria-hidden="true">👋</span></h1><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">Continue your learning journey and build the competencies you need for your next opportunity.</p><div className="mt-6 flex flex-wrap items-center gap-3"><button onClick={() => navigate(`/course/${data.courses[0].id}`)} className="inline-flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-400"><Play size={15} fill="currentColor" /> Continue learning <ArrowRight size={15} /></button><span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[.04] px-3 py-2 text-xs text-slate-300"><Flame size={14} className="text-orange-300" /> 7 day streak</span></div></div>
+          <div className="flex items-center gap-5 rounded-xl border border-white/10 bg-black/10 px-5 py-4"><div className="relative grid h-20 w-20 place-items-center rounded-full" style={{ background: `conic-gradient(#a78bfa ${overall}%, rgba(255,255,255,.1) 0)` }}><div className="grid h-16 w-16 place-items-center rounded-full bg-[#17172a] text-2xl font-semibold text-white">{overall}</div></div><div><p className="text-xs uppercase tracking-wider text-slate-400">Overall progress</p><p className="mt-1 text-sm font-medium text-white">Capability readiness</p><p className="mt-2 text-xs text-emerald-300">+6% this month</p></div></div>
         </div>
+      </section>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -197,6 +196,7 @@ export const LearnerDashboard = () => {
         </section>
       )}
 
+      <section><SectionHeading eyebrow="Stay informed" title="Notifications" action="View all" onAction={() => navigate('/notifications')} /><div className="grid gap-3 md:grid-cols-3">{data.notifications.map(item => <button key={item.text} onClick={() => navigate('/notifications')} className="rounded-xl border border-white/10 bg-white/[.045] p-4 text-left transition hover:border-white/20"><div className="flex items-start gap-3"><Bell size={15} className={item.unread ? 'text-purple-300' : 'text-slate-500'} /><div><p className="text-xs text-slate-200">{item.text}</p><p className="mt-2 text-[10px] text-slate-500">{item.time}{item.unread && <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-purple-300" />}</p></div></div></button>)}</div></section>
     </div>
   );
 };

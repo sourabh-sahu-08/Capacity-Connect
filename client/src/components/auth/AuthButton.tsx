@@ -17,7 +17,7 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
   return (
     <button
       disabled={isLoading || disabled}
-      className={`cc-button cc-auth-button group relative flex w-full justify-center py-3 px-4 disabled:opacity-70 disabled:cursor-not-allowed ${className}`}
+      className={`cc-button cc-auth-button group relative flex w-full justify-center py-2 px-3 text-xs sm:text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed ${className}`}
       {...props}
     >
       {isLoading ? (

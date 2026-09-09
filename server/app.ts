@@ -6,6 +6,8 @@ import { Server } from 'socket.io';
 import authRoutes from './routes/auth';
 import onboardingRoutes from './routes/onboarding';
 import notificationRoutes from './routes/notifications';
+import userRoutes from './routes/user';
+import gamificationRoutes from './routes/gamification';
 import { initializeSocket } from './socket';
 import prisma from './config/prisma';
 
@@ -29,6 +31,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/gamification', gamificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/v1/competency', require('./routes/competency').default);
