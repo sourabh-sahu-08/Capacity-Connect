@@ -1,13 +1,19 @@
 import express from 'express';
-import { createCourse, getCourses } from '../controllers/courseController';
+import { createCourse, getCourses, getCourseById, updateCourse, publishCourse, getRecommendedCourses } from '../controllers/courseController';
+import { enroll, getLearnersForTrainer } from '../controllers/enrollmentController';
 import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.use(protect); // Require authentication for all course routes
+router.post('/', protect, createCourse);
+router.get('/', protect, getCourses);
+router.get('/recommended', protect, getRecommendedCourses);
+router.get('/:id', protect, getCourseById);
+router.patch('/:id', protect, updateCourse);
+router.post('/:id/publish', protect, publishCourse);
 
-router.route('/')
-  .post(createCourse)
-  .get(getCourses);
+// Enrollments
+router.post('/:id/enroll', protect, enroll);
+router.get('/trainer/learners', protect, getLearnersForTrainer);
 
 export default router;
