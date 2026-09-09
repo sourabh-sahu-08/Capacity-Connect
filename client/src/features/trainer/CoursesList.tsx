@@ -75,7 +75,7 @@ export const CoursesList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map(course => (
-            <Link key={course._id} to={`/trainer/courses/${course._id}`} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:border-purple-300 hover:shadow-md transition-all group flex flex-col h-full">
+            <Link key={course.id} to={`/trainer/courses/${course.id}`} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:border-purple-300 hover:shadow-md transition-all group flex flex-col h-full">
               <div className="flex-1">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">{course.title}</h3>
                 <p className="text-sm text-slate-500 line-clamp-2 mb-6">{course.description}</p>

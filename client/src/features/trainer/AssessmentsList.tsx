@@ -25,7 +25,7 @@ export const AssessmentsList = () => {
       setAssessments(assessmentsData);
       setCourses(coursesData);
       if (coursesData.length > 0) {
-        setFormData(prev => ({ ...prev, courseId: coursesData[0]._id }));
+        setFormData(prev => ({ ...prev, courseId: coursesData[0].id }));
       }
     } catch (err) {
       console.error(err);
@@ -40,7 +40,7 @@ export const AssessmentsList = () => {
     try {
       await createAssessment(formData);
       setIsModalOpen(false);
-      setFormData({ title: '', courseId: courses[0]?._id || '', type: 'Project', maxScore: 100 });
+      setFormData({ title: '', courseId: courses[0]?.id || '', type: 'Project', maxScore: 100 });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -93,11 +93,11 @@ export const AssessmentsList = () => {
             ) : assessments.length === 0 ? (
               <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500">No assessments created yet.</td></tr>
             ) : assessments.map(assessment => (
-              <tr key={assessment._id} className="hover:bg-slate-50">
+              <tr key={assessment.id} className="hover:bg-slate-50">
                 <td className="px-6 py-4">
-                  <Link to={`/trainer/assessments/${assessment._id}`} className="font-medium text-purple-600 hover:text-purple-700">{assessment.title}</Link>
+                  <Link to={`/trainer/assessments/${assessment.id}`} className="font-medium text-purple-600 hover:text-purple-700">{assessment.title}</Link>
                 </td>
-                <td className="px-6 py-4 text-slate-500">{assessment.courseId?.title || 'Unknown Course'}</td>
+                <td className="px-6 py-4 text-slate-500">{assessment.course?.title || 'Unknown Course'}</td>
                 <td className="px-6 py-4 text-slate-900 font-medium">{assessment.type}</td>
                 <td className="px-6 py-4 text-slate-900 font-medium">{assessment.maxScore}</td>
                 <td className="px-6 py-4"><span className="px-2 py-1 text-[10px] font-bold uppercase rounded bg-emerald-50 text-emerald-700">{assessment.status}</span></td>
@@ -136,7 +136,7 @@ export const AssessmentsList = () => {
                       onChange={(e) => setFormData({...formData, courseId: e.target.value})}
                     >
                       {courses.map(c => (
-                        <option key={c._id} value={c._id}>{c.title}</option>
+                        <option key={c.id} value={c.id}>{c.title}</option>
                       ))}
                     </select>
                   )}

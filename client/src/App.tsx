@@ -125,6 +125,8 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute><TraineeRoute><AppShell><Dashboard /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/learning-hub" element={<ProtectedRoute><TraineeRoute><AppShell><LearningHub /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/course/:id" element={<ProtectedRoute><TraineeRoute><AppShell><CoursePlayer /></AppShell></TraineeRoute></ProtectedRoute>} />
+          <Route path="/courses/:id" element={<ProtectedRoute><TraineeRoute><AppShell><CoursePlayer /></AppShell></TraineeRoute></ProtectedRoute>} />
+          <Route path="/assessment/:id" element={<ProtectedRoute><TraineeRoute><AppShell><Assessment /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/competency-profile" element={<ProtectedRoute><TraineeRoute><AppShell><CompetencyProfile /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/skill-gap" element={<ProtectedRoute><TraineeRoute><AppShell><SkillGapAnalysis /></AppShell></TraineeRoute></ProtectedRoute>} />
           <Route path="/achievements" element={<ProtectedRoute><TraineeRoute><AppShell><Achievements /></AppShell></TraineeRoute></ProtectedRoute>} />

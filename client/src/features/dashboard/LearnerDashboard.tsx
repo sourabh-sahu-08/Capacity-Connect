@@ -1,39 +1,43 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { ArrowRight, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronRight, Sparkles, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getCompetencyProfile, getSkillGaps } from '../../api/intelligenceApi';
+import { getCompetencyProfile } from '../../api/intelligenceApi';
+import { coursesApi, enrollmentsApi, chatApi } from '../../api/courses.api';
 
 export const LearnerDashboard = () => {
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
   const navigate = useNavigate();
-  const firstName = user?.name?.split(' ')[0] || 'SOURABH';
+  const firstName = user?.name?.split(' ')[0] || 'LEARNER';
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<any>(null);
-  const [gaps, setGaps] = useState<any>(null);
+  const [recommended, setRecommended] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (token) {
       getCompetencyProfile(token).then(setProfile).catch(console.error);
-      getSkillGaps(token, 'dummy_role_id').then(setGaps).catch(console.error);
+      
+      coursesApi.getRecommended().then(res => setRecommended(res.data)).catch(console.error);
+      enrollmentsApi.getMyEnrollments().then(res => setEnrollments(res.data)).catch(console.error);
+      
+      chatApi.getConversations().then(res => {
+        const count = res.data.reduce((acc: number, c: any) => {
+          return acc + (c.messages?.[0] && !c.messages[0].readAt && c.messages[0].senderId !== user?.id ? 1 : 0);
+        }, 0);
+        setUnreadCount(count);
+      }).catch(console.error);
     }
-  }, [token]);
+  }, [token, user]);
 
-  const capabilityNodes = [
-    { id: '1', x: '50%', y: '10%', label: 'Architecture' },
-    { id: '2', x: '80%', y: '50%', label: 'Systems' },
-    { id: '3', x: '50%', y: '90%', label: 'Logic' },
-    { id: '4', x: '20%', y: '50%', label: 'UI/UX' },
-  ];
-
-  const overallScore = profile ? Math.round(profile.overallScore) : 78;
-  const growth = profile?.growth?.monthly ? `+${Math.round(profile.growth.monthly)}%` : '+6.4%';
-  const actionTitle = gaps?.nextBestAction?.title || 'Strengthen Backend Architecture.';
-  const actionImpact = gaps?.nextBestAction?.estimatedImpact || 14;
+  const overallScore = profile ? Math.round(profile.overallScore) : 0;
+  
+  const activeEnrollment = enrollments.find(e => e.status === 'IN_PROGRESS' || e.status === 'ENROLLED');
+  const topRecommendation = recommended[0];
 
   return (
     <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
@@ -49,7 +53,7 @@ export const LearnerDashboard = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4 mb-20 z-10"
+          className="space-y-4 mb-20 z-10 text-center"
         >
           <h2 className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">
             Good Evening, {firstName}
@@ -64,16 +68,17 @@ export const LearnerDashboard = () => {
             {overallScore}
           </div>
           <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
-            Capability Core
-          </div>
-          <div className="text-xs tracking-widest text-emerald-600/80 mt-2 font-medium">
-            {growth} THIS MONTH
+            Capability Score
           </div>
         </div>
 
-        {/* Constellation Nodes */}
         <div className="absolute inset-0 pointer-events-none">
-          {capabilityNodes.map(node => (
+          {[
+            { id: '1', x: '50%', y: '10%', label: 'Active Courses: ' + enrollments.filter(e => e.status !== 'COMPLETED').length },
+            { id: '2', x: '80%', y: '50%', label: 'Completed: ' + enrollments.filter(e => e.status === 'COMPLETED').length },
+            { id: '3', x: '50%', y: '90%', label: 'Skill Gaps: ' + (profile?.skills?.filter((s:any) => s.score < 80).length || 0) },
+            { id: '4', x: '20%', y: '50%', label: 'Unread Msgs: ' + unreadCount },
+          ].map(node => (
             <div 
               key={node.id} 
               className="absolute pointer-events-auto flex flex-col items-center gap-2 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 hover:scale-110 cursor-crosshair"
@@ -82,12 +87,11 @@ export const LearnerDashboard = () => {
               onMouseLeave={() => setHoveredNode(null)}
             >
               <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-purple-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-slate-300'}`} />
-              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors ${hoveredNode === node.id ? 'text-purple-700' : 'text-slate-500'}`}>
+              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors whitespace-nowrap ${hoveredNode === node.id ? 'text-purple-700' : 'text-slate-500'}`}>
                 {node.label}
               </div>
             </div>
           ))}
-          {/* Subtle connecting lines */}
           <svg className="absolute inset-0 w-full h-full opacity-20" style={{ zIndex: -1 }}>
             <line x1="20%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
             <line x1="80%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
@@ -97,101 +101,101 @@ export const LearnerDashboard = () => {
         </div>
       </section>
 
-      {/* NEXT BEST ACTION */}
-      <section className="mt-20">
-        <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
-          <div className="space-y-8 flex-1">
-            <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
-              <Sparkles size={14} className="text-violet-600" /> Next Best Action
-            </h3>
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
-              {actionTitle}
-            </h2>
-            <p className="text-slate-600 max-w-md text-lg leading-relaxed">
-              Improving this competency could increase your target role readiness by <strong className="text-slate-900 font-medium">+{actionImpact}%</strong>.
-            </p>
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-6">
-            <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
-              Est. Effort - 4.5 Hours
+      {/* RECOMMENDED COURSE BASED ON SKILL GAP */}
+      {topRecommendation && (
+        <section className="mt-20">
+          <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
+            <div className="space-y-8 flex-1">
+              <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
+                <Sparkles size={14} className="text-violet-600" /> Recommended For Your Skill Gaps
+              </h3>
+              <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
+                {topRecommendation.course.title}
+              </h2>
+              <p className="text-slate-600 max-w-md text-lg leading-relaxed">
+                {topRecommendation.reason} Created by <strong className="text-slate-900">{topRecommendation.course.trainer?.name}</strong>.
+              </p>
             </div>
-            <button onClick={() => navigate('/learning-hub')} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
-              <span className="text-sm font-bold tracking-widest uppercase">Start Path</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            <div className="shrink-0 flex flex-col items-end gap-6">
+              <div className="flex gap-2">
+                {topRecommendation.matchedSkills.map((s:string) => (
+                  <span key={s} className="text-xs font-medium px-2 py-1 bg-white border border-violet-200 text-violet-700 rounded-full">{s}</span>
+                ))}
+              </div>
+              <button onClick={() => navigate(`/courses/${topRecommendation.course.id}`)} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
+                <span className="text-sm font-bold tracking-widest uppercase">View Course</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CURRENT LEARNING */}
+      {activeEnrollment && (
+        <section className="border-t border-slate-100 pt-20">
+          <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-8">
+            Continue Learning
+          </h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm flex flex-col md:flex-row items-center gap-8">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <BookOpen size={24} />
+            </div>
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-xl font-bold text-slate-800">{activeEnrollment.course.title}</h4>
+                <span className="text-sm font-bold text-slate-500">{Math.round(activeEnrollment.progress)}%</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="bg-emerald-500 h-full rounded-full transition-all duration-1000"
+                  style={{ width: `${activeEnrollment.progress}%` }}
+                />
+              </div>
+            </div>
+            <button onClick={() => navigate(`/courses/${activeEnrollment.course.id}`)} className="shrink-0 px-6 py-3 bg-slate-900 text-white rounded-full font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-colors">
+              Resume
             </button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* HORIZONTAL TIMELINE */}
-      <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-16">
-          Career Evolution
-        </h3>
-        
-        <div className="relative">
-          <div className="absolute top-4 left-0 right-0 h-px bg-slate-200"></div>
-          
-          <div className="grid grid-cols-3 gap-8 relative z-10">
-            {/* PAST */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-300 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Past</div>
-                <h4 className="text-lg font-medium text-slate-600">JavaScript Foundation</h4>
-                <div className="text-xs tracking-widest text-emerald-600/70 mt-2 uppercase">Completed</div>
-              </div>
-            </div>
-
-            {/* NOW */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-purple-600 uppercase mb-2">Now</div>
-                <h4 className="text-lg font-medium text-slate-900">Backend Architecture</h4>
-                <div className="text-xs tracking-widest text-slate-600 mt-2 uppercase">In Progress</div>
-              </div>
-            </div>
-
-            {/* FUTURE */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full border border-slate-300"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Future</div>
-                <h4 className="text-lg font-medium text-slate-500">Full Stack Engineer</h4>
-                <div className="text-xs tracking-widest text-slate-500 mt-2 uppercase">Target</div>
-              </div>
-            </div>
+      {/* MY LEARNING GRID */}
+      {enrollments.length > 0 && (
+        <section className="border-t border-slate-100 pt-20">
+          <div className="flex justify-between items-end mb-8">
+            <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">
+              All Enrollments
+            </h3>
+            <button onClick={() => navigate('/learning-hub')} className="text-sm font-bold tracking-widest text-purple-600 hover:text-purple-800 uppercase flex items-center gap-1">
+              Explore More <ChevronRight size={16} />
+            </button>
           </div>
-        </div>
-      </section>
-
-      {/* INSIGHTS AS STORIES */}
-      <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-12">
-          Growth Story
-        </h3>
-        
-        <div className="group cursor-pointer">
-          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-purple-100 transition-colors">
-            +16%
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {enrollments.map((e: any) => (
+              <div key={e.id} className="flex flex-col bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-lg text-slate-800">{e.course.title}</h4>
+                  <span className={`text-xs px-2 py-1 rounded-full ${e.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {e.status}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-500 mb-6">Trainer: {e.course.trainer?.name}</p>
+                <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex-1 mr-4">
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-slate-800 h-full rounded-full" style={{ width: `${e.progress}%` }} />
+                    </div>
+                  </div>
+                  <button onClick={() => navigate(`/courses/${e.course.id}`)} className="text-sm font-bold text-slate-900 uppercase">
+                    {e.status === 'COMPLETED' ? 'Review' : 'Continue'}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="max-w-2xl space-y-6">
-            <h4 className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed">
-              Competency growth over the last 90 days. Your strongest acceleration happened after completing <strong className="text-slate-900 font-medium">Advanced React Architecture</strong>.
-            </h4>
-            <div onClick={() => navigate('/competency-profile')} className="flex items-center gap-2 text-sm font-bold tracking-widest text-purple-600 uppercase group-hover:text-purple-700 transition-colors">
-              Explore Growth <ChevronRight size={16} />
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
     </div>
   );

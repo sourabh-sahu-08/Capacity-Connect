@@ -1,51 +1,48 @@
-// @ts-nocheck
-import React from 'react';
-import api from '../../api/axios';
-import { useState, useEffect } from 'react';
-
-import { Search, Filter, Star, Clock } from 'lucide-react';
-
-const COURSES = [
-  { id: 1, title: 'Advanced React Development', instructor: 'Sarah Drasner', duration: '18h', difficulty: 'Advanced', rating: 4.8, img: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=600&auto=format&fit=crop' },
-  { id: 2, title: 'Node.js Microservices', instructor: 'Stephen Grider', duration: '24h', difficulty: 'Intermediate', rating: 4.9, img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop' },
-  { id: 3, title: 'Cloud Infrastructure with AWS', instructor: 'Neal Davis', duration: '32h', difficulty: 'Advanced', rating: 4.7, img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop' },
-];
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Star, Clock, BookOpen, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { coursesApi, enrollmentsApi } from '../../api/courses.api';
+import { useAuthStore } from '../../store/authStore';
 
 export const LearningHub = () => {
-
-  const [dbCourses, setDbCourses] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const [courses, setCourses] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/api/courses')
-      .then(res => {
-        setDbCourses(res.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    Promise.all([
+      coursesApi.getAll(),
+      user?.role === 'LEARNER' ? enrollmentsApi.getMyEnrollments() : Promise.resolve({ data: [] })
+    ])
+    .then(([coursesRes, enrollmentsRes]) => {
+      setCourses(coursesRes.data);
+      setEnrollments(enrollmentsRes.data);
+    })
+    .catch(console.error)
+    .finally(() => setLoading(false));
+  }, [user]);
 
-  // Merge static placeholder courses with DB courses so it looks good even if DB is empty, or just use DB courses.
-  // The user asked "why the courses i made as trainer not shown". We should show both, or replace static ones. Let's just prepend DB courses.
-  const allCourses = [
-    ...dbCourses.map(c => ({
-      id: c._id,
-      title: c.title,
-      instructor: c.trainerId?.name || 'Unknown Instructor',
-      duration: '4h', // Mock duration since we don't have it in schema yet
-      difficulty: 'Intermediate', // Mock
-      rating: 5.0, // Mock
-      img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop' // Generic tech image
-    })),
-    ...COURSES
-  ];
+  const handleCourseClick = async (courseId: string, isEnrolled: boolean) => {
+    if (user?.role === 'LEARNER' && !isEnrolled) {
+      try {
+        await coursesApi.enroll(courseId);
+        navigate(`/courses/${courseId}`);
+      } catch (err) {
+        console.error('Failed to enroll', err);
+      }
+    } else {
+      navigate(`/courses/${courseId}`);
+    }
+  };
 
   return (
-    <div className="p-8 space-y-8 text-slate-900 max-w-7xl mx-auto">
+    <div className="p-8 space-y-8 text-slate-900 max-w-7xl mx-auto font-sans selection:bg-purple-500/30">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-bold">Learning Hub</h1>
-          <p className="text-slate-600 mt-2">Discover premium courses to build your competencies.</p>
+          <h1 className="text-3xl font-light tracking-tight text-slate-900">Learning Hub</h1>
+          <p className="text-slate-600 mt-2 text-lg">Discover premium courses to build your competencies.</p>
         </div>
         <div className="flex gap-4 w-full md:w-auto">
           <div className="relative flex-1 md:w-80">
@@ -53,45 +50,86 @@ export const LearningHub = () => {
             <input 
               type="text" 
               placeholder="Search courses, skills..." 
-              className="w-full bg-white border border-slate-200 rounded-lg py-2.5 pl-10 pr-4 text-slate-900 placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-full py-3 pl-10 pr-4 text-slate-900 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
             />
           </div>
-          <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 hover:bg-slate-100 transition-colors">
+          <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-6 py-3 hover:bg-slate-50 transition-colors font-medium">
             <Filter size={18} /> Filters
           </button>
         </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {['All Categories', 'Technology', 'Leadership', 'Management', 'Data Science', 'Cybersecurity'].map((cat, i) => (
-          <button key={cat} className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${i === 0 ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:text-slate-900'}`}>
+        {['All Categories', 'Frontend', 'Backend', 'Data Science', 'Cloud'].map((cat, i) => (
+          <button key={cat} className={`px-6 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-colors ${i === 0 ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:text-slate-900'}`}>
             {cat}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? <div className="col-span-full py-10 flex justify-center"><div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div></div> : allCourses.map(course => (
-          <div key={course.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden group cursor-pointer hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-300">
-            <div className="h-48 w-full bg-cover bg-center" style={{ backgroundImage: `url(${course.img})` }}></div>
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <span className={`text-xs px-2 py-1 rounded font-medium ${course.difficulty === 'Advanced' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                  {course.difficulty}
-                </span>
-                <span className="flex items-center gap-1 text-sm text-slate-600">
-                  <Star className="text-yellow-500 w-4 h-4 fill-yellow-500" /> {course.rating}
-                </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {loading ? (
+          <div className="col-span-full py-20 flex justify-center">
+            <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+          </div>
+        ) : courses.map(course => {
+          const enrollment = enrollments.find(e => e.courseId === course.id);
+          const isEnrolled = !!enrollment;
+          
+          return (
+            <div 
+              key={course.id} 
+              className="bg-white border border-slate-200 rounded-2xl overflow-hidden group hover:shadow-xl hover:border-purple-200 transition-all duration-300 flex flex-col"
+            >
+              <div className="h-48 w-full bg-slate-100 relative overflow-hidden">
+                <img src={course.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop'} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute top-4 left-4">
+                  <span className={`text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full ${course.difficulty === 'Advanced' ? 'bg-amber-100 text-amber-700' : (course.difficulty === 'Intermediate' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700')}`}>
+                    {course.difficulty}
+                  </span>
+                </div>
               </div>
-              <h3 className="text-lg font-bold group-hover:text-purple-600 transition-colors line-clamp-2">{course.title}</h3>
-              <p className="text-sm text-slate-500 mt-1">{course.instructor}</p>
-              
-              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-200 text-sm text-slate-600">
-                <span className="flex items-center gap-1"><Clock size={16} /> {course.duration}</span>
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="flex items-center gap-1 text-sm font-bold text-slate-600">
+                    <Star className="text-yellow-400 w-4 h-4 fill-yellow-400" /> 4.8
+                  </span>
+                  <span className="text-xs font-bold tracking-widest text-slate-400 uppercase">
+                    {course.category}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors line-clamp-2 mb-2">{course.title}</h3>
+                <p className="text-sm text-slate-500 mb-6 flex-1 line-clamp-2">{course.description}</p>
+                
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+                      {course.trainer?.avatar && <img src={course.trainer.avatar} alt="Trainer" />}
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">{course.trainer?.name}</span>
+                  </div>
+                  <span className="flex items-center gap-1 text-sm font-medium text-slate-500"><Clock size={16} /> {course.duration}m</span>
+                </div>
+              </div>
+              <div className="p-6 pt-0 mt-auto">
+                <button 
+                  onClick={() => handleCourseClick(course.id, isEnrolled)}
+                  className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold tracking-widest uppercase text-sm transition-colors ${
+                    isEnrolled 
+                      ? 'bg-slate-100 text-slate-900 hover:bg-slate-200' 
+                      : 'bg-purple-600 text-white hover:bg-purple-700 shadow-[0_0_15px_rgba(147,51,234,0.3)]'
+                  }`}
+                >
+                  {isEnrolled ? (
+                    <><BookOpen size={18} /> Continue Learning</>
+                  ) : (
+                    <><ArrowRight size={18} /> Enroll Now</>
+                  )}
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

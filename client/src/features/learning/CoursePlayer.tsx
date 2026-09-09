@@ -1,31 +1,73 @@
-// @ts-nocheck
-import React, { useState } from 'react';
-import { Play, CheckCircle, MessageSquare, BookOpen, Send, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, CheckCircle, BookOpen, Send, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useParams, useNavigate } from 'react-router-dom';
+import { coursesApi, enrollmentsApi } from '../../api/courses.api';
 
 export const CoursePlayer = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [course, setCourse] = useState<any>(null);
+  const [enrollment, setEnrollment] = useState<any>(null);
+  const [activeLesson, setActiveLesson] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'copilot' | 'notes'>('copilot');
   const [messages, setMessages] = useState<{role: string, content: string}[]>([
-    { role: 'ai', content: 'Hi! I\'m your AI Learning Copilot. I see you are learning about React Hooks. How can I help you today?' }
+    { role: 'ai', content: "Hi! I'm your AI Learning Copilot. How can I help you today?" }
   ]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    Promise.all([
+      coursesApi.getById(id),
+      enrollmentsApi.getMyEnrollments()
+    ]).then(([courseRes, enrollmentsRes]) => {
+      const fetchedCourse = courseRes.data;
+      setCourse(fetchedCourse);
+      
+      const currentEnrollment = enrollmentsRes.data.find((e: any) => e.courseId === id);
+      setEnrollment(currentEnrollment);
+      
+      // Select first lesson by default
+      if (fetchedCourse.modules?.length > 0 && fetchedCourse.modules[0].lessons?.length > 0) {
+        setActiveLesson(fetchedCourse.modules[0].lessons[0]);
+      }
+    }).catch(console.error).finally(() => setLoading(false));
+  }, [id]);
+
+  const handleCompleteLesson = async () => {
+    if (!enrollment || !activeLesson) return;
+    try {
+      await enrollmentsApi.updateProgress(enrollment.id, {
+        lessonId: activeLesson.id,
+        completed: true,
+        timeSpent: 300 // mock time spent
+      });
+      // Refresh enrollment to get new progress
+      const res = await enrollmentsApi.getMyEnrollments();
+      const updated = res.data.find((e: any) => e.courseId === id);
+      setEnrollment(updated);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages([...messages, { role: 'user', content: input }]);
+    setMessages(prev => [...prev, { role: 'user', content: input }]);
     setInput('');
-    setIsLoading(true);
-    
-    // Mock AI response
     setTimeout(() => {
       setMessages(prev => [...prev, { 
         role: 'ai', 
-        content: `Great question! In React, \`useEffect\` lets you synchronize a component with an external system. It's often used for data fetching, setting up subscriptions, or manually changing the DOM.` 
+        content: `I'm an AI assistant. I can see you are currently on ${activeLesson?.title}.` 
       }]);
-      setIsLoading(false);
-    }, 1500);
+    }, 1000);
   };
+
+  if (loading) return <div className="flex h-[80vh] items-center justify-center"><div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div></div>;
+  if (!course) return <div>Course not found</div>;
 
   return (
     <div className="h-[calc(100vh-6rem)] -m-8 flex flex-col md:flex-row bg-slate-50 text-slate-900 overflow-hidden">
@@ -33,26 +75,34 @@ export const CoursePlayer = () => {
       {/* Left: Course Navigation */}
       <div className="w-full md:w-80 border-r border-slate-200 bg-white overflow-y-auto hidden lg:block">
         <div className="p-6 border-b border-slate-200">
-          <h2 className="font-bold text-lg leading-tight">Advanced React Development</h2>
-          <div className="mt-3 bg-slate-100 h-2 rounded-full overflow-hidden">
-            <div className="bg-purple-500 h-full" style={{width: '72%'}}></div>
-          </div>
-          <p className="text-xs text-slate-600 mt-2">72% Completed</p>
+          <h2 className="font-bold text-lg leading-tight">{course.title}</h2>
+          {enrollment && (
+            <>
+              <div className="mt-3 bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="bg-purple-500 h-full transition-all" style={{width: `${enrollment.progress}%`}}></div>
+              </div>
+              <p className="text-xs text-slate-600 mt-2">{Math.round(enrollment.progress)}% Completed</p>
+            </>
+          )}
         </div>
-        <div className="p-4 space-y-2">
-          {['1. Introduction', '2. Understanding Hooks', '3. Advanced State Management', '4. Performance Optimization'].map((mod, i) => (
-            <div key={mod} className="space-y-1">
-              <div className="font-medium text-sm text-slate-700 py-2">{mod}</div>
-              {i === 1 && (
-                <div className="pl-4 space-y-1 border-l border-slate-200 ml-2">
-                  <div className="flex gap-2 items-center text-sm py-2 text-purple-600 bg-purple-50 px-2 rounded">
-                    <Play size={14} /> 2.1 The useEffect Hook
-                  </div>
-                  <div className="flex gap-2 items-center text-sm py-2 text-slate-600 hover:text-slate-800 cursor-pointer px-2">
-                    <BookOpen size={14} /> 2.2 Custom Hooks
-                  </div>
-                </div>
-              )}
+        <div className="p-4 space-y-4">
+          {course.modules?.map((mod: any, i: number) => (
+            <div key={mod.id} className="space-y-1">
+              <div className="font-medium text-sm text-slate-700 py-2">{i+1}. {mod.title}</div>
+              <div className="pl-4 space-y-1 border-l border-slate-200 ml-2">
+                {mod.lessons?.map((lesson: any, j: number) => {
+                  const isActive = activeLesson?.id === lesson.id;
+                  return (
+                    <div 
+                      key={lesson.id} 
+                      onClick={() => setActiveLesson(lesson)}
+                      className={`flex gap-2 items-center text-sm py-2 px-2 rounded cursor-pointer transition-colors ${isActive ? 'text-purple-600 bg-purple-50' : 'text-slate-600 hover:text-slate-800'}`}
+                    >
+                      <Play size={14} /> {i+1}.{j+1} {lesson.title}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -60,18 +110,26 @@ export const CoursePlayer = () => {
 
       {/* Center: Video Player */}
       <div className="flex-1 flex flex-col min-w-0 bg-white">
-        <div className="flex-1 relative bg-white flex items-center justify-center">
-          {/* Mock Video Player */}
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+        <div className="flex-1 relative bg-slate-900 flex items-center justify-center">
           <button className="relative z-10 w-20 h-20 bg-purple-600/90 hover:bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] rounded-full flex items-center justify-center text-white  transition-transform hover:scale-105">
             <Play size={32} className="ml-2" />
           </button>
         </div>
-        <div className="h-64 bg-slate-50 p-6 overflow-y-auto border-t border-slate-200">
-          <h1 className="text-2xl font-bold mb-2">2.1 The useEffect Hook</h1>
-          <p className="text-slate-600 text-sm leading-relaxed max-w-3xl">
-            In this lesson, we explore the fundamental concepts of the useEffect hook in React. We will learn how to manage side effects, perform data fetching, and correctly utilize the dependency array to optimize rendering performance.
-          </p>
+        <div className="h-auto min-h-64 bg-slate-50 p-6 overflow-y-auto border-t border-slate-200 flex justify-between items-start gap-8">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">{activeLesson?.title || 'Lesson Details'}</h1>
+            <p className="text-slate-600 text-sm leading-relaxed max-w-3xl">
+              {course.description}
+            </p>
+          </div>
+          {enrollment && (
+            <button 
+              onClick={handleCompleteLesson}
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold tracking-widest uppercase text-sm shrink-0 flex items-center gap-2"
+            >
+              <CheckCircle size={18} /> Mark Complete
+            </button>
+          )}
         </div>
       </div>
 
@@ -107,25 +165,9 @@ export const CoursePlayer = () => {
                   </div>
                 </motion.div>
               ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-slate-100 border border-slate-300 rounded-2xl rounded-bl-none px-4 py-3 flex gap-1 items-center">
-                    <div className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce"></div>
-                    <div className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    <div className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: '0.4s'}}></div>
-                  </div>
-                </div>
-              )}
             </div>
             
             <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {['Explain Simply', 'Give Example', 'Generate Quiz'].map(action => (
-                  <button key={action} onClick={() => setInput(action)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs rounded-full whitespace-nowrap text-slate-700 transition-colors">
-                    ✨ {action}
-                  </button>
-                ))}
-              </div>
               <div className="flex gap-2">
                 <input 
                   type="text" 
