@@ -25,7 +25,7 @@ export const AssessmentsList = () => {
       setAssessments(assessmentsData);
       setCourses(coursesData);
       if (coursesData.length > 0) {
-        setFormData(prev => ({ ...prev, courseId: coursesData[0]._id }));
+        setFormData(prev => ({ ...prev, courseId: coursesData[0].id }));
       }
     } catch (err) {
       console.error(err);
@@ -40,7 +40,7 @@ export const AssessmentsList = () => {
     try {
       await createAssessment(formData);
       setIsModalOpen(false);
-      setFormData({ title: '', courseId: courses[0]?._id || '', type: 'Project', maxScore: 100 });
+      setFormData({ title: '', courseId: courses[0]?.id || '', type: 'Project', maxScore: 100 });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -95,27 +95,14 @@ export const AssessmentsList = () => {
             ) : assessments.length === 0 ? (
               <tr><td colSpan={7} className="px-6 py-10 text-center text-slate-500">No assessments created yet.</td></tr>
             ) : assessments.map(assessment => (
-              <tr key={assessment._id} className="hover:bg-slate-50/80 transition-colors">
+              <tr key={assessment.id} className="hover:bg-slate-50">
                 <td className="px-6 py-4">
-                  <Link to={`/trainer/assessments/${assessment._id}`} className="font-bold text-purple-600 hover:text-purple-700">{assessment.title}</Link>
+                  <Link to={`/trainer/assessments/${assessment.id}`} className="font-medium text-purple-600 hover:text-purple-700">{assessment.title}</Link>
                 </td>
-                <td className="px-6 py-4 text-slate-600 text-sm">{assessment.courseId?.title || 'Unknown Course'}</td>
-                <td className="px-6 py-4 text-slate-900 font-semibold text-sm">{assessment.type}</td>
-                <td className="px-6 py-4 text-slate-900 font-semibold text-sm">{assessment.maxScore} pts</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700">
-                    {assessment.submissionsCount ?? 0} submitted
-                  </span>
-                </td>
-                <td className="px-6 py-4"><span className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full bg-emerald-50 text-emerald-700">{assessment.status}</span></td>
-                <td className="px-6 py-4 text-right">
-                  <Link
-                    to={`/trainer/assessments/${assessment._id}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    Grade Rubric →
-                  </Link>
-                </td>
+                <td className="px-6 py-4 text-slate-500">{assessment.course?.title || 'Unknown Course'}</td>
+                <td className="px-6 py-4 text-slate-900 font-medium">{assessment.type}</td>
+                <td className="px-6 py-4 text-slate-900 font-medium">{assessment.maxScore}</td>
+                <td className="px-6 py-4"><span className="px-2 py-1 text-[10px] font-bold uppercase rounded bg-emerald-50 text-emerald-700">{assessment.status}</span></td>
               </tr>
             ))}
           </tbody>
@@ -151,7 +138,7 @@ export const AssessmentsList = () => {
                       onChange={(e) => setFormData({...formData, courseId: e.target.value})}
                     >
                       {courses.map(c => (
-                        <option key={c._id} value={c._id}>{c.title}</option>
+                        <option key={c.id} value={c.id}>{c.title}</option>
                       ))}
                     </select>
                   )}

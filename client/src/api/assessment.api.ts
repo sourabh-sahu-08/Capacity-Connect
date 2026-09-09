@@ -72,32 +72,7 @@ export interface AssessmentSubmissionItem {
 }
 
 export const assessmentApi = {
-  getAll: async (): Promise<AssessmentItem[]> => {
-    const res = await api.get('/api/assessments');
-    return res.data;
-  },
-  getById: async (id: string): Promise<AssessmentItem> => {
-    const res = await api.get(`/api/assessments/${id}`);
-    return res.data;
-  },
-  submit: async (id: string, data: { githubUrl?: string; demoUrl?: string; notes?: string }): Promise<{ message: string; submission: AssessmentSubmissionItem }> => {
-    const res = await api.post(`/api/assessments/${id}/submit`, data);
-    return res.data;
-  },
-  getMySubmissions: async (): Promise<AssessmentSubmissionItem[]> => {
-    const res = await api.get('/api/assessments/my-submissions');
-    return res.data;
-  },
-  getSubmissions: async (id: string): Promise<AssessmentSubmissionItem[]> => {
-    const res = await api.get(`/api/assessments/${id}/submissions`);
-    return res.data;
-  },
-  gradeSubmission: async (
-    assessmentId: string,
-    submissionId: string,
-    data: { score: number; feedback: string; status?: 'GRADED' | 'REJECTED' }
-  ): Promise<{ message: string; submission: AssessmentSubmissionItem }> => {
-    const res = await api.post(`/api/assessments/${assessmentId}/submissions/${submissionId}/grade`, data);
-    return res.data;
-  }
+  getById: (id: string) => api.get(`/api/assessments/${id}`),
+  submit: (id: string, data: any) => api.post(`/api/assessments/${id}/attempt`, data),
+  grade: (attemptId: string, data: any) => api.post(`/api/assessments/attempt/${attemptId}/grade`, data),
 };

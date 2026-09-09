@@ -7,6 +7,6 @@ const router = express.Router();
 router.get('/options', getOptions);
 router.post('/complete', protect, completeOnboarding);
 
-export default router;
-
 router.post('/complete-trainer', protect, completeTrainerOnboarding);
+
+export default router;

@@ -1,51 +1,43 @@
-// @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { getCompetencyProfile, getSkillGaps } from '../../api/intelligenceApi';
-import { learnerDashboardData as data } from './learnerDashboard.data';
-import { ArrowRight, Award, Bell, BookOpen, Brain, Check, ChevronRight, Circle, Clock3, Flame, Play, ShieldCheck, Star, Target, TrendingUp, Zap } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-
-const activity = [{ day: 'Mon', hours: 2 }, { day: 'Tue', hours: 1 }, { day: 'Wed', hours: 3 }, { day: 'Thu', hours: 2 }, { day: 'Fri', hours: 4 }, { day: 'Sat', hours: 1 }, { day: 'Sun', hours: 3 }];
-const activityIcons = { course: BookOpen, assessment: Target, certificate: Award, competency: TrendingUp };
-
-const SectionHeading = ({ eyebrow, title, action, onAction }) => (
-  <div className="mb-5 flex items-end justify-between gap-4">
-    <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-purple-300">{eyebrow}</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-white">{title}</h2></div>
-    {action && <button onClick={onAction} className="flex items-center gap-1 text-xs font-semibold text-slate-400 transition-colors hover:text-white">{action}<ChevronRight size={14} /></button>}
-  </div>
-);
-
-const ProgressBar = ({ value, color = 'bg-purple-400' }) => <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} /></div>;
+import { ArrowRight, ChevronRight, Sparkles, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { getCompetencyProfile } from '../../api/intelligenceApi';
+import { coursesApi, enrollmentsApi, chatApi } from '../../api/courses.api';
 
 export const LearnerDashboard = () => {
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const firstName = user?.name?.split(' ')[0] || 'LEARNER';
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
   const [profile, setProfile] = useState<any>(null);
-  const firstName = user?.name?.split(' ')[0] || 'Learner';
+  const [recommended, setRecommended] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    let active = true;
-    const load = async () => {
-      if (token) {
-        try { const result = await getCompetencyProfile(token); if (active) setProfile(result); } catch { /* Mock data keeps the dashboard useful when the service is unavailable. */ }
-        try { await getSkillGaps(token, 'dummy_role_id'); } catch { /* Skill gaps are replaced by the API when available. */ }
-      }
-      if (active) setLoading(false);
-    };
-    load();
-    return () => { active = false; };
-  }, [token]);
+    if (token) {
+      getCompetencyProfile(token).then(setProfile).catch(console.error);
+      
+      coursesApi.getRecommended().then(res => setRecommended(res.data)).catch(console.error);
+      enrollmentsApi.getMyEnrollments().then(res => setEnrollments(res.data)).catch(console.error);
+      
+      chatApi.getConversations().then(res => {
+        const count = res.data.reduce((acc: number, c: any) => {
+          return acc + (c.messages?.[0] && !c.messages[0].readAt && c.messages[0].senderId !== user?.id ? 1 : 0);
+        }, 0);
+        setUnreadCount(count);
+      }).catch(console.error);
+    }
+  }, [token, user]);
 
-  if (loading) return <div className="space-y-6 pb-24 animate-pulse"><div className="h-48 rounded-2xl bg-white/[.06]" /><div className="grid grid-cols-2 gap-3 lg:grid-cols-6">{[1, 2, 3, 4, 5, 6].map(item => <div key={item} className="h-24 rounded-xl bg-white/[.06]" />)}</div><div className="h-72 rounded-2xl bg-white/[.06]" /></div>;
-
-  const overall = profile?.overallScore ? Math.round(profile.overallScore) : 78;
-  const stats = [
-    { label: 'Active courses', value: '4', note: '2 due this month', icon: BookOpen, accent: 'text-purple-300' }, { label: 'Completed courses', value: '8', note: '2 this quarter', icon: Check, accent: 'text-emerald-300' }, { label: 'Learning hours', value: '32h', note: '12h this week', icon: Clock3, accent: 'text-sky-300' }, { label: 'Avg. assessment', value: '84%', note: 'Strong momentum', icon: Target, accent: 'text-amber-300' }, { label: 'Certificates', value: '5', note: 'All verified', icon: Award, accent: 'text-pink-300' }, { label: 'Learning streak', value: '7 days', note: 'Keep it going', icon: Flame, accent: 'text-orange-300' },
-  ];
+  const overallScore = profile ? Math.round(profile.overallScore) : 0;
+  
+  const activeEnrollment = enrollments.find(e => e.status === 'IN_PROGRESS' || e.status === 'ENROLLED');
+  const topRecommendation = recommended[0];
 
   return (
     <div className="space-y-10 pb-28">
@@ -57,19 +49,152 @@ export const LearnerDashboard = () => {
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">{stats.map(({ label, value, note, icon: Icon, accent }) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.045] p-4 transition hover:border-white/20 hover:bg-white/[.07]"><Icon size={17} className={accent} /><p className="mt-4 text-2xl font-semibold text-white">{value}</p><p className="mt-1 text-xs font-medium text-slate-300">{label}</p><p className="mt-2 text-[10px] text-slate-500">{note}</p></div>)}</section>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 mb-20 z-10 text-center"
+        >
+          <h2 className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">
+            Good Evening, {firstName}
+          </h2>
+          <h1 className="text-sm font-medium tracking-[0.3em] text-slate-700 uppercase">
+            Your capability system is evolving
+          </h1>
+        </motion.div>
 
-      <section><SectionHeading eyebrow="Priority learning" title="Continue learning" action="View all courses" onAction={() => navigate('/learning-hub')} /><div className="grid gap-4 lg:grid-cols-2">{data.courses.map(course => <article key={course.id} className="overflow-hidden rounded-xl border border-white/10 bg-white/[.045] transition hover:border-purple-300/40"><div className="flex flex-col sm:flex-row"><img src={course.image} alt="" className="h-40 w-full object-cover sm:h-auto sm:w-44" /><div className="flex-1 p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] uppercase tracking-wider text-purple-300">{course.category}</p><h3 className="mt-1 font-semibold text-white">{course.title}</h3><p className="mt-1 text-xs text-slate-400">with {course.trainer} · {course.level}</p></div><span className="text-lg font-semibold text-purple-200">{course.progress}%</span></div><div className="mt-5"><div className="mb-2 flex justify-between text-[11px] text-slate-400"><span>{course.modules}</span><span>{course.lastAccessed}</span></div><ProgressBar value={course.progress} /></div><button onClick={() => navigate(`/course/${course.id}`)} className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-purple-300">Continue learning <ArrowRight size={14} /></button></div></div></article>)}</div></section>
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-slate-900 to-slate-500">
+            {overallScore}
+          </div>
+          <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
+            Capability Score
+          </div>
+        </div>
 
-      <div className="grid gap-8 xl:grid-cols-[1.15fr_.85fr]"><section><SectionHeading eyebrow="Next up" title="Upcoming assessments" action="View assessments" onAction={() => navigate('/learning-hub')} /><div className="divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[.045]">{data.assessments.map(item => <div key={item.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3"><div className={`mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg ${item.status === 'Due soon' ? 'bg-amber-400/10 text-amber-300' : item.status === 'Completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-sky-400/10 text-sky-300'}`}><Target size={15} /></div><div><p className="text-sm font-medium text-white">{item.title}</p><p className="mt-1 text-xs text-slate-400">{item.course} · {item.questions} questions · {item.duration}</p><p className="mt-2 text-[11px] text-slate-500">Deadline: {item.deadline}</p></div></div><div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end"><span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{item.status}</span>{item.status !== 'Completed' && <button className="rounded-md border border-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-purple-300/50 hover:text-white">Start</button>}</div></div>)}</div></section><section><SectionHeading eyebrow="Your rhythm" title="Learning activity" /><div className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="mb-3 flex items-end justify-between"><div><p className="text-3xl font-semibold text-white">12<span className="text-base text-slate-500"> / 15h</span></p><p className="text-xs text-slate-400">Weekly learning goal</p></div><span className="text-xs font-medium text-emerald-300">80% complete</span></div><div className="h-44"><ResponsiveContainer width="100%" height="100%"><AreaChart data={activity} margin={{ top: 10, right: 5, left: -24, bottom: 0 }}><defs><linearGradient id="learningFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a78bfa" stopOpacity={0.4} /><stop offset="100%" stopColor="#a78bfa" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" vertical={false} /><XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} /><YAxis tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: '#1b1a2b', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: 12 }} /><Area type="monotone" dataKey="hours" stroke="#a78bfa" fill="url(#learningFill)" strokeWidth={2} /></AreaChart></ResponsiveContainer></div></div></section></div>
+        <div className="absolute inset-0 pointer-events-none">
+          {[
+            { id: '1', x: '50%', y: '10%', label: 'Active Courses: ' + enrollments.filter(e => e.status !== 'COMPLETED').length },
+            { id: '2', x: '80%', y: '50%', label: 'Completed: ' + enrollments.filter(e => e.status === 'COMPLETED').length },
+            { id: '3', x: '50%', y: '90%', label: 'Skill Gaps: ' + (profile?.skills?.filter((s:any) => s.score < 80).length || 0) },
+            { id: '4', x: '20%', y: '50%', label: 'Unread Msgs: ' + unreadCount },
+          ].map(node => (
+            <div 
+              key={node.id} 
+              className="absolute pointer-events-auto flex flex-col items-center gap-2 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 hover:scale-110 cursor-crosshair"
+              style={{ left: node.x, top: node.y }}
+              onMouseEnter={() => setHoveredNode(node.id)}
+              onMouseLeave={() => setHoveredNode(null)}
+            >
+              <div className={`w-3 h-3 rounded-full ${hoveredNode === node.id ? 'bg-purple-400 shadow-[0_0_20px_rgba(99,102,241,0.6)]' : 'bg-slate-300'}`} />
+              <div className={`text-[10px] tracking-[0.2em] uppercase font-bold transition-colors whitespace-nowrap ${hoveredNode === node.id ? 'text-purple-700' : 'text-slate-500'}`}>
+                {node.label}
+              </div>
+            </div>
+          ))}
+          <svg className="absolute inset-0 w-full h-full opacity-20" style={{ zIndex: -1 }}>
+            <line x1="20%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="80%" y1="50%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="10%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="50%" y1="90%" x2="50%" y2="50%" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+          </svg>
+        </div>
+      </section>
 
-      <section><SectionHeading eyebrow="Curated for your growth" title="Recommended for you" action="Explore courses" onAction={() => navigate('/learning-hub')} /><div className="grid gap-4 md:grid-cols-3">{data.recommendations.map(course => <article key={course.id} className="overflow-hidden rounded-xl border border-white/10 bg-white/[.045] transition hover:-translate-y-0.5 hover:border-purple-300/40"><img src={course.image} alt="" className="h-32 w-full object-cover" /><div className="p-4"><div className="flex items-center justify-between text-[11px] text-slate-400"><span>{course.level}</span><span className="flex items-center gap-1 text-amber-200"><Star size={12} fill="currentColor" /> {course.rating}</span></div><h3 className="mt-2 font-semibold text-white">{course.title}</h3><p className="mt-1 text-xs text-slate-400">{course.trainer} · {course.duration}</p><p className="mt-4 rounded-md bg-purple-400/10 p-2.5 text-xs leading-5 text-purple-200"><Brain size={13} className="mr-1 inline" /> {course.reason}</p><button onClick={() => navigate('/learning-hub')} className="mt-4 text-xs font-semibold text-white hover:text-purple-300">View course <ArrowRight size={13} className="ml-1 inline" /></button></div></article>)}</div></section>
+      {/* RECOMMENDED COURSE BASED ON SKILL GAP */}
+      {topRecommendation && (
+        <section className="mt-20">
+          <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
+            <div className="space-y-8 flex-1">
+              <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
+                <Sparkles size={14} className="text-violet-600" /> Recommended For Your Skill Gaps
+              </h3>
+              <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
+                {topRecommendation.course.title}
+              </h2>
+              <p className="text-slate-600 max-w-md text-lg leading-relaxed">
+                {topRecommendation.reason} Created by <strong className="text-slate-900">{topRecommendation.course.trainer?.name}</strong>.
+              </p>
+            </div>
+            <div className="shrink-0 flex flex-col items-end gap-6">
+              <div className="flex gap-2">
+                {topRecommendation.matchedSkills.map((s:string) => (
+                  <span key={s} className="text-xs font-medium px-2 py-1 bg-white border border-violet-200 text-violet-700 rounded-full">{s}</span>
+                ))}
+              </div>
+              <button onClick={() => navigate(`/courses/${topRecommendation.course.id}`)} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
+                <span className="text-sm font-bold tracking-widest uppercase">View Course</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
-      <div className="grid gap-8 xl:grid-cols-[1.1fr_.9fr]"><section><SectionHeading eyebrow="Capability intelligence" title="My competencies" action="Full profile" onAction={() => navigate('/competency-profile')} /><div className="rounded-xl border border-white/10 bg-white/[.045] p-5"><div className="space-y-5">{data.competencies.map(item => <div key={item.name}><div className="mb-2 flex items-center justify-between text-xs"><span className="font-medium text-slate-200">{item.name}</span><span className="text-slate-400">{item.score}% · {item.level}</span></div><div className="relative"><ProgressBar value={item.score} color="bg-emerald-300" /><span className="absolute -top-1.5 h-4 w-px bg-purple-300/70" style={{ left: `${item.target}%` }} /></div><p className="mt-1 text-[10px] text-slate-500">Target level: {item.target}%</p></div>)}</div></div></section><section><SectionHeading eyebrow="Close the gap" title="Your skill gaps" action="View analysis" onAction={() => navigate('/skill-gap')} /><div className="space-y-3">{data.skillGaps.map(gap => <div key={gap.name} className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-medium text-white">{gap.name}</h3><p className="mt-1 text-xs text-slate-400">{gap.current} <span className="mx-1 text-slate-600">→</span> {gap.target}</p></div><span className="text-lg font-semibold text-amber-200">{gap.score}%</span></div><ProgressBar value={gap.score} color="bg-amber-300" /><p className="mt-3 text-xs text-slate-400">Recommended: <span className="text-slate-200">{gap.recommendation}</span></p><button onClick={() => navigate('/skill-gap')} className="mt-3 text-xs font-semibold text-purple-200 hover:text-white">View recommendation <ArrowRight size={13} className="ml-1 inline" /></button></div>)}</div></section></div>
+      {/* CURRENT LEARNING */}
+      {activeEnrollment && (
+        <section className="border-t border-slate-100 pt-20">
+          <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-8">
+            Continue Learning
+          </h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm flex flex-col md:flex-row items-center gap-8">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <BookOpen size={24} />
+            </div>
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-xl font-bold text-slate-800">{activeEnrollment.course.title}</h4>
+                <span className="text-sm font-bold text-slate-500">{Math.round(activeEnrollment.progress)}%</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="bg-emerald-500 h-full rounded-full transition-all duration-1000"
+                  style={{ width: `${activeEnrollment.progress}%` }}
+                />
+              </div>
+            </div>
+            <button onClick={() => navigate(`/courses/${activeEnrollment.course.id}`)} className="shrink-0 px-6 py-3 bg-slate-900 text-white rounded-full font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-colors">
+              Resume
+            </button>
+          </div>
+        </section>
+      )}
 
-      <section><SectionHeading eyebrow="Your next opportunity" title="Recommended learning path" /><div className="overflow-x-auto rounded-xl border border-white/10 bg-white/[.045] p-5"><div className="flex min-w-[680px] items-start">{data.learningPath.map((item, index) => <React.Fragment key={item.title}><div className="flex w-36 flex-col items-center text-center"><div className={`grid h-9 w-9 place-items-center rounded-full border ${item.state === 'complete' ? 'border-emerald-300/50 bg-emerald-300/10 text-emerald-300' : item.state === 'current' ? 'border-purple-300 bg-purple-400/20 text-purple-200 shadow-[0_0_20px_rgba(167,139,250,.2)]' : 'border-white/15 text-slate-500'}`}>{item.state === 'complete' ? <Check size={15} /> : item.state === 'current' ? <Play size={13} fill="currentColor" /> : <Circle size={10} />}</div><p className={`mt-3 text-xs ${item.state === 'current' ? 'font-semibold text-white' : 'text-slate-400'}`}>{item.title}</p><p className="mt-1 text-[10px] uppercase tracking-wider text-slate-600">{item.state}</p></div>{index < data.learningPath.length - 1 && <div className={`mt-4 h-px flex-1 ${item.state === 'complete' ? 'bg-emerald-300/50' : 'bg-white/10'}`} />}</React.Fragment>)}</div></div></section>
-
-      <div className="grid gap-8 lg:grid-cols-2"><section><SectionHeading eyebrow="Proof of progress" title="Certificates" action="View all" onAction={() => navigate('/achievements')} /><div className="grid gap-3 sm:grid-cols-2">{data.certificates.map(certificate => <div key={certificate.id} className="rounded-xl border border-white/10 bg-white/[.045] p-4"><div className="mb-4 flex items-center justify-between"><div className="grid h-9 w-9 place-items-center rounded-lg bg-amber-300/10 text-amber-200"><Award size={17} /></div><span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300"><ShieldCheck size={13} /> Verified</span></div><h3 className="text-sm font-semibold text-white">{certificate.title}</h3><p className="mt-1 text-xs text-slate-400">{certificate.course}</p><p className="mt-3 text-[10px] text-slate-500">Issued {certificate.date} · {certificate.id}</p><div className="mt-4 flex gap-3"><button className="text-xs font-semibold text-purple-200 hover:text-white">View</button><button className="text-xs font-semibold text-slate-400 hover:text-white">Download</button></div></div>)}</div></section><section><SectionHeading eyebrow="Momentum" title="Recent activity" /><div className="rounded-xl border border-white/10 bg-white/[.045] p-4">{data.activity.map(item => { const Icon = activityIcons[item.type]; return <div key={item.text} className="flex gap-3 border-b border-white/10 py-3 last:border-0"><div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-purple-400/10 text-purple-200"><Icon size={13} /></div><div><p className="text-xs text-slate-200">{item.text}</p><p className="mt-1 text-[10px] text-slate-500">{item.time}</p></div></div>; })}</div></section></div>
+      {/* MY LEARNING GRID */}
+      {enrollments.length > 0 && (
+        <section className="border-t border-slate-100 pt-20">
+          <div className="flex justify-between items-end mb-8">
+            <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">
+              All Enrollments
+            </h3>
+            <button onClick={() => navigate('/learning-hub')} className="text-sm font-bold tracking-widest text-purple-600 hover:text-purple-800 uppercase flex items-center gap-1">
+              Explore More <ChevronRight size={16} />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {enrollments.map((e: any) => (
+              <div key={e.id} className="flex flex-col bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-lg text-slate-800">{e.course.title}</h4>
+                  <span className={`text-xs px-2 py-1 rounded-full ${e.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {e.status}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-500 mb-6">Trainer: {e.course.trainer?.name}</p>
+                <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex-1 mr-4">
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-slate-800 h-full rounded-full" style={{ width: `${e.progress}%` }} />
+                    </div>
+                  </div>
+                  <button onClick={() => navigate(`/courses/${e.course.id}`)} className="text-sm font-bold text-slate-900 uppercase">
+                    {e.status === 'COMPLETED' ? 'Review' : 'Continue'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section><SectionHeading eyebrow="Stay informed" title="Notifications" action="View all" onAction={() => navigate('/notifications')} /><div className="grid gap-3 md:grid-cols-3">{data.notifications.map(item => <button key={item.text} onClick={() => navigate('/notifications')} className="rounded-xl border border-white/10 bg-white/[.045] p-4 text-left transition hover:border-white/20"><div className="flex items-start gap-3"><Bell size={15} className={item.unread ? 'text-purple-300' : 'text-slate-500'} /><div><p className="text-xs text-slate-200">{item.text}</p><p className="mt-2 text-[10px] text-slate-500">{item.time}{item.unread && <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-purple-300" />}</p></div></div></button>)}</div></section>
     </div>

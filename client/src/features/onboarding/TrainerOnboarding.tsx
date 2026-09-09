@@ -97,7 +97,7 @@ export const TrainerOnboarding = () => {
             
             <h2 className="text-2xl font-bold text-slate-900 mt-8 pt-4 border-t border-slate-100">Training experience level?</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {['Beginner Trainer', '1�3 Years', '3�5 Years', '5+ Years'].map((exp) => (
+              {['Beginner Trainer', '1-3 Years', '3-5 Years', '5+ Years'].map((exp) => (
                 <button
                   key={exp}
                   onClick={() => { setExperience(exp); nextStep(); }}

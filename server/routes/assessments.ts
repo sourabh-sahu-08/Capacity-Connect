@@ -1,32 +1,12 @@
 import express from 'express';
-import {
-  createAssessment,
-  getAssessments,
-  getAssessmentById,
-  submitAssessment,
-  getMySubmissions,
-  getAssessmentSubmissions,
-  gradeSubmission
-} from '../controllers/assessmentController';
+import { createAssessment, submitAttempt, gradeAttempt, getAssessments } from '../controllers/assessmentController';
 import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.use(protect); // Require authentication for all assessment routes
-
-router.route('/')
-  .post(createAssessment)
-  .get(getAssessments);
-
-router.get('/my-submissions', getMySubmissions);
-
-router.route('/:id')
-  .get(getAssessmentById);
-
-router.post('/:id/submit', submitAssessment);
-
-router.get('/:id/submissions', getAssessmentSubmissions);
-
-router.post('/:id/submissions/:submissionId/grade', gradeSubmission);
+router.get('/', protect, getAssessments);
+router.post('/', protect, createAssessment);
+router.post('/:id/attempt', protect, submitAttempt);
+router.post('/attempt/:attemptId/grade', protect, gradeAttempt);
 
 export default router;

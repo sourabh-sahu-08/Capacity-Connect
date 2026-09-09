@@ -1,71 +1,40 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Users, BookOpen, CheckCircle, AlertTriangle, Clock, 
-  TrendingUp, TrendingDown, Brain, Activity, Target,
-  Bell, Plus, ChevronRight, MessageCircle, Presentation, Beaker, Trophy, Calendar
+  Users, BookOpen, AlertTriangle, ChevronRight, MessageCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-
-// --- MOCK DATA LAYER ---
-const mockData = {
-  kpis: {
-    activeLearners: 124,
-    activeCourses: 8,
-    completionRate: 78,
-    avgAssessment: 74,
-    needAttention: 12,
-    pendingReviews: 8
-  },
-  priorities: [
-    { id: 1, type: 'critical', name: 'Priya Sharma', issue: 'Assessment score dropped by 24%', actionPrimary: 'Intervene', actionSecondary: 'View Learner' },
-    { id: 2, type: 'warning', name: 'Rahul Desai', issue: 'Stuck on Module 4 for 3 days', actionPrimary: 'Message', actionSecondary: 'View Progress' },
-    { id: 3, type: 'task', name: '8 Assignments', issue: 'Awaiting Review', actionPrimary: 'Review Now', actionSecondary: null },
-    { id: 4, type: 'task', name: '4 Challenges', issue: 'Pending Evaluation', actionPrimary: 'Evaluate', actionSecondary: null }
-  ],
-  courses: [
-    { id: 1, name: 'Backend Development', learners: 82, completion: 78, avgScore: 74, status: 'Performing Well' },
-    { id: 2, name: 'Frontend Architecture', learners: 54, completion: 42, avgScore: 68, status: 'Needs Improvement' },
-    { id: 3, name: 'Cloud Infrastructure', learners: 32, completion: 91, avgScore: 88, status: 'Excellent' }
-  ],
-  aiInsight: {
-    topic: 'Database Normalization',
-    percentage: 62,
-    details: 'This topic has the highest assessment failure rate this week.'
-  },
-  learnerSnapshots: {
-    'Top Performers': [
-      { id: 1, name: 'Rahul Desai', course: 'Backend Dev', progress: 92, score: 88, status: 'Excellent' },
-      { id: 2, name: 'Priya Sharma', course: 'Frontend Arch', progress: 76, score: 91, status: 'Good' }
-    ],
-    'Most Improved': [
-      { id: 3, name: 'Neha Gupta', course: 'Cloud Infra', progress: 85, score: 95, status: 'Accelerating' }
-    ],
-    'At Risk': [
-      { id: 4, name: 'Aman Singh', course: 'Backend Dev', progress: 42, score: 54, status: 'Falling Behind' }
-    ]
-  },
-  assessmentOverview: { upcoming: 3, avgScore: 74, passRate: 81, difficultTopic: 'JWT Authentication', pendingReviews: 6 },
-  activePrograms: [
-    { id: 1, name: 'FULL STACK DEVELOPMENT', learners: 124, progress: 68, nextSession: 'Tomorrow • 10:00 AM' }
-  ],
-  notifications: [
-    { id: 1, text: 'Rahul has been inactive for 7 days', type: 'warning' },
-    { id: 2, text: 'Priya submitted Backend Challenge', type: 'info' }
-  ],
-  impactMetrics: { trained: 248, improvement: '+18%', validated: 426, successRate: 84, impactScore: 92 }
-};
+import { getCourses, getLearners, getConversations } from '../../api/trainerApi';
+import { useNavigate } from 'react-router-dom';
 
 export const TrainerDashboard = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [activeSnapshotTab, setActiveSnapshotTab] = useState('Top Performers');
-  const [activeSecondaryTab, setActiveSecondaryTab] = useState('Assessment Overview');
+  
+  const [courses, setCourses] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+  const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      try {
+        const [coursesData, enrollmentsData, convosData] = await Promise.all([
+          getCourses(),
+          getLearners(),
+          getConversations()
+        ]);
+        setCourses(coursesData);
+        setEnrollments(enrollmentsData);
+        setConversations(convosData);
+      } catch (error) {
+        console.error('Failed to fetch trainer data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   if (loading) {
@@ -75,6 +44,17 @@ export const TrainerDashboard = () => {
       </div>
     );
   }
+
+  // Calculate live KPIs
+  const activeLearners = new Set(enrollments.map((e: any) => e.learnerId)).size;
+  const activeCourses = courses.length;
+  const avgProgress = enrollments.length > 0 
+    ? Math.round(enrollments.reduce((acc: number, e: any) => acc + e.progress, 0) / enrollments.length)
+    : 0;
+    
+  const unreadMessages = conversations.reduce((acc: number, c: any) => {
+    return acc + (c.messages && c.messages[0] && !c.messages[0].readAt && c.messages[0].senderId !== user?.id ? 1 : 0);
+  }, 0);
 
   return (
     <div className="space-y-32 pb-32 pt-10 font-sans selection:bg-purple-500/30">
@@ -102,23 +82,23 @@ export const TrainerDashboard = () => {
 
         <div className="relative z-10 flex flex-col items-center">
           <div className="text-[10rem] md:text-[12rem] font-light leading-none tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-slate-900 to-slate-500">
-            {mockData.kpis.activeLearners}
+            {activeLearners}
           </div>
           <div className="text-sm font-bold tracking-[0.2em] text-purple-600 mt-4 uppercase">
             Active Learners
           </div>
           <div className="text-xs tracking-widest text-emerald-600/80 mt-2 font-medium uppercase">
-            +12 THIS WEEK
+            across {activeCourses} courses
           </div>
         </div>
 
         {/* Constellation Nodes for Trainer */}
         <div className="absolute inset-0 pointer-events-none">
           {[
-            { id: '1', x: '50%', y: '10%', label: 'Reviews (8)' },
-            { id: '2', x: '80%', y: '50%', label: 'Courses (3)' },
-            { id: '3', x: '50%', y: '90%', label: 'Interventions (4)' },
-            { id: '4', x: '20%', y: '50%', label: 'Assessments (12)' },
+            { id: '1', x: '50%', y: '10%', label: `Unread Messages (${unreadMessages})` },
+            { id: '2', x: '80%', y: '50%', label: `Courses (${activeCourses})` },
+            { id: '3', x: '50%', y: '90%', label: `Avg Progress (${avgProgress}%)` },
+            { id: '4', x: '20%', y: '50%', label: `Enrollments (${enrollments.length})` },
           ].map(node => (
             <div 
               key={node.id} 
@@ -126,7 +106,7 @@ export const TrainerDashboard = () => {
               style={{ left: node.x, top: node.y }}
             >
               <div className="w-3 h-3 rounded-full bg-slate-300 hover:bg-purple-400 hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] transition-all" />
-              <div className="text-[10px] tracking-[0.2em] uppercase font-bold text-slate-500 hover:text-purple-700 transition-colors">
+              <div className="text-[10px] tracking-[0.2em] uppercase font-bold text-slate-500 hover:text-purple-700 transition-colors whitespace-nowrap">
                 {node.label}
               </div>
             </div>
@@ -140,99 +120,79 @@ export const TrainerDashboard = () => {
         </div>
       </section>
 
-      {/* PRIORITY ACTION */}
+      {/* RECENT LEARNERS / ENROLLMENTS */}
       <section className="mt-20">
-        <div className="bg-linear-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-10 flex flex-col md:flex-row items-end justify-between gap-10">
-          <div className="space-y-8 flex-1">
-            <h3 className="text-xs font-bold tracking-[0.2em] text-violet-600 uppercase flex items-center gap-2">
-              <AlertTriangle size={14} className="text-violet-600" /> Critical Intervention
-            </h3>
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 leading-tight">
-              Priya Sharma
-            </h2>
-            <p className="text-slate-600 max-w-md text-lg leading-relaxed">
-              Assessment score dropped by <strong className="text-slate-900 font-medium">24%</strong> in Backend Architecture. Immediate mentoring suggested.
-            </p>
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-6">
-            <div className="text-sm font-medium tracking-widest text-slate-500 uppercase">
-              Priority: High
+        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-8">
+          Recent Enrollments
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {enrollments.slice(0, 3).map((enrollment: any) => (
+            <div key={enrollment.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h4 className="font-bold text-slate-800">{enrollment.learner?.name}</h4>
+                  <p className="text-sm text-slate-500">{enrollment.course?.title}</p>
+                </div>
+                <div className="text-xs font-bold px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
+                  {Math.round(enrollment.progress)}%
+                </div>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="bg-purple-600 h-full rounded-full transition-all duration-1000"
+                  style={{ width: `${enrollment.progress}%` }}
+                />
+              </div>
             </div>
-            <button className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
-              <span className="text-sm font-bold tracking-widest uppercase">Intervene Now</span>
-              <MessageCircle size={18} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
+          ))}
+          {enrollments.length === 0 && (
+            <div className="col-span-3 text-center text-slate-500 py-10">
+              No active learners yet.
+            </div>
+          )}
         </div>
       </section>
 
-      {/* HORIZONTAL TIMELINE / WORKFLOW */}
+      {/* YOUR COURSES */}
       <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-16">
-          Trainer Workflow
-        </h3>
-        
-        <div className="relative">
-          <div className="absolute top-4 left-0 right-0 h-px bg-slate-200"></div>
-          
-          <div className="grid grid-cols-3 gap-8 relative z-10">
-            {/* COMPLETED */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-300 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Evaluated</div>
-                <h4 className="text-lg font-medium text-slate-600">14 Assignments</h4>
-                <div className="text-xs tracking-widest text-emerald-600/70 mt-2 uppercase">Completed Today</div>
-              </div>
-            </div>
-
-            {/* NOW */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-500/50 flex items-center justify-center mx-auto md:mx-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-purple-600 uppercase mb-2">Pending</div>
-                <h4 className="text-lg font-medium text-slate-900">8 Reviews</h4>
-                <div className="text-xs tracking-widest text-slate-600 mt-2 uppercase">Requires Attention</div>
-              </div>
-            </div>
-
-            {/* FUTURE */}
-            <div className="space-y-6">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mx-auto md:mx-0">
-                <div className="w-2 h-2 rounded-full border border-slate-300"></div>
-              </div>
-              <div>
-                <div className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase mb-2">Upcoming</div>
-                <h4 className="text-lg font-medium text-slate-500">Live Workshop</h4>
-                <div className="text-xs tracking-widest text-slate-500 mt-2 uppercase">Tomorrow, 10:00 AM</div>
-              </div>
-            </div>
-          </div>
+        <div className="flex justify-between items-end mb-8">
+          <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">
+            Your Courses
+          </h3>
+          <button 
+            onClick={() => navigate('/trainer/courses')}
+            className="text-sm font-bold tracking-widest text-purple-600 hover:text-purple-800 uppercase flex items-center gap-1"
+          >
+            Manage <ChevronRight size={16} />
+          </button>
         </div>
-      </section>
-
-      {/* INSIGHTS AS STORIES */}
-      <section className="border-t border-slate-100 pt-20">
-        <h3 className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase mb-12">
-          Cohort Story
-        </h3>
         
-        <div className="group cursor-pointer">
-          <div className="text-[6rem] md:text-[8rem] font-light leading-none tracking-tighter text-slate-900 mb-8 group-hover:text-purple-100 transition-colors">
-            {mockData.kpis.completionRate}%
-          </div>
-          <div className="max-w-2xl space-y-6">
-            <h4 className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed">
-              Overall completion rate across all active cohorts. The highest momentum is currently in <strong className="text-slate-900 font-medium">Cloud Infrastructure</strong>.
-            </h4>
-            <div className="flex items-center gap-2 text-sm font-bold tracking-widest text-purple-600 uppercase group-hover:text-purple-700 transition-colors">
-              Explore Analytics <ChevronRight size={16} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {courses.slice(0, 4).map((course: any) => (
+            <div key={course.id} className="flex flex-col bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-bold text-lg text-slate-800">{course.title}</h4>
+                <span className={`text-xs px-2 py-1 rounded-full ${course.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                  {course.status}
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6 line-clamp-2">{course.description}</p>
+              
+              <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex gap-2">
+                  {course.courseSkills?.slice(0,2).map((cs: any) => (
+                    <span key={cs.id} className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded">
+                      {cs.skill?.name}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-sm font-medium text-slate-600 flex items-center gap-1">
+                  <Users size={14} /> 
+                  {enrollments.filter((e: any) => e.courseId === course.id).length}
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
