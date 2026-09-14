@@ -116,13 +116,32 @@ export const getAssessments = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    const assessments = await prisma.assessment.findMany({
-      where: { trainerId },
-      include: { course: { select: { title: true } } },
-      orderBy: { createdAt: 'desc' }
-    });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const skip = (page - 1) * limit;
+
+    const [assessments, total] = await Promise.all([
+      prisma.assessment.findMany({
+        where: { trainerId },
+        skip,
+        take: limit,
+        include: { course: { select: { title: true } } },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.assessment.count({ where: { trainerId } })
+    ]);
     
-    res.json(assessments);
+    res.json({
+      data: assessments,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: skip + limit < total,
+        hasPreviousPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('getAssessments error', error);
     res.status(500).json({ message: 'Server Error' });

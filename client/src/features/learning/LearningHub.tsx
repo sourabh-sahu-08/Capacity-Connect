@@ -6,7 +6,7 @@ import { useAuthStore } from '../../store/authStore';
 
 export const LearningHub = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const user = useAuthStore(state => state.user);
   const [courses, setCourses] = useState<any[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,13 +20,23 @@ export const LearningHub = () => {
       user?.role === 'LEARNER' ? enrollmentsApi.getMyEnrollments() : Promise.resolve({ data: [] })
     ])
     .then(([coursesRes, enrollmentsRes]) => {
-      setCourses(coursesRes.data);
+      setCourses(coursesRes.data.data || coursesRes.data);
       setEnrollments(enrollmentsRes.data);
     })
     .catch(console.error)
     .finally(() => setLoading(false));
-  }, [user]);
+  }, [user?.role]);
 
+  const filteredCourses = React.useMemo(() => {
+    return courses.filter(c => {
+      const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            c.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'All Categories' || c.category === selectedCategory;
+      const matchesDifficulty = selectedDifficulty === 'ALL' || c.difficulty === selectedDifficulty;
+      return matchesSearch && matchesCategory && matchesDifficulty;
+    });
+  }, [courses, searchQuery, selectedCategory, selectedDifficulty]);
+  
   const handleCourseClick = async (courseId: string, isEnrolled: boolean) => {
     if (user?.role === 'LEARNER' && !isEnrolled) {
       try {
@@ -54,6 +64,8 @@ export const LearningHub = () => {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses, skills..." 
               className="w-full bg-white border border-slate-200 rounded-full py-3 pl-10 pr-4 text-slate-900 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
             />
@@ -77,7 +89,7 @@ export const LearningHub = () => {
           <div className="col-span-full py-20 flex justify-center">
             <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
           </div>
-        ) : courses.map(course => {
+        ) : filteredCourses.map(course => {
           const enrollment = enrollments.find(e => e.courseId === course.id);
           const isEnrolled = !!enrollment;
           

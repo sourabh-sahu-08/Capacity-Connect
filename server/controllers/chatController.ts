@@ -85,6 +85,8 @@ export const getMessages = async (req: AuthRequest, res: Response): Promise<void
   try {
     const { id } = req.params;
     const userId = req.user?.id;
+    const { cursor, limit = '30' } = req.query;
+    const take = Math.min(parseInt(limit as string), 50);
     
     const conversation = await prisma.conversation.findUnique({ where: { id } });
     
@@ -95,10 +97,14 @@ export const getMessages = async (req: AuthRequest, res: Response): Promise<void
     
     const messages = await prisma.message.findMany({
       where: { conversationId: id },
-      orderBy: { createdAt: 'asc' }
+      take: take,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor as string } : undefined,
+      orderBy: { createdAt: 'desc' } // Fetch newest first for pagination
     });
     
-    res.json(messages);
+    // We reverse the array because chat UIs typically display oldest at top, newest at bottom
+    res.json(messages.reverse());
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }

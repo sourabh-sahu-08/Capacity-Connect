@@ -20,19 +20,22 @@ export const LearnerDashboard = () => {
 
   useEffect(() => {
     if (token) {
-      getCompetencyProfile(token).then(setProfile).catch(console.error);
-      
-      coursesApi.getRecommended().then(res => setRecommended(res.data)).catch(console.error);
-      enrollmentsApi.getMyEnrollments().then(res => setEnrollments(res.data)).catch(console.error);
-      
-      chatApi.getConversations().then(res => {
-        const count = res.data.reduce((acc: number, c: any) => {
-          return acc + (c.messages?.[0] && !c.messages[0].readAt && c.messages[0].senderId !== user?.id ? 1 : 0);
-        }, 0);
-        setUnreadCount(count);
-      }).catch(console.error);
+      Promise.all([
+        getCompetencyProfile(token).catch(() => null),
+        coursesApi.getRecommended().then(res => res.data).catch(() => []),
+        enrollmentsApi.getMyEnrollments().then(res => res.data).catch(() => []),
+        chatApi.getConversations().then(res => res.data).catch(() => [])
+      ]).then(([p, r, e, c]) => {
+        if (p) setProfile(p);
+        if (r) setRecommended(r);
+        if (e) setEnrollments(e);
+        if (c) {
+          const count = c.reduce((acc, chat) => acc + (chat.messages?.[0] && !chat.messages[0].readAt && chat.messages[0].senderId !== user?.id ? 1 : 0), 0);
+          setUnreadCount(count);
+        }
+      });
     }
-  }, [token, user]);
+  }, [token, user?.id]);
 
   const overallScore = profile ? Math.round(profile.overallScore) : 0;
   

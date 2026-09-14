@@ -37,7 +37,7 @@ const mockData = {
 };
 
 export const TrainerOverview = () => {
-  const { user } = useAuthStore();
+  const user = useAuthStore(state => state.user);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

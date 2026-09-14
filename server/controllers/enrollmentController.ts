@@ -117,16 +117,35 @@ export const getLearnersForTrainer = async (req: AuthRequest, res: Response): Pr
     const trainerId = req.user?.id;
     if (!trainerId) return;
     
-    const enrollments = await prisma.enrollment.findMany({
-      where: { trainerId },
-      include: {
-        learner: { select: { id: true, name: true, avatar: true } },
-        course: { select: { title: true } }
-      },
-      orderBy: { lastActivityAt: 'desc' }
-    });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const skip = (page - 1) * limit;
+
+    const [enrollments, total] = await Promise.all([
+      prisma.enrollment.findMany({
+        where: { trainerId },
+        skip,
+        take: limit,
+        include: {
+          learner: { select: { id: true, name: true, avatar: true } },
+          course: { select: { title: true } }
+        },
+        orderBy: { lastActivityAt: 'desc' }
+      }),
+      prisma.enrollment.count({ where: { trainerId } })
+    ]);
     
-    res.json(enrollments);
+    res.json({
+      data: enrollments,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: skip + limit < total,
+        hasPreviousPage: page > 1
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }

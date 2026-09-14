@@ -2,41 +2,40 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { chatApi } from '../../api/courses.api';
 import { Send, User, ChevronLeft, MessageCircle } from 'lucide-react';
-import { io, Socket } from 'socket.io-client';
+import { useSocket } from '../../hooks/useSocket';
 
 export const MessagingWorkspace = () => {
-  const { user, token } = useAuthStore();
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
   const [conversations, setConversations] = useState<any[]>([]);
   const [activeConversation, setActiveConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socket = useSocket(token);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Fetch conversations
     chatApi.getConversations().then(res => setConversations(res.data)).catch(console.error);
-
-    // Init Socket
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-      auth: { token }
-    });
-    setSocket(newSocket);
-
-    newSocket.on('message:new', (msg) => {
+  }, [token]);
+  
+  useEffect(() => {
+    if (!socket) return;
+    const messageHandler = (msg: any) => {
       setMessages(prev => [...prev, msg]);
-      // Update conversations preview
       setConversations(prev => prev.map(c => 
         c.id === msg.conversationId 
           ? { ...c, lastMessagePreview: msg.content, lastMessageAt: msg.createdAt }
           : c
       ));
-    });
+    };
+
+    socket.on('message:new', messageHandler);
 
     return () => {
-      newSocket.disconnect();
+      socket.off('message:new', messageHandler);
     };
-  }, [token]);
+  }, [socket]);
 
   useEffect(() => {
     if (activeConversation) {

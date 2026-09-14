@@ -108,16 +108,35 @@ export const getCourses = async (req: AuthRequest, res: Response): Promise<void>
       query = { trainerId: req.user.id };
     }
 
-    const courses = await prisma.course.findMany({ 
-      where: query, 
-      include: { 
-        trainer: { select: { name: true, avatar: true } },
-        courseSkills: { include: { skill: true } }
-      }, 
-      orderBy: { createdAt: 'desc' } 
-    });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const skip = (page - 1) * limit;
+
+    const [courses, total] = await Promise.all([
+      prisma.course.findMany({ 
+        where: query,
+        skip,
+        take: limit,
+        include: { 
+          trainer: { select: { name: true, avatar: true } },
+          courseSkills: { include: { skill: true } }
+        }, 
+        orderBy: { createdAt: 'desc' } 
+      }),
+      prisma.course.count({ where: query })
+    ]);
       
-    res.json(courses);
+    res.json({
+      data: courses,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: skip + limit < total,
+        hasPreviousPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('getCourses Error:', error);
     res.status(500).json({ message: 'Server Error' });
