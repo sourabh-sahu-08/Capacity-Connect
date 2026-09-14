@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { ArrowRight, ChevronRight, Sparkles, BookOpen } from 'lucide-react';
@@ -112,7 +112,7 @@ export const LearnerDashboard = () => {
                   <span key={s} className="text-xs font-medium px-2 py-1 bg-white border border-violet-200 text-violet-700 rounded-full">{s}</span>
                 ))}
               </div>
-              <button onClick={() => navigate(`/courses/${topRecommendation.course.id}`)} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all shadow-sm">
+              <button onClick={() => navigate(`/courses/${topRecommendation.course.id}`)} className="group flex items-center gap-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-700 text-white px-8 py-4 rounded-full transition-all">
                 <span className="text-sm font-bold tracking-widest uppercase">View Course</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>

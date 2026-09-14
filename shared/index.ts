@@ -6,7 +6,7 @@ export enum Role {
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: Role;
@@ -27,7 +27,7 @@ export interface UserProfile {
 }
 
 export interface Competency {
-  _id: string;
+  id: string;
   name: string;
   category: string;
   description?: string;
@@ -40,7 +40,7 @@ export interface UserCompetency {
 }
 
 export interface Course {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   instructor: string | User;
@@ -54,14 +54,14 @@ export interface Course {
 }
 
 export interface Module {
-  _id: string;
+  id: string;
   title: string;
   order: number;
   lessons: Lesson[];
 }
 
 export interface Lesson {
-  _id: string;
+  id: string;
   title: string;
   order: number;
   content: string;
@@ -76,7 +76,7 @@ export interface Resource {
 }
 
 export interface Assessment {
-  _id: string;
+  id: string;
   courseId?: string;
   title: string;
   questions: Question[];
@@ -87,7 +87,7 @@ export interface Assessment {
 }
 
 export interface Question {
-  _id: string;
+  id: string;
   text: string;
   type: 'MCQ' | 'Scenario' | 'ShortAnswer';
   options?: string[];
@@ -95,7 +95,7 @@ export interface Question {
 }
 
 export interface LearningProgress {
-  _id: string;
+  id: string;
   userId: string;
   courseId: string;
   completedLessons: string[]; // Lesson IDs
@@ -106,7 +106,7 @@ export interface LearningProgress {
 }
 
 export interface LearningPath {
-  _id: string;
+  id: string;
   userId: string;
   targetRole: string;
   skillsGap: Array<{ skill: string; gap: number; priority: 'HIGH' | 'MEDIUM' | 'LOW' }>;
@@ -115,7 +115,7 @@ export interface LearningPath {
 }
 
 export interface CommunityPost {
-  _id: string;
+  id: string;
   author: string | User;
   content: string;
   tags: string[];
@@ -125,14 +125,14 @@ export interface CommunityPost {
 }
 
 export interface Comment {
-  _id: string;
+  id: string;
   author: string | User;
   content: string;
   createdAt: string;
 }
 
 export interface Certificate {
-  _id: string;
+  id: string;
   userId: string;
   courseId: string;
   certificateId: string;
@@ -141,7 +141,7 @@ export interface Certificate {
 }
 
 export interface Achievement {
-  _id: string;
+  id: string;
   userId: string;
   title: string;
   description: string;
@@ -150,7 +150,7 @@ export interface Achievement {
 }
 
 export interface Notification {
-  _id: string;
+  id: string;
   userId: string;
   title: string;
   message: string;
@@ -160,7 +160,7 @@ export interface Notification {
 }
 
 export interface Skill {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   category: 'technical' | 'analytical' | 'communication' | 'leadership' | 'creative';
@@ -172,7 +172,7 @@ export interface Skill {
 }
 
 export interface RoleRequirement {
-  _id: string;
+  id: string;
   roleName: string;
   skills: Array<{
     skillId: string | Skill;
@@ -183,7 +183,7 @@ export interface RoleRequirement {
 }
 
 export interface CompetencyProfile {
-  _id: string;
+  id: string;
   userId: string;
   overallScore: number;
   roleReadiness: {
@@ -210,7 +210,7 @@ export interface CompetencyProfile {
 }
 
 export interface CompetencySnapshot {
-  _id: string;
+  id: string;
   userId: string;
   overallScore: number;
   competencyDNA: {
@@ -230,7 +230,7 @@ export interface CompetencySnapshot {
 }
 
 export interface CompetencyEvidence {
-  _id: string;
+  id: string;
   userId: string;
   skillId: string;
   source: 'assessment' | 'course' | 'challenge' | 'trainer_review';
@@ -241,7 +241,7 @@ export interface CompetencyEvidence {
 }
 
 export interface InsightEvent {
-  _id: string;
+  id: string;
   userId: string;
   organizationId?: string;
   type: 'COMPETENCY_IMPROVED' | 'READINESS_INCREASED' | 'CRITICAL_GAP_DETECTED' | 'LEARNING_PATH_UPDATED' | 'LEARNER_AT_RISK';
