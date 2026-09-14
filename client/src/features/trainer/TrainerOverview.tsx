@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Link } from 'react-router-dom';
+import { getCourses } from '../../api/trainerApi';
 
 const mockData = {
   kpis: {
@@ -39,10 +40,16 @@ const mockData = {
 export const TrainerOverview = () => {
   const user = useAuthStore(state => state.user);
   const [loading, setLoading] = useState(true);
+  const [realCourses, setRealCourses] = useState<any[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
+    getCourses().then(data => {
+      setRealCourses(data.slice(0, 3));
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -125,25 +132,32 @@ export const TrainerOverview = () => {
           <Link to="/trainer/courses" className="text-[10px] font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Courses ?</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {mockData.courses.map(course => (
+          {realCourses.length > 0 ? realCourses.map(course => (
             <Link key={course.id} to={`/trainer/courses/${course.id}`} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:border-purple-300 hover:shadow-md transition-all cursor-pointer">
-              <h3 className="font-bold text-slate-900 mb-4">{course.name}</h3>
+              <h3 className="font-bold text-slate-900 mb-4">{course.title}</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1">Learners</p>
-                  <p className="text-lg font-medium text-slate-900">{course.learners}</p>
+                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1">Level</p>
+                  <p className="text-lg font-medium text-slate-900 capitalize">{course.difficulty?.toLowerCase() || 'beginner'}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1">Completion</p>
-                  <p className="text-lg font-medium text-slate-900">{course.completion}%</p>
+                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1">Status</p>
+                  <p className="text-lg font-medium text-slate-900 capitalize">{course.status}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${course.completion > 80 ? 'bg-emerald-500' : course.completion < 50 ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
-                <span className="text-xs font-medium text-slate-600">{course.status}</span>
+                <span className={`w-2 h-2 rounded-full ${course.status === 'PUBLISHED' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+                <span className="text-xs font-medium text-slate-600">{course.status === 'PUBLISHED' ? 'Live' : 'Draft'}</span>
               </div>
             </Link>
-          ))}
+          )) : (
+            <div className="col-span-3 text-center py-10 bg-slate-50 border border-slate-200 rounded-xl">
+              <p className="text-sm font-medium text-slate-500 mb-4">No courses created yet.</p>
+              <Link to="/trainer/courses/new" className="px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-purple-700 shadow-sm">
+                Create Course
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
