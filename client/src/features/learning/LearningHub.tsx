@@ -13,7 +13,6 @@ export const LearningHub = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('ALL');
-  const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([
