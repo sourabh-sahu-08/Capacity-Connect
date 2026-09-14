@@ -127,7 +127,7 @@ export const TrainerOnboarding = () => {
             
             <h2 className="text-2xl font-bold text-slate-900 mt-8 pt-4 border-t border-slate-100">How many learners do you typically manage?</h2>
             <div className="grid grid-cols-2 gap-3">
-              {['1�20', '20�50', '50�100', '100+'].map((num) => (
+              {['1-20', '20-50', '50-100', '100+'].map((num) => (
                 <button
                   key={num}
                   onClick={() => { setLearners(num); nextStep(); }}

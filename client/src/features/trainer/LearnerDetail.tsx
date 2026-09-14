@@ -16,7 +16,7 @@ export const LearnerDetail = () => {
       <header className="border-b border-slate-200 pb-6 flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Learner {id} Profile</h1>
-          <p className="text-sm text-slate-500">Frontend Architecture � Joined Jan 2026</p>
+          <p className="text-sm text-slate-500">Frontend Architecture • Joined Jan 2026</p>
         </div>
         <button className="px-4 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-sm font-bold tracking-widest uppercase border border-purple-200">
           Message Learner
