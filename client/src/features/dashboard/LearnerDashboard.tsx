@@ -30,7 +30,7 @@ export const LearnerDashboard = () => {
         if (r) setRecommended(r);
         if (e) setEnrollments(e);
         if (c) {
-          const count = c.reduce((acc, chat) => acc + (chat.messages?.[0] && !chat.messages[0].readAt && chat.messages[0].senderId !== user?.id ? 1 : 0), 0);
+          const count = c.reduce((acc: number, chat: any) => acc + (chat.messages?.[0] && !chat.messages[0].readAt && chat.messages[0].senderId !== user?.id ? 1 : 0), 0);
           setUnreadCount(count);
         }
       });

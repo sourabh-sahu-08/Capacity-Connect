@@ -170,7 +170,7 @@ export const TrainerOnboarding = () => {
             <div className="pt-6">
               <button
                 onClick={handleFinish}
-                className="w-full py-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-lg"
+                className="w-full py-4 bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)] text-white hover:bg-purple-700 rounded-xl font-bold transition-colors"
               >
                 Complete Onboarding
               </button>
@@ -202,7 +202,7 @@ export const TrainerOnboarding = () => {
               </div>
             ))}
           </div>
-          <div className="min-h-[400px]">
+          <div className="min-h-100">
             <AnimatePresence mode="wait">
               {renderStepContent()}
             </AnimatePresence>

@@ -35,7 +35,7 @@ export const LearnerDetail = () => {
         ))}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-8 min-h-[400px] flex items-center justify-center text-slate-500">
+      <div className="bg-white border border-slate-200 rounded-xl p-8 min-h-100 flex items-center justify-center text-slate-500">
         <div className="text-center">
           <p className="font-medium text-slate-900">{activeTab} Content</p>
           <p className="text-sm mt-1">Detailed view for this section goes here.</p>
