@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { NotificationBell } from '../notifications/NotificationBell';
-import { CircleHelp, Search, Settings, Trophy, UserRound } from 'lucide-react';
+import { CircleHelp, Search, Settings, Trophy, UserRound, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const TopHeader = () => {
-  const { user } = useAuthStore();
+  const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
 
