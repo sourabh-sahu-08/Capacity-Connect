@@ -83,7 +83,7 @@ export const gradeAttempt = async (req: AuthRequest, res: Response): Promise<voi
     
     const attempt = await prisma.assessmentAttempt.findUnique({ 
       where: { id: attemptId },
-      include: { assessment: true }
+      include: { assessment: { include: { course: { include: { courseSkills: { include: { skill: true } } } } } } }
     });
     
     if (!attempt || attempt.trainerId !== trainerId) {
@@ -101,9 +101,42 @@ export const gradeAttempt = async (req: AuthRequest, res: Response): Promise<voi
         gradedBy: trainerId as string
       }
     });
+
+    // --- INTEGRATION: COMPETENCY UPDATE ---
+    if (score >= (attempt.assessment.passingScore || 0) && attempt.assessment.course) {
+      let profile = await prisma.competencyProfile.findUnique({ where: { userId: attempt.learnerId } });
+      if (!profile) {
+        profile = await prisma.competencyProfile.create({ data: { userId: attempt.learnerId, overallScore: 50, readinessScore: 50 } });
+      }
+
+      const boost = (score / 100) * 5; 
+      const newScore = Math.min(Math.round(profile.overallScore + boost), 100);
+
+      await prisma.competencyProfile.update({
+        where: { id: profile.id },
+        data: { overallScore: newScore }
+      });
+      
+      const { getIO } = require('../socket');
+      const io = getIO();
+      if (io) {
+          io.to(`user:${attempt.learnerId}`).emit('competency:updated', { newScore });
+          
+          // Also emit notification
+          io.to(`user:${attempt.learnerId}`).emit('notification:new', {
+              id: 'notif-' + attemptId,
+              title: 'Assessment Graded',
+              message: `Your assessment for ${attempt.assessment.title} was graded: ${score}%. Your capability score improved!`,
+              type: 'SUCCESS',
+              read: false,
+              createdAt: new Date()
+          });
+      }
+    }
     
     res.json(graded);
   } catch (error) {
+    console.error('gradeAttempt error', error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

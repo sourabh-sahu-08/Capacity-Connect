@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { getManagerOverview, getAttentionQueue } from '../../api/intelligenceApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, AlertTriangle, ShieldAlert, Target, Activity, 
@@ -38,12 +39,23 @@ const executiveData = {
 };
 
 export const ManagerOverview = () => {
-  const { user } = useAuthStore();
+  const user = useAuthStore(state => state.user);
   const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+  const [queue, setQueue] = useState<any[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 700);
-    return () => clearTimeout(timer);
+    Promise.all([
+      getManagerOverview(),
+      getAttentionQueue()
+    ]).then(([overviewRes, queueRes]) => {
+      setData(overviewRes);
+      setQueue(queueRes);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -68,12 +80,12 @@ export const ManagerOverview = () => {
       {/* 2. ORGANIZATION HEALTH OVERVIEW */}
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { label: 'Active Workforce', value: executiveData.health.activeLearners },
-          { label: 'Avg Competency', value: `${executiveData.health.avgCompetency}%` },
-          { label: 'Workforce Readiness', value: `${executiveData.health.readiness}%` },
-          { label: 'Completion Rate', value: `${executiveData.health.completion}%` },
-          { label: 'Teams At Risk', value: executiveData.health.teamsAtRisk, alert: true },
-          { label: 'Critical Gaps', value: executiveData.health.criticalGaps, alert: true }
+          { label: 'Active Workforce', value: data?.totalActiveLearners || 0 },
+          { label: 'Avg Competency', value: `${Math.round(data?.averageCompetency || 0)}%` },
+          { label: 'Workforce Readiness', value: `${data?.learningVelocity || '0'}%` },
+          { label: 'Completion Rate', value: `${0}%` },
+          { label: 'Teams At Risk', value: 0, alert: true },
+          { label: 'Critical Gaps', value: 0, alert: true }
         ].map((kpi, idx) => (
           <div key={idx} className={`bg-white border ${kpi.alert ? 'border-amber-200' : 'border-slate-200'} rounded-lg p-3 flex flex-col justify-center shadow-sm`}>
             <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1">{kpi.label}</span>
@@ -95,15 +107,15 @@ export const ManagerOverview = () => {
             <div key={item.id} className="bg-white border border-rose-200 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
               <div className="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
               <div className="flex justify-between items-start mb-2 pl-2">
-                <span className="text-[10px] font-bold tracking-widest text-rose-600 uppercase">{item.target}</span>
-                <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded ${item.risk === 'HIGH' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
-                  {item.risk} RISK
+                <span className="text-[10px] font-bold tracking-widest text-rose-600 uppercase">{item.learner || 'Unknown Learner'}</span>
+                <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded ${item.riskScore > 80 ? 'HIGH' : 'MEDIUM' === 'HIGH' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {item.riskScore > 80 ? 'HIGH' : 'MEDIUM'} RISK
                 </span>
               </div>
-              <p className="text-sm font-medium text-slate-900 mb-4 pl-2 leading-relaxed">{item.issue}</p>
+              <p className="text-sm font-medium text-slate-900 mb-4 pl-2 leading-relaxed">{item.reason || 'Skill gap detected'}</p>
               <div className="pl-2 mt-auto">
                 <button className="text-[10px] font-bold tracking-widest uppercase text-slate-500 group-hover:text-rose-600 transition-colors flex items-center gap-1">
-                  {item.actionLabel} <ArrowRight size={12} />
+                  {item.recommendedIntervention || 'Review'} <ArrowRight size={12} />
                 </button>
               </div>
             </div>

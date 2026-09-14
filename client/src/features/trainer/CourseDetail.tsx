@@ -32,13 +32,13 @@ export const CourseDetail = () => {
       await publishCourse(id as string);
       await fetchCourse();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to publish');
+      alert(`Validation Error: ${err.response?.data?.message || 'Failed to publish course. Ensure you have added skills, modules, and lessons.'}`);
     } finally {
       setPublishing(false);
     }
   };
 
-  if (loading) return <div className="p-20 text-center">Loading...</div>;
+  if (loading) return <div className="p-20 text-center flex flex-col items-center gap-4"><div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>Loading Course...</div>;
   if (!course) return <div className="p-20 text-center">Course not found</div>;
 
   return (
