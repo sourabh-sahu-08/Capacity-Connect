@@ -56,6 +56,15 @@ export const submitAttempt = async (req: AuthRequest, res: Response): Promise<vo
       res.status(403).json({ message: 'Must be enrolled to submit' });
       return;
     }
+
+    const existingAttempt = await prisma.assessmentAttempt.findFirst({
+      where: { assessmentId, learnerId: learnerId as string }
+    });
+
+    if (existingAttempt) {
+      res.status(400).json({ message: 'You have already submitted this assessment.' });
+      return;
+    }
     
     const attempt = await prisma.assessmentAttempt.create({
       data: {
