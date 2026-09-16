@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useNotificationStore } from '../../features/notifications/notificationStore';
 import type { Notification } from './notificationStore';
@@ -30,8 +30,8 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       
       const [notifsRes, countRes] = await Promise.all([
-        axios.get(\/api/notifications?limit=10, { headers: { Authorization: \Bearer \\ } }),
-        axios.get(\/api/notifications/unread-count, { headers: { Authorization: \Bearer \\ } })
+        axios.get(`${apiURL}/api/notifications?limit=10`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${apiURL}/api/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       setNotifications(notifsRes.data.notifications);
