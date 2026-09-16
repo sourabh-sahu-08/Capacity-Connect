@@ -1,16 +1,18 @@
-// @ts-nocheck
-import React, { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useNotificationStore } from '../../features/notifications/notificationStore';
 import type { Notification } from './notificationStore';
 import { useAuthStore } from '../../store/authStore';
 import { NotificationToast } from '../../components/notifications/NotificationToast';
 import { AnimatePresence } from 'framer-motion';
+import { useSocket } from '../../hooks/useSocket';
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-  const { token, isAuthenticated } = useAuthStore();
-  const socketRef = useRef<Socket | null>(null);
+  const token = useAuthStore(state => state.token);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  
+  const socket = useSocket(token);
+  
   const [activeToast, setActiveToast] = useState<Notification | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -18,7 +20,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     setNotifications,
     addNotification,
     setUnreadCount,
-    incrementUnreadCount,
     setSocketConnected,
     reset
   } = useNotificationStore();
@@ -29,8 +30,8 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       
       const [notifsRes, countRes] = await Promise.all([
-        axios.get(`${apiURL}/api/notifications?limit=10`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${apiURL}/api/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(\/api/notifications?limit=10, { headers: { Authorization: \Bearer \\ } }),
+        axios.get(\/api/notifications/unread-count, { headers: { Authorization: \Bearer \\ } })
       ]);
 
       setNotifications(notifsRes.data.notifications);
@@ -43,59 +44,53 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (isAuthenticated && token) {
       fetchInitialData();
-
-      const socketURL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      
-      socketRef.current = io(socketURL, {
-        auth: { token },
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000
-      });
-
-      const socket = socketRef.current;
-
-      socket.on('connect', () => {
-        setSocketConnected(true);
-        // On reconnection, we might have missed events. Re-sync via REST.
-        fetchInitialData();
-      });
-
-      socket.on('disconnect', () => {
-        setSocketConnected(false);
-      });
-
-      socket.on('notification:new', (notification: Notification) => {
-        addNotification(notification);
-        
-        // Show Toast for medium+ priorities
-        if (['MEDIUM', 'HIGH', 'CRITICAL'].includes(notification.priority)) {
-          setActiveToast(notification);
-          if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-          toastTimeoutRef.current = setTimeout(() => {
-            setActiveToast(null);
-          }, 5000);
-        }
-      });
-
-      socket.on('notification:count_updated', (data: { unreadCount: number }) => {
-        setUnreadCount(data.unreadCount);
-      });
-
-      return () => {
-        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-        socket.disconnect();
-        reset();
-      };
     } else {
-      // User logged out
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
       reset();
     }
   }, [isAuthenticated, token]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onConnect = () => {
+      setSocketConnected(true);
+      fetchInitialData();
+    };
+
+    const onDisconnect = () => {
+      setSocketConnected(false);
+    };
+
+    const onNewNotification = (notification: Notification) => {
+      addNotification(notification);
+      
+      setActiveToast(notification);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => {
+        setActiveToast(null);
+      }, 5000);
+    };
+
+    const onCountUpdated = (data: { unreadCount: number }) => {
+      setUnreadCount(data.unreadCount);
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('notification:new', onNewNotification);
+    socket.on('notification:count_updated', onCountUpdated);
+
+    if (socket.connected) {
+      setSocketConnected(true);
+    }
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('notification:new', onNewNotification);
+      socket.off('notification:count_updated', onCountUpdated);
+    };
+  }, [socket]);
 
   return (
     <>

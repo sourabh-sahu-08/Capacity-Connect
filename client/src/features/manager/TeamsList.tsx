@@ -1,14 +1,27 @@
-// @ts-nocheck
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ShieldAlert } from 'lucide-react';
+import { getTeams } from '../../api/intelligenceApi';
 
 export const TeamsList = () => {
+  const [teams, setTeams] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTeams().then(res => {
+      setTeams(res);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="space-y-6 pb-32">
       <header className="border-b border-slate-200 pb-6">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Teams</h1>
-        <p className="text-sm text-slate-500">Monitor capability and readiness across all departments.</p>
+        <p className="text-sm text-slate-500">Monitor capability and readiness grouped by current role.</p>
       </header>
 
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -30,24 +43,27 @@ export const TeamsList = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {[
-              { id: 1, name: 'Engineering', m: 124, comp: 78, read: 72, risk: 'Low' },
-              { id: 2, name: 'Product', m: 42, comp: 64, read: 58, risk: 'High' }
-            ].map(team => (
-              <tr key={team.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4">
-                  <Link to={`/manager/teams/${team.id}`} className="font-bold text-slate-900 hover:text-purple-600 transition-colors">{team.name}</Link>
-                </td>
-                <td className="px-6 py-4 text-slate-500">{team.m}</td>
-                <td className="px-6 py-4 text-slate-900 font-medium">{team.comp}%</td>
-                <td className="px-6 py-4 text-slate-900 font-medium">{team.read}%</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded ${team.risk === 'High' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>
-                    {team.risk} Risk
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading teams...</td></tr>
+            ) : teams.length === 0 ? (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-500">No teams found in the organization.</td></tr>
+            ) : (
+              teams.map(team => (
+                <tr key={team.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4">
+                    <Link to={`/manager/teams/${team.id}`} className="font-bold text-slate-900 hover:text-purple-600 transition-colors">{team.name}</Link>
+                  </td>
+                  <td className="px-6 py-4 text-slate-500">{team.m}</td>
+                  <td className="px-6 py-4 text-slate-900 font-medium">{team.comp}%</td>
+                  <td className="px-6 py-4 text-slate-900 font-medium">{team.read}%</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded ${team.risk === 'High' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                      {team.risk} Risk
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

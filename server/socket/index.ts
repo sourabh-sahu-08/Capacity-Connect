@@ -52,6 +52,20 @@ export const initializeSocket = (io: Server) => {
         const conv = await prisma.conversation.findUnique({ where: { id: data.conversationId } });
         if (!conv || (conv.learnerId !== user.id && conv.trainerId !== user.id)) return;
         
+        // Strict Authorization: Verify valid active/completed enrollment exists
+        const enrollment = await prisma.enrollment.findFirst({
+          where: { 
+            learnerId: conv.learnerId, 
+            trainerId: conv.trainerId,
+            status: { in: ['ENROLLED', 'IN_PROGRESS', 'COMPLETED'] }
+          }
+        });
+
+        if (!enrollment) {
+          socket.emit('error', { message: 'Not authorized to chat. Valid enrollment required.' });
+          return;
+        }
+
         // Save message
         const message = await prisma.message.create({
           data: {
