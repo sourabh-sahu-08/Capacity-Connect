@@ -146,27 +146,27 @@ export interface WorkforceReadinessItem {
 
 export const managerApi = {
   getOverview: async () => {
-    const res = await api.get('/api/manager/overview');
+    const res = await api.get('/api/v1/manager/overview');
     return res.data;
   },
   getQueue: async () => {
-    const res = await api.get('/api/manager/attention-queue');
+    const res = await api.get('/api/v1/manager/attention-queue');
     return res.data;
   },
   getCapabilityMatrix: async (): Promise<CapabilityMatrixResponse> => {
-    const res = await api.get('/api/manager/capability-matrix');
+    const res = await api.get('/api/v1/manager/capability-matrix');
     return res.data;
   },
   getRoles: async (): Promise<RoleRequirementItem[]> => {
-    const res = await api.get('/api/manager/roles');
+    const res = await api.get('/api/v1/manager/roles');
     return res.data;
   },
   simulateMobility: async (targetRoleId: string, minThreshold = 0): Promise<TalentMobilityResponse> => {
-    const res = await api.post('/api/manager/simulate-mobility', { targetRoleId, minThreshold });
+    const res = await api.post('/api/v1/manager/simulate-mobility', { targetRoleId, minThreshold });
     return res.data;
   },
   getWorkforceReadiness: async (): Promise<WorkforceReadinessItem[]> => {
-    const res = await api.get('/api/manager/readiness');
+    const res = await api.get('/api/v1/manager/readiness');
     return res.data;
   }
 };
