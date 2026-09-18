@@ -6,6 +6,9 @@ import { Server } from 'socket.io';
 import authRoutes from './routes/auth';
 import onboardingRoutes from './routes/onboarding';
 import notificationRoutes from './routes/notifications';
+import gamificationRoutes from './routes/gamification';
+import usersRoutes from './routes/users';
+import errorMiddleware from './middleware/errorMiddleware';
 import { initializeSocket } from './socket';
 import prisma from './config/prisma';
 
@@ -31,12 +34,16 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/gamification', gamificationRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/v1/competency', require('./routes/competency').default);
 app.use('/api/v1/manager', require('./routes/manager').default);
 app.use('/api/courses', require('./routes/courses').default);
 app.use('/api/assessments', require('./routes/assessments').default);
 app.use('/api/enrollments', require('./routes/enrollments').default);
 app.use('/api/conversations', require('./routes/chat').default);
+
+app.use(errorMiddleware);
 
 app.get('/api/health', (req, res) => {
   res.json({
