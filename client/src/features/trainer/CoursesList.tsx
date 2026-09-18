@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Filter, X } from 'lucide-react';
-import { getCourses, createCourse } from '../../api/trainerApi';
+import { getCourseSummary, createCourse } from '../../api/trainerApi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const CoursesList = () => {
@@ -17,7 +17,7 @@ export const CoursesList = () => {
 
   const fetchCourses = async () => {
     try {
-      const data = await getCourses();
+      const data = await getCourseSummary();
       setCourses(data);
     } catch (err) {
       console.error(err);

@@ -10,9 +10,53 @@ interface AuthState {
   logout: () => void;
 }
 
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+
+const getCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null;
+  const entry = document.cookie.split('; ').find((value) => value.startsWith(`${name}=`));
+  return entry ? decodeURIComponent(entry.slice(name.length + 1)) : null;
+};
+
+const setCookie = (name: string, value: string, maxAge = AUTH_COOKIE_MAX_AGE) => {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; samesite=lax`;
+};
+
+const removeCookie = (name: string) => setCookie(name, '', 0);
+
+const syncAuthCookies = (user: User, token: string) => {
+  if (!hasAuthCookieConsent()) return;
+  setCookie('cc_token', token);
+  setCookie('cc_user', JSON.stringify(user));
+};
+
+export const hasAuthCookieConsent = () => getCookie('cc_cookie_consent') === 'accepted';
+
+export const setAuthCookieConsent = (accepted: boolean) => {
+  if (!accepted) {
+    removeCookie('cc_cookie_consent');
+    removeCookie('cc_token');
+    removeCookie('cc_user');
+    return;
+  }
+
+  setCookie('cc_cookie_consent', 'accepted', 60 * 60 * 24 * 365);
+  const token = getStoredToken();
+  const user = getStoredUser();
+  if (token && user) syncAuthCookies(user, token);
+};
+
 const getStoredUser = (): User | null => {
   try {
     const raw = localStorage.getItem('user');
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // Fall back to the cookie below when local storage is unavailable.
+  }
+
+  try {
+    const raw = getCookie('cc_user');
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -21,9 +65,9 @@ const getStoredUser = (): User | null => {
 
 const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem('token');
+    return localStorage.getItem('token') || getCookie('cc_token');
   } catch {
-    return null;
+    return getCookie('cc_token');
   }
 };
 
@@ -38,6 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      syncAuthCookies(user, token);
     } catch (e) {
       console.error('Failed to save auth to localStorage:', e);
     }
@@ -59,6 +104,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      removeCookie('cc_token');
+      removeCookie('cc_user');
     } catch (e) {
       console.error('Failed to remove auth from localStorage:', e);
     }

@@ -8,6 +8,7 @@ import { AppShell } from './components/layout/AppShell';
 import { TrainerLayout } from './layouts/TrainerLayout';
 import { ManagerLayout } from './layouts/ManagerLayout';
 import { NotificationProvider } from './features/notifications/NotificationProvider';
+import { CookieConsent } from './components/common/CookieConsent';
 
 // ─── Lazy-loaded route components ───────────────────────────────────────────
 // Auth
@@ -100,6 +101,7 @@ const IndexRedirect = () => {
 function App() {
   return (
     <BrowserRouter>
+      <CookieConsent />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Public */}

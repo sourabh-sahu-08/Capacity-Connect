@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Link } from 'react-router-dom';
-import { getCourses } from '../../api/trainerApi';
+import { getCourseSummary } from '../../api/trainerApi';
 
 const mockData = {
   kpis: {
@@ -43,7 +43,7 @@ export const TrainerOverview = () => {
   const [realCourses, setRealCourses] = useState<any[]>([]);
 
   useEffect(() => {
-    getCourses().then(data => {
+    getCourseSummary().then(data => {
       setRealCourses(data.slice(0, 3));
       setLoading(false);
     }).catch(err => {
@@ -51,14 +51,6 @@ export const TrainerOverview = () => {
       setLoading(false);
     });
   }, []);
-
-  if (loading) {
-    return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-10 pb-32">
@@ -132,7 +124,15 @@ export const TrainerOverview = () => {
           <Link to="/trainer/courses" className="text-[10px] font-bold tracking-widest text-purple-600 uppercase hover:text-purple-700">View All Courses ?</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {realCourses.length > 0 ? realCourses.map(course => (
+          {loading ? [1, 2, 3].map((course) => (
+            <div key={course} className="h-40 rounded-xl border border-slate-200 bg-white p-5 animate-pulse">
+              <div className="h-5 w-2/3 rounded bg-slate-100" />
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <div className="h-10 rounded bg-slate-100" />
+                <div className="h-10 rounded bg-slate-100" />
+              </div>
+            </div>
+          )) : realCourses.length > 0 ? realCourses.map(course => (
             <Link key={course.id} to={`/trainer/courses/${course.id}`} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:border-purple-300 hover:shadow-md transition-all cursor-pointer">
               <h3 className="font-bold text-slate-900 mb-4">{course.title}</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">

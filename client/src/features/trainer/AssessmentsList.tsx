@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Filter, FileText, X } from 'lucide-react';
-import { getAssessments, createAssessment, getCourses } from '../../api/trainerApi';
+import { getAssessments, createAssessment, getCourseSummary } from '../../api/trainerApi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const AssessmentsList = () => {
@@ -20,7 +20,7 @@ export const AssessmentsList = () => {
     try {
       const [assessmentsData, coursesData] = await Promise.all([
         getAssessments(),
-        getCourses()
+        getCourseSummary()
       ]);
       setAssessments(assessmentsData);
       setCourses(coursesData);

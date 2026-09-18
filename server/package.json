@@ -4,7 +4,9 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
+    "prebuild": "npm run build --workspace=shared",
     "start": "node dist/app.js",
+    "predev": "npm run build --workspace=shared",
     "dev": "nodemon app.ts",
     "build": "tsc",
     "seed": "ts-node seed.ts"

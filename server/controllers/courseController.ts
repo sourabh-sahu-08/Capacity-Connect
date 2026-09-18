@@ -111,18 +111,27 @@ export const getCourses = async (req: AuthRequest, res: Response): Promise<void>
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
     const skip = (page - 1) * limit;
+    const summary = req.query.summary === 'true';
 
     const [courses, total] = await Promise.all([
-      prisma.course.findMany({ 
-        where: query,
-        skip,
-        take: limit,
-        include: { 
-          trainer: { select: { name: true, avatar: true } },
-          courseSkills: { include: { skill: true } }
-        }, 
-        orderBy: { createdAt: 'desc' } 
-      }),
+      summary
+        ? prisma.course.findMany({
+            where: query,
+            skip,
+            take: limit,
+            select: { id: true, title: true, description: true, difficulty: true, status: true, createdAt: true },
+            orderBy: { createdAt: 'desc' }
+          })
+        : prisma.course.findMany({ 
+            where: query,
+            skip,
+            take: limit,
+            include: { 
+              trainer: { select: { name: true, avatar: true } },
+              courseSkills: { include: { skill: true } }
+            }, 
+            orderBy: { createdAt: 'desc' } 
+          }),
       prisma.course.count({ where: query })
     ]);
       

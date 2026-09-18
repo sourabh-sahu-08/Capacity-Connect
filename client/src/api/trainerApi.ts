@@ -5,6 +5,11 @@ export const getCourses = async () => {
   return response.data.data || response.data;
 };
 
+export const getCourseSummary = async () => {
+  const response = await api.get('/api/courses?myCourses=true&summary=true&limit=3');
+  return response.data.data || response.data;
+};
+
 export const createCourse = async (data: any) => {
   const response = await api.post('/api/courses', data);
   return response.data.data || response.data;
